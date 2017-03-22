@@ -1,0 +1,97 @@
+<MainScreen>:
+    BoxLayout:
+        Button:
+            text: '<-'
+            on_release:
+                root.manager.current = 'party'
+                root.manager.transition.direction = 'right'
+        BoxLayout:
+	        orientation: 'vertical'
+            Button:
+                text: 'hoch'
+                on_release: root.rolladen_hoch()
+            Label:
+                text: 'Rolladen ' + root.rolladen
+            Button:
+                text: 'runter'
+                on_release: root.rolladen_runter()
+        BoxLayout:
+	        orientation: 'vertical'
+            Label:
+                text: root.deckenlampe
+            Button:
+                id: btn_deckenlampe
+                text: 'Deckenlampe'
+                on_release: root.toggle_WzDeckenlampe()
+        BoxLayout:
+	        orientation: 'vertical'
+            Label:
+                text: root.stehlampe
+            Button:
+                id: WzStehlampe
+                text: 'Stehlampe'
+                on_release: root.toggle_WzStehlampe()
+        BoxLayout:
+	        orientation: 'vertical'
+        	Label:
+        	    text: root.rgb
+        	Label:
+        	    text: root.led_switch
+            Button:
+                id: led_switch_toggle
+                text: 'LED switch'
+                on_release: root.toggle_LEDswitch()
+        Button:
+            text: '->'
+            on_release:
+                root.manager.current = 'bad'
+                root.manager.transition.direction = 'left'
+<BathroomScreen>:
+    BoxLayout:
+        Button:
+            text: '<-'
+            on_release: 
+                root.manager.current = 'main'
+                root.manager.transition.direction = 'right'
+        BoxLayout:
+	        orientation: 'vertical'
+            BoxLayout:
+                Label:
+                    text: 'Temperatur'
+                Label:
+                    text: root.temp
+            BoxLayout:
+                Label:
+                    text: 'Luftfeuchtigkeit'
+                Label:
+                    text: root.hum
+            BoxLayout:
+                Label:
+                    text: 'Aktuator'
+                Label:
+                    text: root.actuator
+            BoxLayout:
+                Label:
+                    text: 'Fenster'
+                Label:
+                    text: root.window
+        Button:
+            text: '->'
+            on_release:
+                root.manager.current = 'party'
+                root.manager.transition.direction = 'left'
+<PartyScreen>:
+    BoxLayout:
+        Button:
+            text: '<-'
+            on_release:
+                root.manager.current = 'bad'
+                root.manager.transition.direction = 'right'
+        Label:
+            id: lbl_party
+            text: 'Party'
+        Button:
+            text: '->'
+            on_release:
+                root.manager.current = 'main'
+                root.manager.transition.direction = 'left'
