@@ -62,17 +62,22 @@
             text: root.window
 
 <SmartHomeTabbedPanel>:
-    id: sh_tab_panel
     do_default_tab: False
     tab_pos: 'top_left'
+    wohnzimmerItem: wohnzimmerItem
+    badItem: badItem
 
-    TabbedPanelItem:
-        id: tab_1
+    ExTabbedPanelItem:
+        id: wohnzimmerItem
         text: 'Wohnzimmer'
+        subwidget: smarthomewohnzimmer
         SmartHomeWohnzimmer:
+            id: smarthomewohnzimmer
 
-    TabbedPanelItem:
-        id: tab_2
+    ExTabbedPanelItem:
+        id: badItem
         #background_normal: 'gfx/home_r.png'
         text: 'Bad'
+        subwidget: smarthomebad
         SmartHomeBad:
+            id: smarthomebad

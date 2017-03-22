@@ -22,7 +22,8 @@
     canvas.after:
         PopMatrix
 
-<TabbedIconPanelItem@TabbedPanelItem>:
+#<TabbedIconPanelItem@TabbedPanelItem>:
+<TabbedIconPanelItem>:
     img: ''
     background_color: (0, 0, 0, 1)
     spacing: 20, 20, 20, 20
@@ -38,8 +39,6 @@
             size: root.size
             pos: self.pos
 
-<IncrediblyCrudeClock>:
-
 
 <HomeCtrlTabbedPanel>:
     do_default_tab: False
@@ -49,15 +48,21 @@
     tab_width: self.tab_height
     padding: 20, 0, 0, 0
     spacing: 20
+    size: (100,100)
+    weatherItem: weatherItem
+    musicItem: musicItem
+    smarthomeItem: smarthomeItem
 
     TabbedIconPanelItem:
-        id: tab_3
+        id: weatherItem
         img: 'gfx/weather_r.png'
         #text: 'Wetter'
+        subwidget: weatherWidget
         WeatherWidget:
+            id: weatherWidget
 
     TabbedIconPanelItem:
-        id: tab_2
+        id: musicItem
         img: 'gfx/music_r.png'
         #text: 'Entertainment'
         #Label:
@@ -66,17 +71,18 @@
 
 
     TabbedIconPanelItem:
-        id: tab_1
+        id: smarthomeItem
         img: 'gfx/home_r.png'
         #text: 'SmartHome'
+        subwidget: smartHomeWidget
         SmartHomeTabbedPanel:
-
+            id: smartHomeWidget
    
 <PongGame>:
     id: layout
     width: 100
-    HomeCtrlTabbedPanel:
-        id: sh_tab_panel
+#    HomeCtrlTabbedPanel:
+#        id: sh_tab_panel
 
 
 #    canvas:
