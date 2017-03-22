@@ -1,0 +1,33 @@
+<LCARSButton>:
+    background_color: (1.0, 0.0, 0.0, 1.0)
+
+<LCARSButton2>:
+    size_hint: (None, None)
+    size: (30, 30)
+    background_normal: ''
+    canvas:
+        Color:
+            rgba: (0, 1, 0, 1) # green
+        Ellipse:
+            size: 30, 30
+            pos: (self.x, self.y)
+        Rectangle:
+            size: 30, 15
+            pos: (self.x, self.y)
+
+<LCARSButton3>:
+    size_hint: (None, None)
+    size: (30, 30)
+    BoxLayout:
+        canvas:
+            Color:
+                rgba: (0, 1, 0, 1) # green
+            Ellipse:
+                size: 30, 30
+                pos: self.parent.pos
+            Rectangle:
+                size: 30, 15
+                pos: self.parent.pos
+        Button:
+            background_color: 0, 0, 0, 0
+            text: 'blob'

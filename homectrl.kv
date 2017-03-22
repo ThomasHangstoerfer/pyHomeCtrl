@@ -1,12 +1,13 @@
 #:kivy 1.0.9
 
-<LCARSButton>:
-    background_color: (1.0, 0.0, 0.0, 1.0)
+#:include smarthome.kv
+#:include lcarsbuttons.kv
+#:include weather.kv
 
 <TabbedPanelStrip>:
     canvas:
-        Color:
-            rgba: (0, 1, 0, 1) # green
+        #Color:
+        #    rgba: (0, 1, 0, 1) # green
         Rectangle:
             size: self.size
             pos: self.pos
@@ -37,69 +38,8 @@
             size: root.size
             pos: self.pos
 
-
-<SmartHomeTabbedPanel>:
-    id: sh_tab_panel
-    do_default_tab: False
-    tab_pos: 'top_left'
-
-    TabbedPanelItem:
-        id: tab_1
-        text: 'Wohnzimmer'
-        BoxLayout:
-            LCARSButton:
-                #on_press:   root.btn_new_on_press()
-                text: 'Stehlampe'
-            Button:
-                #on_press:  root.btn_close_on_press()
-                text: 'Deckenlampe'
-
-    TabbedPanelItem:
-        id: tab_2
-        background_normal: 'gfx/home_r.png'
-        text: 'Bad'
-        BoxLayout:
-            Label:
-                #on_press:   root.btn_new_on_press()
-                text: 'Temp'
-            Label:
-                #on_press:  root.btn_close_on_press()
-                text: 'Humidity'  
-
 <IncrediblyCrudeClock>:
 
-<LCARSButton2>:
-    size_hint: (None, None)
-    size: (30, 30)
-    background_normal: ''
-    canvas:
-        Color:
-            rgba: (0, 1, 0, 1) # green
-        Ellipse:
-            size: 30, 30
-            pos: (self.x, self.y)
-        Rectangle:
-            size: 30, 15
-            pos: (self.x, self.y)
-
-<LCARSButton3>:
-    size_hint: (None, None)
-    size: (30, 30)
-    BoxLayout:
-        canvas:
-            Color:
-                rgba: (0, 1, 0, 1) # green
-            Ellipse:
-                size: 30, 30
-                pos: self.parent.pos
-            Rectangle:
-                size: 30, 15
-                pos: self.parent.pos
-        Button:
-            background_color: 0, 0, 0, 0
-            text: 'blob'
-
-<WeatherWidget>:
 
 <HomeCtrlTabbedPanel>:
     do_default_tab: False
@@ -115,12 +55,6 @@
         img: 'gfx/weather_r.png'
         #text: 'Wetter'
         WeatherWidget:
-            AsyncImage:
-                source: self.parent.icon
-#                source: 'http://openweathermap.org/img/w/10d.png'
-
-    Widget:
-        text: 's'
 
     TabbedIconPanelItem:
         id: tab_2

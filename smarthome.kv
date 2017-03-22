@@ -1,0 +1,78 @@
+
+<SmartHomeWohnzimmer>:
+    BoxLayout:
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'hoch'
+                on_release: root.rolladen_hoch()
+            Label:
+                text: 'Rolladen ' + root.rolladen
+            Button:
+                text: 'runter'
+                on_release: root.rolladen_runter()
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: root.deckenlampe
+            Button:
+                id: btn_deckenlampe
+                text: 'Deckenlampe'
+                on_release: root.toggle_WzDeckenlampe()
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: root.stehlampe
+            Button:
+                id: WzStehlampe
+                text: 'Stehlampe'
+                on_release: root.toggle_WzStehlampe()
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: root.rgb
+            Label:
+                text: root.led_switch
+            Button:
+                id: led_switch_toggle
+                text: 'LED switch'
+                on_release: root.toggle_LEDswitch()
+
+<SmartHomeBad>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Temperatur'
+        Label:
+            text: root.temp
+    BoxLayout:
+        Label:
+            text: 'Luftfeuchtigkeit'
+        Label:
+            text: root.hum
+    BoxLayout:
+        Label:
+            text: 'Aktuator'
+        Label:
+            text: root.actuator
+    BoxLayout:
+        Label:
+            text: 'Fenster'
+        Label:
+            text: root.window
+
+<SmartHomeTabbedPanel>:
+    id: sh_tab_panel
+    do_default_tab: False
+    tab_pos: 'top_left'
+
+    TabbedPanelItem:
+        id: tab_1
+        text: 'Wohnzimmer'
+        SmartHomeWohnzimmer:
+
+    TabbedPanelItem:
+        id: tab_2
+        #background_normal: 'gfx/home_r.png'
+        text: 'Bad'
+        SmartHomeBad:
