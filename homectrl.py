@@ -235,6 +235,12 @@ class SimpleClock(Label):
         #self.text = time.asctime()
         self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
 
+class WifiState(Image):
+    source = 'gfx/wifi4.png'
+    def update(self, *args):
+        #self.text = time.asctime()
+        self.source = 'gfx/wifi4.png'
+
 class LCARSButton(Button):
     def on_release(self):
         print('RELEASE')
@@ -316,9 +322,12 @@ class HomeCtrlApp(App):
     def build(self):
         p = PongGame()
         p.add_widget(homectrlTabbedPanel)
-        simpleclock = SimpleClock(pos=(-10,-10), size_hint= (None, None) )
+        simpleclock = SimpleClock(pos=(-10,-20), size_hint= (None, None) )
         Clock.schedule_interval(simpleclock.update, 1)
         p.add_widget(simpleclock)
+        wifistate = WifiState(pos=(20,60), size=(30,30), size_hint= (None, None))
+        Clock.schedule_interval(wifistate.update, 5)
+        p.add_widget(wifistate)
 
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+"C"
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
