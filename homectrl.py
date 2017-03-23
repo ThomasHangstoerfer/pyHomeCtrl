@@ -91,14 +91,14 @@ class WeatherWidget(BoxLayout):
         print('forecast_redirect')
 
     def new_forecast_data(self,request,payload):
-        print(payload)
+        #print(payload)
         f = json.loads(payload.decode()) if not isinstance(payload,dict) else payload
         flist = f["list"]
         count = 0
         for index in range(len(flist)):
             dt_txt = flist[index]["dt_txt"]
             if ( dt_txt.endswith('12:00:00')):
-                print 'Current :', dt_txt
+                #print 'Current :', dt_txt
                 if ( count == 0 ):
                     self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_1.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
@@ -118,7 +118,7 @@ class WeatherWidget(BoxLayout):
         #self.forecast.forecast_1.wf_temp.text = f
 
     def new_weather_data(self,request,payload):
-        print(payload)
+        #print(payload)
         w = json.loads(payload.decode()) if not isinstance(payload,dict) else payload
         #w = json.loads(payload)
         weather = w["weather"]
@@ -129,7 +129,7 @@ class WeatherWidget(BoxLayout):
         #    self.ww_cur_cond_icon.source = 'gfx/'+ weather[0]["icon"] + '.png'
         #else:
         #    self.ww_cur_cond_icon.source = 'http://openweathermap.org/img/w/' + weather[0]["icon"] + '.png'
-        print(self.ww_cur_cond_icon.source)
+        #print(self.ww_cur_cond_icon.source)
         self.ww_temp.text = '{}°C'.format(int(w["main"]["temp"]))
         self.ww_temp_min_max.text = '{}°C / {}°C'.format(int(w["main"]["temp_min"]), int(w["main"]["temp_max"]) )
         self.ww_wind_speed.text = 'Wind: {} km/h'.format(int(w["wind"]["speed"]))
@@ -139,7 +139,7 @@ class WeatherForecastItemWidget(BoxLayout):
     wf_icon = ObjectProperty()
     wf_temp = ObjectProperty()
     def clear_widget(self):
-        print('WeatherForecastItemWidget.clear_widget()')
+        #print('WeatherForecastItemWidget.clear_widget()')
         self.wf_icon.source = ''
         self.wf_temp.text = ''
 
@@ -151,7 +151,7 @@ class WeatherForecastWidget(BoxLayout):
     forecast_3 = ObjectProperty()
     forecast_4 = ObjectProperty()
     def clear_widget(self):
-        print('WeatherForecastWidget.clear_widget()')
+        #print('WeatherForecastWidget.clear_widget()')
         self.forecast_1.clear_widget()
         self.forecast_2.clear_widget()
         self.forecast_3.clear_widget()
@@ -279,12 +279,6 @@ class LCARSButton3(Widget):
         print('LCARSButton3-RELEASE')
     pass
 
-class WeatherWidget(BoxLayout):
-    wwlabel = ObjectProperty()
-    icon = StringProperty()
-    icon = 'http://openweathermap.org/img/w/10d.png'
-    pass
-
 class ExTabbedPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
     pass
@@ -325,7 +319,8 @@ class HomeCtrlApp(App):
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = fh.get_dev_reading("BadFenster", "state")
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = fh.get_dev_reading("BadHeizung", "actuator")
-
+        homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
+        homectrlTabbedPanel.weatherItem.subwidget.update()
         return p
 
 

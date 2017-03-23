@@ -42,21 +42,24 @@
     		font_size: 15
 	WeatherForecastWidget:
 		id: forecast
-		size_hint: (0.75, None)
+		size_hint: (0.75, 1)
 
 <WeatherForecastItemWidget>:
 	orientation: 'vertical'
 	wf_temp: wf_temp
 	wf_icon: wf_icon
-#	ww_temp: ww_temp
-#	ww_temp_min_max: ww_temp_min_max
-#	ww_wind_speed: ww_wind_speed
 	Label:
-		id: wf_temp
 		text: ''
     Image:
     	id: wf_icon
     	size: (25, 25)
+	Label:
+		id: wf_temp
+		text: ''
+	Label:
+		text: ''
+	Label:
+		text: ''
 
 <WeatherForecastWidget>:
 	forecast_1: forecast_1
