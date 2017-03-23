@@ -97,18 +97,24 @@ class WeatherWidget(BoxLayout):
         count = 0
         for index in range(len(flist)):
             dt_txt = flist[index]["dt_txt"]
+
             if ( dt_txt.endswith('12:00:00')):
-                #print 'Current :', dt_txt
+                lt = time.localtime(flist[index]["dt"])
+                day = time.strftime("%a", lt)
                 if ( count == 0 ):
+                    self.forecast.forecast_1.wf_day.text = day
                     self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_1.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 1 ):
+                    self.forecast.forecast_2.wf_day.text = day
                     self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_2.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 2 ):
+                    self.forecast.forecast_3.wf_day.text = day
                     self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_3.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 3 ):
+                    self.forecast.forecast_4.wf_day.text = day
                     self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_4.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 4 ):
@@ -138,11 +144,11 @@ class WeatherWidget(BoxLayout):
 class WeatherForecastItemWidget(BoxLayout):
     wf_icon = ObjectProperty()
     wf_temp = ObjectProperty()
+    wf_day = ObjectProperty()
     def clear_widget(self):
-        #print('WeatherForecastItemWidget.clear_widget()')
         self.wf_icon.source = ''
         self.wf_temp.text = ''
-
+        self.wf_day.text = ''
     pass
 
 class WeatherForecastWidget(BoxLayout):
@@ -151,7 +157,6 @@ class WeatherForecastWidget(BoxLayout):
     forecast_3 = ObjectProperty()
     forecast_4 = ObjectProperty()
     def clear_widget(self):
-        #print('WeatherForecastWidget.clear_widget()')
         self.forecast_1.clear_widget()
         self.forecast_2.clear_widget()
         self.forecast_3.clear_widget()
