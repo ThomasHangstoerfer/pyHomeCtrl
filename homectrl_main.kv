@@ -6,11 +6,26 @@
 
 <TabbedPanelStrip>:
     canvas:
-        #Color:
-        #    rgba: (0, 1, 0, 1) # green
+        Color:
+            rgba: (0, 0, 0, 1)
         Rectangle:
             size: self.size
             pos: self.pos
+
+#<StripLayout>:
+#    #padding: 0, 50, 0, 0
+#    #spacing: [30, 30]
+
+#<TabbedPanelHeader>:
+    #height: 50
+    #width: 40
+    #padding: (70, 70)
+    #width: Window.size[0] / column_count / 2  # not used
+#    size_hint: None, None
+    #col_default_width: 80
+    #col_force_default: True
+    #row_default_width: 80
+    #row_force_default: True
 
 <RotatedImage>:
     canvas.before:
@@ -24,8 +39,11 @@
 
 <TabbedIconPanelItem>:
     img: ''
-#    background_color: (0, 0, 0, 1)
-    spacing: 20, 20, 20, 20
+    background_color: (0, 0, 0, 1)
+    #spacing: 20, 20, 20, 20
+    spacing: [10, 10]
+    size: (50,50)
+#    border: [30, 30, 30, 30]
 #    canvas.before:
 #        Color:
 #            rgba: 0, 0, 1, 1
@@ -35,7 +53,8 @@
     canvas:
         Rectangle:
             source: self.img
-            size: root.size
+            #size: self.size
+            size: (30,30)
             pos: self.pos
 
 
@@ -44,10 +63,11 @@
     tab_pos: 'left_mid'
     #tab_width: self.size[0]/len(self.tab_list)
     #tab_width: self.tab_list[0].img.width
-    tab_width: self.tab_height
+    #tab_width: self.tab_height
+    tab_width: self.width / 8
     padding: 20, 0, 0, 0
     spacing: 20
-    size: (100,100)
+    #size: (200,200)
     weatherItem: weatherItem
     musicItem: musicItem
     smarthomeItem: smarthomeItem
@@ -76,7 +96,7 @@
         SmartHomeTabbedPanel:
             id: smartHomeWidget
    
-<PongGame>:
+<HomeCtrl>:
     id: layout
     width: 100
 #    HomeCtrlTabbedPanel:

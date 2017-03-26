@@ -19,6 +19,9 @@ from thread import start_new_thread
 import time
 import json
 
+from upnp import *
+
+
 import fhem # https://github.com/domschl/python-fhem
 
 try:
@@ -47,7 +50,7 @@ class WeatherMain(BoxLayout):
     pass
 
 # {"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":7.34,"pressure":1012,"humidity":81,"temp_min":7,"temp_max":8},"visibility":10000,"wind":{"speed":3.1,"deg":20},"clouds":{"all":75},"dt":1490206800,"sys":{"type":1,"id":4921,"message":0.0033,"country":"DE","sunrise":1490160155,"sunset":1490204573},"id":2808802,"name":"Wilferdingen","cod":200}
-class WeatherWidget(BoxLayout):
+class WeatherWidget(FloatLayout):
     ww_city = ObjectProperty()
     ww_cur_cond_icon = ObjectProperty()
     ww_temp = ObjectProperty()
@@ -241,12 +244,6 @@ class WifiState(Image):
         #self.text = time.asctime()
         self.source = 'gfx/wifi4.png'
 
-class LCARSButton(Button):
-    def on_release(self):
-        print('RELEASE')
-    pass
-
-
 class SmartHomeBad(BoxLayout):
     temp = StringProperty()
     hum = StringProperty()
@@ -255,6 +252,9 @@ class SmartHomeBad(BoxLayout):
 
 
 class SmartHomeWohnzimmer(BoxLayout):
+    led_r = NumericProperty()
+    led_g = NumericProperty()
+    led_b = NumericProperty()
     rgb = StringProperty()
     led_switch = StringProperty()
     deckenlampe = StringProperty()
@@ -280,9 +280,20 @@ class SmartHomeWohnzimmer(BoxLayout):
         print('rolladen_runter')
         fh.send_cmd("set WzRolladen off")
 
+class LCARSButton(Button):
+    def on_release(self):
+        print('RELEASE')
+    pass
+
 class LCARSButton2(Button):
     def on_release(self):
         print('LCARSButton2-RELEASE')
+        client = upnp(None, None, None)
+        client.msearch('device', 'MediaRenderer')
+
+        #data = "M-SEARCH * HTTP/1.1\r\nHost:239.255.255.250:1900\r\n"
+        #client.findRequest(data, None, None)
+
     pass
 
 class LCARSButton3(Widget):
@@ -298,7 +309,7 @@ class TabbedIconPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
     pass
 
-class PongGame(FloatLayout):
+class HomeCtrl(FloatLayout):
     pass
 
 class SmartHomeTabbedPanel(TabbedPanel):
@@ -310,6 +321,12 @@ class HomeCtrlTabbedPanel(TabbedPanel):
     weatherItem = ObjectProperty()
     musicItem = ObjectProperty()
     smarthomeItem = ObjectProperty()
+    def __init__(self, *args, **kwargs):
+        super(HomeCtrlTabbedPanel, self).__init__(*args, **kwargs)
+        print('HIER')
+        #self.set_def_tab(self.tab_list[0])
+        #self.switch_to(self.musicItem)
+
     pass
 
 class RotatedImage(Image):
@@ -320,7 +337,7 @@ homectrlTabbedPanel = HomeCtrlTabbedPanel()
 
 class HomeCtrlApp(App):
     def build(self):
-        p = PongGame()
+        p = HomeCtrl()
         p.add_widget(homectrlTabbedPanel)
         simpleclock = SimpleClock(pos=(-10,-20), size_hint= (None, None) )
         Clock.schedule_interval(simpleclock.update, 1)

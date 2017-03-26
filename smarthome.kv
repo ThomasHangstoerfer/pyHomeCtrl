@@ -1,7 +1,11 @@
 
 <SmartHomeWohnzimmer>:
+    led_r: 0
+    led_g: 0
+    led_b: 1
     BoxLayout:
         BoxLayout:
+            padding: [20,20]
             orientation: 'vertical'
             Button:
                 text: 'hoch'
@@ -12,6 +16,7 @@
                 text: 'runter'
                 on_release: root.rolladen_runter()
         BoxLayout:
+            padding: [20,20]
             orientation: 'vertical'
             Label:
                 text: root.deckenlampe
@@ -19,7 +24,10 @@
                 id: btn_deckenlampe
                 text: 'Deckenlampe'
                 on_release: root.toggle_WzDeckenlampe()
+            Label:
+                text: ''
         BoxLayout:
+            padding: [20,20]
             orientation: 'vertical'
             Label:
                 text: root.stehlampe
@@ -27,16 +35,52 @@
                 id: WzStehlampe
                 text: 'Stehlampe'
                 on_release: root.toggle_WzStehlampe()
+            Label:
+                text: ''
         BoxLayout:
+            padding: [20,20]
             orientation: 'vertical'
             Label:
+                canvas:
+                    Color:
+                        rgba: root.led_r, root.led_g, root.led_b, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 text: root.rgb
-            Label:
-                text: root.led_switch
             Button:
                 id: led_switch_toggle
                 text: 'LED switch'
                 on_release: root.toggle_LEDswitch()
+            BoxLayout:
+                orientation: 'vertical'
+                BoxLayout:
+                    Button:
+                        text: '-'
+                        on_release: root.led_r -= 0.1
+                    Label:
+                        text: 'RED'
+                    Button:
+                        text: '+'
+                        on_release: root.led_r += 0.1
+                BoxLayout:
+                    Button:
+                        text: '-'
+                        on_release: root.led_g -= 0.1
+                    Label:
+                        text: 'GREEN'
+                    Button:
+                        text: '+'
+                        on_release: root.led_g += 0.1
+                BoxLayout:
+                    Button:
+                        text: '-'
+                        on_release: root.led_b -= 0.1
+                    Label:
+                        text: 'BLUE'
+                    Button:
+                        text: '+'
+                        on_release: root.led_b += 0.1
 
 <SmartHomeBad>:
     orientation: 'vertical'
