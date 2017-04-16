@@ -18,6 +18,7 @@ from thread import start_new_thread
 
 import time
 import json
+import socket
 
 from upnp import *
 
@@ -40,6 +41,11 @@ fh.connect()
 
 Builder.load_file("homectrl_main.kv")
 
+
+def get_ip_address():
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
 
 class WeatherMain(BoxLayout):
     ww = ObjectProperty()
@@ -345,6 +351,8 @@ class HomeCtrlApp(App):
         wifistate = WifiState(pos=(20,60), size=(30,30), size_hint= (None, None))
         Clock.schedule_interval(wifistate.update, 5)
         p.add_widget(wifistate)
+
+        print('IP: ', get_ip_address() )
 
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+"C"
         homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
