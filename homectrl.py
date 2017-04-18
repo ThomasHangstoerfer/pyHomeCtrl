@@ -36,10 +36,21 @@ fake_data = 1
 
 fhem_server = "pi"
 
+Builder.load_file("homectrl_main.kv")
+
 fh = fhem.Fhem(fhem_server)
 fh.connect()
+time.sleep( 1)
+while True:
+    if ( fh.connected() == True ):
+        print('Fhem connected!' )
+        break
+    else:
+        print('Fhem not connected. Retry.' )
+        time.sleep( 2)
+        fh.connect()
+    #print('fhemev: ', fhemev.fhem.connected() )
 
-Builder.load_file("homectrl_main.kv")
 
 
 def get_ip_address():
@@ -176,6 +187,17 @@ class WeatherForecastWidget(BoxLayout):
 def queue_thread(a):
     que = queue.Queue()
     fhemev = fhem.FhemEventQueue(fhem_server, que)
+    time.sleep( 1)
+    while True:
+        if ( fhemev.fhem.connected() == True ):
+            print('FhemEventQueue connected!' )
+            break
+        else:
+            print('FhemEventQueue not connected. Retry.' )
+            time.sleep( 2)
+            fhemev.fhem.connect()
+	    #print('fhemev: ', fhemev.fhem.connected() )
+
     while True:
         ev = que.get()
         # FHEM events are parsed into a Python dictionary:
