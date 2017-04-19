@@ -19,10 +19,16 @@ from kivy.graphics import Line
 from kivy.network.urlrequest import UrlRequest
 
 from thread import start_new_thread
-
+import threading
+from threading import Timer
+import sched
+import os
 import time
 import json
 import socket
+import signal
+import sys
+
 
 from upnp import *
 
@@ -41,6 +47,8 @@ import weather
 global sh # Smarthome
 
 fhem_server = "pi"
+
+display_off_timeout = 60.0
 
 Builder.load_file("homectrl_main.kv")
 
@@ -148,9 +156,57 @@ class HomeCtrlTabbedPanel(TabbedPanel):
 
     pass
 
+
+class RepeatedTimer(object):
+    def __init__(self, interval, function, *args, **kwargs):
+        self._timer     = None
+        self.function   = function
+        self.interval   = interval
+        self.args       = args
+        self.kwargs     = kwargs
+        self.is_running = False
+        self.start()
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.function(*self.args, **self.kwargs)
+
+    def start(self):
+        if not self.is_running:
+            self._timer = Timer(self.interval, self._run)
+            self._timer.start()
+            self.is_running = True
+
+    def stop(self):
+        self._timer.cancel()
+        self.is_running = False
+
+def displayOff(arg):
+    print('displayOff')
+    os.system('echo 1 > /sys/class/backlight/rpi_backlight/bl_power')
+
+
+
+def displayOn():
+    print('displayOn')
+    os.system('echo 0 > /sys/class/backlight/rpi_backlight/bl_power')
+
+displayOn()
+rt = RepeatedTimer(display_off_timeout, displayOff, "") # it auto-starts, no need of rt.start()
+
+def signal_handler(signal, frame):
+    print('You pressed Ctrl+C!')
+    rt.stop()
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+
 def on_motion(self, etype, motionevent):
     # will receive all motion events.
-    print('on_motion')
+    displayOn()
+    print('on_motion -> Reset display-sleep-timer')
+    rt.stop() # better in a try/finally block to make sure the program ends!
+    rt.start()
     #ret = super(..., self).on_motion(etype, motionevent)
     #return ret
 Window.bind(on_motion=on_motion)
