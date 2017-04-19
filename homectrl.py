@@ -173,7 +173,6 @@ def displayOff(arg):
     os.system('echo 1 > /sys/class/backlight/rpi_backlight/bl_power')
 
 
-
 def displayOn():
     print('displayOn')
     os.system('echo 0 > /sys/class/backlight/rpi_backlight/bl_power')
@@ -184,6 +183,7 @@ rt = RepeatedTimer(display_off_timeout, displayOff, "") # it auto-starts, no nee
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     rt.stop()
+    displayOn()
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
