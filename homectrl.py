@@ -52,19 +52,6 @@ display_off_timeout = 60.0
 
 Builder.load_file("homectrl_main.kv")
 
-#fh = fhem.Fhem(fhem_server)
-#fh.connect()
-#time.sleep( 1)
-#while True:
-#    if ( fh.connected() == True ):
-#        print('Fhem connected!' )
-#        break
-#    else:
-#        print('Fhem not connected. Retry.' )
-#        time.sleep( 2)
-#        fh.connect()
-#    #print('fhemev: ', fhemev.fhem.connected() )
-
 
 def get_ip_address():
     s = socket(AF_INET, SOCK_DGRAM)
@@ -133,11 +120,10 @@ class TabbedIconPanelItem(TabbedPanelItem):
     pass
 
 class HomeCtrl(FloatLayout):
-    #def on_touch_down(self, touch): 
-    #    print('HomeCtrl.on_touch_down')
-    #    ret = super(FloatLayout, self).on_touch_down(touch)
-    #    return ret
     pass
+
+class RotatedImage(Image):
+    angle = NumericProperty()
 
 class SmartHomeTabbedPanel(TabbedPanel):
     wohnzimmerItem = ObjectProperty()
@@ -205,21 +191,13 @@ def on_motion(self, etype, motionevent):
     # will receive all motion events.
     displayOn()
     print('on_motion -> Reset display-sleep-timer')
-    rt.stop() # better in a try/finally block to make sure the program ends!
+    #print('etype', etype)
+    rt.stop()
     rt.start()
+    # TODO ignore the first touch event from 'begin' to 'end' when the display was off
     #ret = super(..., self).on_motion(etype, motionevent)
     #return ret
 Window.bind(on_motion=on_motion)
-
-#def on_mouse_move(self, x, y, modifiers):
-#    # will receive all motion events.
-#    print('on_mouse_move')
-#    pass
-#
-#Window.bind(on_mouse_move=on_mouse_move)
-
-class RotatedImage(Image):
-    angle = NumericProperty()
 
 
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
@@ -250,5 +228,4 @@ class HomeCtrlApp(App):
 
 
 if __name__ == '__main__':
-    #start_new_thread(queue_thread,(0,))
     HomeCtrlApp().run()
