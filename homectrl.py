@@ -217,11 +217,6 @@ class HomeCtrlApp(App):
 
         print('IP: ', get_ip_address() )
 
-        if ( sh.fh.connected() == True ):
-            homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = sh.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+"C"
-            homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = sh.fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
-            homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = sh.fh.get_dev_reading("BadFenster", "state")
-            homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = sh.fh.get_dev_reading("BadHeizung", "actuator")
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
         return p

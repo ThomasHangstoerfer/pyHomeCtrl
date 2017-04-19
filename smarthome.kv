@@ -2,7 +2,7 @@
 <SmartHomeWohnzimmer>:
     led_r: 0
     led_g: 0
-    led_b: 1
+    led_b: 0
     BoxLayout:
         BoxLayout:
             padding: [20,20]
@@ -57,30 +57,30 @@
                 BoxLayout:
                     Button:
                         text: '-'
-                        on_release: root.led_r -= 0.1
+                        on_release: root.redDown()
                     Label:
                         text: 'RED'
                     Button:
                         text: '+'
-                        on_release: root.led_r += 0.1
+                        on_release: root.redUp()
                 BoxLayout:
                     Button:
                         text: '-'
-                        on_release: root.led_g -= 0.1
+                        on_release: root.greenDown()
                     Label:
                         text: 'GREEN'
                     Button:
                         text: '+'
-                        on_release: root.led_g += 0.1
+                        on_release: root.greenUp()
                 BoxLayout:
                     Button:
                         text: '-'
-                        on_release: root.led_b -= 0.1
+                        on_release: root.blueDown()
                     Label:
                         text: 'BLUE'
                     Button:
                         text: '+'
-                        on_release: root.led_b += 0.1
+                        on_release: root.blueUp()
 
 <SmartHomeBad>:
     orientation: 'vertical'

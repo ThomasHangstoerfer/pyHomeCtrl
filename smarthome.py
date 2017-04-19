@@ -50,6 +50,7 @@ class SmartHomeWohnzimmer(BoxLayout):
     deckenlampe = StringProperty()
     stehlampe = StringProperty()
     rolladen = StringProperty()
+
     def toggle_WzDeckenlampe(self):
         print('toggle_WzDeckenlampe')
         toggle('WzDeckenlampe')
@@ -61,6 +62,60 @@ class SmartHomeWohnzimmer(BoxLayout):
     def toggle_LEDswitch(self):
         print('toggle_LEDswitch')
         toggle('LEDswitch')
+
+    def setRGB(self, rgb):
+        print('setRGB(' + rgb + ') rgb[4:6] = ' + rgb[4:6] )
+        # TODO split 'rgb' and set led_r etc
+        self.led_r = int(rgb[0:2], 16)/25
+        self.led_g = int(rgb[2:4], 16)/25
+        self.led_b = int(rgb[4:6], 16)/25
+        print('setRGB led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
+
+    def update_LEDswitch(self):
+        print('update_LEDswitch led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
+        redHex = "%0.2X" % (self.led_r * 25)
+        greenHex = "%0.2X" % (self.led_g * 25)
+        blueHex = "%0.2X" % (self.led_b * 25)
+        print('redHex ' + redHex )
+        print('greenHex ' + greenHex )
+        print('blueHex ' + blueHex )
+        fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
+
+    def redDown(self):
+        print('redDown() self.led_r ', self.led_r)
+        if self.led_r > 0:
+            self.led_r -= 1
+        self.update_LEDswitch()
+
+    def redUp(self):
+        print('redUp() self.led_r ', self.led_r)
+        if self.led_r < 10:
+            self.led_r += 1
+        self.update_LEDswitch()
+
+    def greenDown(self):
+        print('greenDown() self.led_g ', self.led_g)
+        if self.led_g > 0:
+            self.led_g -= 1
+        self.update_LEDswitch()
+
+    def greenUp(self):
+        print('greenUp() self.led_g ', self.led_g)
+        if self.led_g < 10:
+            self.led_g += 1
+        self.update_LEDswitch()
+
+    def blueDown(self):
+        print('blueDown() self.led_b ', self.led_b)
+        if self.led_b > 0:
+            self.led_b -= 1
+        self.update_LEDswitch()
+
+    def blueUp(self):
+        print('blueUp() self.led_b ', self.led_b)
+        if self.led_b < 10:
+            self.led_b += 1
+        self.update_LEDswitch()
 
     def rolladen_hoch(self):
         print('rolladen_hoch')
@@ -90,6 +145,11 @@ class Smarthome:
             print('FHEM not connected. Retrying.')
             Clock.schedule_once(self.connect, 2)
         else:
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+"C"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = self.fh.get_dev_reading("BadFenster", "state")
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fh.get_dev_reading("BadHeizung", "actuator")
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fh.get_dev_reading("LED", "RGB") )
             start_new_thread(self.queue_thread,(0,))
 
     def queue_thread(self, a):
@@ -139,6 +199,7 @@ class Smarthome:
                 if ( ev["reading"] == "RGB" ):
                     print("LED: RGB: " + ev["value"])
                     self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb = ev["value"]
+                    #self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( ev["value"] )
             elif ( device == "WzStehlampe" ):
                 if ( ev["reading"] == "STATE" ):
                     print("WzStehlampe: " + ev["value"])
