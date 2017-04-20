@@ -19,7 +19,7 @@ import json
 import socket
 
 
-fake_data = 1
+fake_data = 0
 
 
 class WeatherMain(BoxLayout):
