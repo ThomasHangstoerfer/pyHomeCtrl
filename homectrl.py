@@ -23,6 +23,7 @@ import threading
 from threading import Timer
 import sched
 import os
+import subprocess
 import time
 import json
 import socket
@@ -48,7 +49,7 @@ global sh # Smarthome
 
 fhem_server = "pi"
 
-display_off_timeout = 60.0
+display_off_timeout = 120.0
 
 Builder.load_file("homectrl_main.kv")
 
@@ -71,8 +72,8 @@ class NetworkInfoPopup(Popup):
         #self.my_widget = my_widget
         self.content = BoxLayout(orientation="vertical")
         self.content.add_widget(Label(text=get_ip_address()))
-        self.content.add_widget(Label(text='Hi'))
-        self.button = Button(text='Ok', size_hint=(0.5, 0.5))
+        self.content.add_widget(Label(text='ProximaCentauri'))
+        self.button = Button(text='Ok', size_hint=(1.0, 0.5))
         self.button.bind(on_press=self.dismiss)
         self.content.add_widget(self.button)
 
@@ -80,16 +81,81 @@ class NetworkInfoPopup(Popup):
         #print('on_open')
         pass
 
+netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
+
 class WifiState(ButtonBehavior, Image):
-    source = 'gfx/wifi4.png'
+    #source = 'gfx/wifi4.png'
+    img = StringProperty()
+    img = 'gfx/wifi0.png'
  
     def on_release(self):
-        popup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
-        popup.open()
+        netinfopopup.open()
 
     def update(self, *args):
-        #self.text = time.asctime()
-        self.source = 'gfx/wifi4.png'
+        try:
+            wlan_device = "wlan0"
+            output = subprocess.check_output("iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8", shell=True )
+            #output = subprocess.check_output("ifconfig lo |grep 'RX packets'|tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 4", shell=True )
+            #print('output = ' + output)
+            bitrate = output[9:12]
+
+            tokens = output.split()
+            raw = tokens[2][-5:]
+            q = raw.split("/")[0]
+            t = raw.split("/")[1]
+            quality = ( int(q) * 100 ) / int(t)
+
+            netinfopopup.title="Device '" + wlan_device + "' - Rate: %sMb/s - Quality: %d%%" % (bitrate, quality)
+
+            #print('WifiState update output: ' + output + ' raw: ', raw, ' quality: ', quality)
+            if ( quality < 20 ):
+                self.source = 'gfx/wifi1.png'
+            elif ( quality < 40 ):
+                self.source = 'gfx/wifi2.png'
+            elif ( quality < 80 ):
+                self.source = 'gfx/wifi3.png'
+            else:
+                self.source = 'gfx/wifi4.png'
+        except Exception as e:
+            self.source = 'gfx/wifi0.png'
+            print('WifiState.update(): ', e)
+
+
+class SettingsPopup(Popup):
+
+    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
+        super(SettingsPopup,self).__init__(**kwargs)
+        #self.my_widget = my_widget
+        self.content = BoxLayout(orientation="horizontal")
+        self.shutdown_button = Button(text='SHUTDOWN', size_hint=(0.5, 0.5))
+        self.shutdown_button.bind(on_press=self.shutdown)
+        self.content.add_widget(self.shutdown_button)
+        self.reboot_button = Button(text='REBOOT', size_hint=(0.5, 0.5))
+        self.reboot_button.bind(on_press=self.reboot)
+        self.content.add_widget(self.reboot_button)
+
+    def shutdown(self, a):
+        print('SHUTDOWN')
+        pass
+
+    def reboot(self, a):
+        print('REBOOT')
+        pass
+
+    def on_open(self):
+        #print('on_open')
+        pass
+
+settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
+
+class SettingsButton(ButtonBehavior, Image):
+    #source = 'gfx/wifi4.png'
+    img = StringProperty()
+    img = 'gfx/settings.png'
+
+    def on_release(self):
+        settingspopup.open()
+
 
 class LCARSButton(Button):
     def on_release(self):
@@ -199,7 +265,6 @@ def on_motion(self, etype, motionevent):
     #return ret
 Window.bind(on_motion=on_motion)
 
-
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
 sh = smarthome.Smarthome(fhem_server, homectrlTabbedPanel)
 
@@ -211,9 +276,12 @@ class HomeCtrlApp(App):
         simpleclock = SimpleClock(pos=(-10,-20), size_hint= (None, None) )
         Clock.schedule_interval(simpleclock.update, 1)
         p.add_widget(simpleclock)
-        wifistate = WifiState(pos=(20,60), size=(30,30), size_hint= (None, None))
+        wifistate = WifiState()
+        wifistate.update()
         Clock.schedule_interval(wifistate.update, 5)
         p.add_widget(wifistate)
+        settingsbutton = SettingsButton()
+        p.add_widget(settingsbutton)
 
         print('IP: ', get_ip_address() )
 
