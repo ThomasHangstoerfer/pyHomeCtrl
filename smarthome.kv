@@ -89,6 +89,14 @@
             text: 'Temperatur'
         Label:
             text: root.temp
+        Button:
+            text: '-'
+            on_release: root.tempDown()
+        Label:
+            text: root.desired_temp
+        Button:
+            text: '+'
+            on_release: root.tempUp()
     BoxLayout:
         Label:
             text: 'Luftfeuchtigkeit'

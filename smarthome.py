@@ -36,9 +36,23 @@ def toggle(dev):
 
 class SmartHomeBad(BoxLayout):
     temp = StringProperty()
+    desired_temp = StringProperty()
     hum = StringProperty()
     window = StringProperty()
     actuator = StringProperty()
+
+    # set BadThermostat_Climate desired-temp 18
+    def tempDown(self):
+        print('tempDown()')
+        t = float(fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+        newt = t - 0.5
+        fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+
+    def tempUp(self):
+        print('tempUp()')
+        t = float(fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+        newt = t + 0.5
+        fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
 
 
 class SmartHomeWohnzimmer(BoxLayout):
@@ -145,11 +159,17 @@ class Smarthome:
             print('FHEM not connected. Retrying.')
             Clock.schedule_once(self.connect, 2)
         else:
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+"C"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fh.get_dev_reading("BadThermostat_Climate", "humidity")+"%"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = self.fh.get_dev_reading("BadFenster", "state")
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fh.get_dev_reading("BadHeizung", "actuator")
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fh.get_dev_reading("LED", "RGB") )
+            time.sleep(0.5)
+            try:
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = self.fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fh.get_dev_reading("LED", "RGB") )
+            except Exception as e:
+                print('Smarthome.connect(): ', e)
+
             start_new_thread(self.queue_thread,(0,))
 
     def queue_thread(self, a):
@@ -177,29 +197,26 @@ class Smarthome:
             if ( device == "BadThermostat_Climate" ):
                 if ( ev["reading"] == "humidity" ):
                     print("BadThermostat_Climate: Humidity: " + ev["value"])
-                    #bathroom_screen.hum = ev["value"]
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = ev["value"]
+                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = ev["value"] + "%"
                 elif ( ev["reading"] == "measured-temp" ):
                     print("BadThermostat_Climate: measured-temp: " + ev["value"])
-                    #bathroom_screen.temp = ev["value"]
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = ev["value"]
+                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = ev["value"] + u"°C"
+                elif ( ev["reading"] == "desired-temp" ):
+                    print("BadThermostat_Climate: desired-temp: " + ev["value"])
+                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
             elif ( device == "BadFenster" ):
                 print("BadFenster: " + ev["value"])
-                #bathroom_screen.window = ev["value"]
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = ev["value"]
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
             elif ( device == "BadHeizung" ):
                 if ( ev["reading"] == "actuator" ):
                     print("BadHeizung: actuator: " + ev["value"])
-                    #bathroom_screen.actuator = ev["value"]
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = ev["value"]
+                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = ev["value"] + u"%"
             elif ( device == "LEDswitch" ):
                 print("LEDswitch: " + ev["value"])
-                #main_screen.led_switch = ev["value"]
             elif ( device == "LED" ):
                 if ( ev["reading"] == "RGB" ):
                     print("LED: RGB: " + ev["value"])
                     self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb = ev["value"]
-                    #self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( ev["value"] )
             elif ( device == "WzStehlampe" ):
                 if ( ev["reading"] == "STATE" ):
                     print("WzStehlampe: " + ev["value"])
@@ -208,5 +225,6 @@ class Smarthome:
                 if ( ev["reading"] == "STATE" ):
                     print("WzDeckenlampe: " + ev["value"])
                     #main_screen.deckenlampe = ev["value"]
+            #else
+            #    print('unknown device: ' + device)
             self.que.task_done()
-
