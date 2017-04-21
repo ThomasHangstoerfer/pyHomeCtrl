@@ -3,6 +3,7 @@
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
@@ -29,6 +30,7 @@ import json
 import socket
 import signal
 import sys
+import carousel
 
 
 from upnp import *
@@ -44,12 +46,17 @@ import logging, sys
 
 import smarthome
 import weather
+import slideshow
 
 global sh # Smarthome
 
 fhem_server = "pi"
 
 display_off_timeout = 120.0
+display_off_active = True
+
+bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
+running_on_pi = os.path.isfile(bl_power_file)
 
 Builder.load_file("homectrl_main.kv")
 
@@ -125,21 +132,45 @@ class SettingsPopup(Popup):
 
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(SettingsPopup,self).__init__(**kwargs)
-        #self.my_widget = my_widget
-        self.content = BoxLayout(orientation="horizontal")
+
         self.shutdown_button = Button(text='SHUTDOWN', size_hint=(0.5, 0.5))
         self.shutdown_button.bind(on_press=self.shutdown)
-        self.content.add_widget(self.shutdown_button)
         self.reboot_button = Button(text='REBOOT', size_hint=(0.5, 0.5))
         self.reboot_button.bind(on_press=self.reboot)
-        self.content.add_widget(self.reboot_button)
+        self.displayoff_label = Label(text='Turn display off', size_hint=(0.5, 0.5))
+        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=display_off_active)
+        self.displayoff_checkbox.bind(active=self.on_checkbox_active)
+
+
+        self.content = BoxLayout(orientation="vertical")
+        self.settingslayout = BoxLayout(orientation="horizontal")
+        self.settingslayout.add_widget(self.displayoff_label)
+        self.settingslayout.add_widget(self.displayoff_checkbox)
+        self.shutdownlayout = BoxLayout(orientation="horizontal")
+        self.shutdownlayout.add_widget(self.shutdown_button)
+        self.shutdownlayout.add_widget(self.reboot_button)
+        self.content.add_widget(self.settingslayout)
+        self.content.add_widget(self.shutdownlayout)
+
+    def on_checkbox_active(self, a, checked):
+        print('on_checkbox_active(', checked)
+        global display_off_active
+        display_off_active = checked
+        print('on_checkbox_active() display_off_active = ', display_off_active)
+        pass
 
     def shutdown(self, a):
         print('SHUTDOWN')
+        if ( running_on_pi ):
+            displayOff(0)
+            os.system('sync; sleep 1; /sbin/poweroff -f')
         pass
 
     def reboot(self, a):
         print('REBOOT')
+        if ( running_on_pi ):
+            displayOff(0)
+            os.system('sync; sleep 1; /sbin/reboot -f now')
         pass
 
     def on_open(self):
@@ -147,6 +178,41 @@ class SettingsPopup(Popup):
         pass
 
 settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
+
+class DisplayOffPopup(Popup):
+
+    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
+        super(DisplayOffPopup,self).__init__(**kwargs)
+        self.content = Button(text='', size_hint=(1.0, 1.0))
+        self.content.bind(on_release=self.dismiss)
+
+    def on_open(self):
+        #print('on_open')
+        pass
+
+    def on_dismiss(self):
+        print('on_dismiss')
+        displayOn()
+        pass
+
+displayoffpopup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
+
+def displayOff(arg):
+    print('displayOff() display_off_active = ', display_off_active)
+    if ( display_off_active ):
+        if ( running_on_pi ):
+            os.system('echo 1 > ' + bl_power_file)
+        displayoffpopup.open()
+
+def displayOn():
+    print('displayOn')
+    #displayoffpopup.dismiss()
+    if ( running_on_pi ):
+        os.system('echo 0 > ' + bl_power_file)
+
+
+
+
 
 class SettingsButton(ButtonBehavior, Image):
     #source = 'gfx/wifi4.png'
@@ -234,15 +300,6 @@ class RepeatedTimer(object):
         self._timer.cancel()
         self.is_running = False
 
-def displayOff(arg):
-    print('displayOff')
-    os.system('echo 1 > /sys/class/backlight/rpi_backlight/bl_power')
-
-
-def displayOn():
-    print('displayOn')
-    os.system('echo 0 > /sys/class/backlight/rpi_backlight/bl_power')
-
 displayOn()
 rt = RepeatedTimer(display_off_timeout, displayOff, "") # it auto-starts, no need of rt.start()
 
@@ -253,10 +310,13 @@ def signal_handler(signal, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
+class SlideshowWidget:
+    carousel = ObjectProperty()
+
 def on_motion(self, etype, motionevent):
     # will receive all motion events.
-    displayOn()
-    print('on_motion -> Reset display-sleep-timer')
+    #displayOn()
+    print('on_motion -> Reset display-sleep-timer display_off_active = ', display_off_active)
     #print('etype', etype)
     rt.stop()
     rt.start()
@@ -287,6 +347,7 @@ class HomeCtrlApp(App):
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
+        homectrlTabbedPanel.slideshowItem.subwidget.carousel.stop_automatic()
         return p
 
 

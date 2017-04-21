@@ -19,16 +19,8 @@ import json
 import socket
 
 
-fake_data = 0
-
-
-class WeatherMain(BoxLayout):
-    ww = ObjectProperty()
-    def init(self):
-        self.ww.clear_widget()
-    def update(self):
-        self.ww.update()
-    pass
+fake_data = 1
+weather_theme = "w"
 
 # {"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":7.34,"pressure":1012,"humidity":81,"temp_min":7,"temp_max":8},"visibility":10000,"wind":{"speed":3.1,"deg":20},"clouds":{"all":75},"dt":1490206800,"sys":{"type":1,"id":4921,"message":0.0033,"country":"DE","sunrise":1490160155,"sunset":1490204573},"id":2808802,"name":"Wilferdingen","cod":200}
 class WeatherWidget(FloatLayout):
@@ -90,19 +82,19 @@ class WeatherWidget(FloatLayout):
                 if ( count == 0 ):
                     self.forecast.forecast_1.wf_day.text = day
                     self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_1.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 1 ):
                     self.forecast.forecast_2.wf_day.text = day
                     self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_2.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 2 ):
                     self.forecast.forecast_3.wf_day.text = day
                     self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_3.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 3 ):
                     self.forecast.forecast_4.wf_day.text = day
                     self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_4.wf_icon.source = 'gfx/'+ flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
                 elif ( count == 4 ):
                     print('ende')
                 count += 1
@@ -116,9 +108,9 @@ class WeatherWidget(FloatLayout):
         weather = w["weather"]
         print(weather[0]["main"])
         self.ww_city.text = w["name"]
-        self.ww_cur_cond_icon.source = 'gfx/'+ weather[0]["icon"] + '.png'
+        self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
         #if ( fake_data == 1 ):
-        #    self.ww_cur_cond_icon.source = 'gfx/'+ weather[0]["icon"] + '.png'
+        #    self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
         #else:
         #    self.ww_cur_cond_icon.source = 'http://openweathermap.org/img/w/' + weather[0]["icon"] + '.png'
         #print(self.ww_cur_cond_icon.source)

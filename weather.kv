@@ -9,76 +9,76 @@
 
 
 <WeatherWidget>:
-	orientation: 'horizontal'
-	ww_city: ww_city
-	ww_cur_cond_icon: ww_cur_cond_icon
-	ww_temp: ww_temp
-	ww_temp_min_max: ww_temp_min_max
-	ww_wind_speed: ww_wind_speed
-	forecast: forecast
+    orientation: 'horizontal'
+    ww_city: ww_city
+    ww_cur_cond_icon: ww_cur_cond_icon
+    ww_temp: ww_temp
+    ww_temp_min_max: ww_temp_min_max
+    ww_wind_speed: ww_wind_speed
+    forecast: forecast
     Button:
         on_release: root.update()
         size_hint: (0.2, 0.1)
         right: root.right-self.width/8
         text: 'Update'
     BoxLayout:
-		BoxLayout:
-	        orientation: 'vertical'
-	        size_hint: root.size_hint
-	    	Label:
-	    		id: ww_city
-	    		text: ''
-	        Image:
-	        	id: ww_cur_cond_icon
-	        	size: (50, 50)
-	    	Label:
-	    		id: ww_temp
-	    		text: ''
-	    		font_size: 40
-	    	Label:
-	    		id: ww_temp_min_max
-	    		text: ''
-	    		font_size: 15
-	    	Label:
-	    		id: ww_wind_speed
-	    		text: ''
-	    		font_size: 15
-		WeatherForecastWidget:
-			id: forecast
-			size_hint: (0.75, 1)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: root.size_hint
+            Label:
+                id: ww_city
+                text: ''
+            Image:
+                id: ww_cur_cond_icon
+                size: (50, 50)
+            Label:
+                id: ww_temp
+                text: ''
+                font_size: 40
+            Label:
+                id: ww_temp_min_max
+                text: ''
+                font_size: 15
+            Label:
+                id: ww_wind_speed
+                text: ''
+                font_size: 15
+        WeatherForecastWidget:
+            id: forecast
+            size_hint: (0.75, 1)
 
 <WeatherForecastItemWidget>:
-	orientation: 'vertical'
-	wf_temp: wf_temp
-	wf_icon: wf_icon
-	wf_day: wf_day
-	Label:
-		id: wf_day
-		text: ''
+    orientation: 'vertical'
+    wf_temp: wf_temp
+    wf_icon: wf_icon
+    wf_day: wf_day
+    Label:
+        id: wf_day
+        text: ''
     Image:
-    	id: wf_icon
-    	size: (25, 25)
-	Label:
-		id: wf_temp
-		text: ''
-	Label:
-		text: ''
-	Label:
-		text: ''
+        id: wf_icon
+        size: (25, 25)
+    Label:
+        id: wf_temp
+        text: ''
+    Label:
+        text: ''
+    Label:
+        text: ''
 
 <WeatherForecastWidget>:
-	forecast_1: forecast_1
-	forecast_2: forecast_2
-	forecast_3: forecast_3
-	forecast_4: forecast_4
-	WeatherForecastItemWidget:
-		id: forecast_1
-	WeatherForecastItemWidget:
-		id: forecast_2
-	WeatherForecastItemWidget:
-		id: forecast_3
-	WeatherForecastItemWidget:
-		id: forecast_4
+    forecast_1: forecast_1
+    forecast_2: forecast_2
+    forecast_3: forecast_3
+    forecast_4: forecast_4
+    WeatherForecastItemWidget:
+        id: forecast_1
+    WeatherForecastItemWidget:
+        id: forecast_2
+    WeatherForecastItemWidget:
+        id: forecast_3
+    WeatherForecastItemWidget:
+        id: forecast_4
 
 #Label:
 #    canvas:

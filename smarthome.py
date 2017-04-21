@@ -153,7 +153,7 @@ class Smarthome:
 
     def connect(self, *args):
         print('Smarthome.connect')
-        self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = 'SDF'
+        #self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = 'SDF'
         self.fh.connect()
         if ( self.fh.connected() == False ):
             print('FHEM not connected. Retrying.')

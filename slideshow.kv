@@ -1,0 +1,18 @@
+
+<SlideshowWidget>:
+    carousel: carousel
+    size: root.size
+    MyCarousel:
+        id: carousel
+        loop: True
+        size_hint: root.size_hint
+        size: root.size
+    MenuSpawner:
+        menu_args:
+            dict(
+            choices=[
+            dict(text=u'Tagger pour redresser', index=1, callback=carousel.callback_current_set_wip),
+            dict(text=u'Stop', index=2, callback=carousel.callback_stop_automatic),
+            dict(text=u'Start', index=3, callback=carousel.callback_start_automatic),
+            dict(text=u'Nouvelles photos', index=4, callback=carousel.callback_new_photos),
+            ])

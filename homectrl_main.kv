@@ -3,6 +3,7 @@
 #:include smarthome.kv
 #:include lcarsbuttons.kv
 #:include weather.kv
+#:include slideshow.kv
 
 <TabbedPanelStrip>:
     canvas:
@@ -74,16 +75,18 @@
 <HomeCtrlTabbedPanel>:
     do_default_tab: False
     tab_pos: 'left_mid'
-    #tab_width: self.size[0]/len(self.tab_list)
-    #tab_width: self.tab_list[0].img.width
-    #tab_width: self.tab_height
-    tab_width: self.width / 8
+    tab_width: self.width / 12
     padding: 20, 0, 0, 0
     spacing: 20
     #size: (200,200)
     weatherItem: weatherItem
     musicItem: musicItem
     smarthomeItem: smarthomeItem
+    slideshowItem: slideshowItem
+
+    TabbedIconPanelItem:
+        id: emptyItem
+        img: 'gfx/empty.png'
 
     TabbedIconPanelItem:
         id: weatherItem
@@ -96,15 +99,18 @@
     TabbedIconPanelItem:
         id: musicItem
         img: 'gfx/music_r.png'
-        #text: 'Entertainment'
-        #Label:
-        #    text: 'WebRadio'
         LCARSButton2:
+
+    TabbedIconPanelItem:
+        id: slideshowItem
+        img: 'gfx/view_r.png'
+        subwidget: ss
+        SlideshowWidget:
+            id: ss
 
     TabbedIconPanelItem:
         id: smarthomeItem
         img: 'gfx/home_r.png'
-        #text: 'SmartHome'
         subwidget: smartHomeWidget
         SmartHomeTabbedPanel:
             id: smartHomeWidget
