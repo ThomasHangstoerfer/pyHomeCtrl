@@ -47,6 +47,7 @@ import logging, sys
 import smarthome
 import weather
 import slideshow
+import verboseclock
 
 global sh # Smarthome
 

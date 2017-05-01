@@ -4,6 +4,7 @@
 #:include lcarsbuttons.kv
 #:include weather.kv
 #:include slideshow.kv
+#:include verboseclock.kv
 
 <TabbedPanelStrip>:
     canvas:
@@ -87,6 +88,9 @@
     TabbedIconPanelItem:
         id: emptyItem
         img: 'gfx/empty.png'
+        subwidget: vClock
+        VerboseClock:
+            id: vClock
 
     TabbedIconPanelItem:
         id: weatherItem
