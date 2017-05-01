@@ -52,7 +52,7 @@ global sh # Smarthome
 
 fhem_server = "pi"
 
-display_off_timeout = 120.0
+display_off_timeout = 20.0
 display_off_active = True
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
@@ -199,6 +199,7 @@ displayoffpopup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1
 
 def displayOff(arg):
     print('displayOff() display_off_active = ', display_off_active)
+    #p.export_to_png("/tmp/kivy.png")
     if ( display_off_active ):
         if ( running_on_pi ):
             os.system('echo 1 > ' + bl_power_file)
@@ -283,12 +284,18 @@ class RepeatedTimer(object):
         self.args       = args
         self.kwargs     = kwargs
         self.is_running = False
+        self.ignore_next = True
         self.start()
 
     def _run(self):
         self.is_running = False
         self.start()
-        self.function(*self.args, **self.kwargs)
+        print('RepeatedTimer()_run ignore_next = ', self.ignore_next)
+        if ( self.ignore_next ):
+            print('ignore first display_off')
+            self.ignore_next = False
+        else:
+            self.function(*self.args, **self.kwargs)
 
     def start(self):
         if not self.is_running:
@@ -332,6 +339,7 @@ class HomeCtrlApp(App):
     def build(self):
 
         p = HomeCtrl()
+        global p
         p.add_widget(homectrlTabbedPanel)
         simpleclock = SimpleClock(pos=(-10,-20), size_hint= (None, None) )
         Clock.schedule_interval(simpleclock.update, 1)
@@ -343,7 +351,7 @@ class HomeCtrlApp(App):
         settingsbutton = SettingsButton()
         p.add_widget(settingsbutton)
 
-        print('IP: ', get_ip_address() )
+        #print('IP: ', get_ip_address() )
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
