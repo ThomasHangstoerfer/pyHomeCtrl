@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.clock import Clock
@@ -33,6 +34,24 @@ def toggle(dev):
             fh.send_cmd("set " + dev + " on")
         else:
             fh.send_cmd("set " + dev + " off")
+
+class PhoneCallPopup(Popup):
+
+    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
+        super(PhoneCallPopup,self).__init__(**kwargs)
+        #self.my_widget = my_widget
+        self.content = BoxLayout(orientation="vertical")
+        self.content.add_widget(Label(text='Thomas'))
+        self.content.add_widget(Label(text='PhoneCall',id='number'))
+        self.button = Button(text='Ok', size_hint=(1.0, 0.5))
+        self.button.bind(on_press=self.dismiss)
+        self.content.add_widget(self.button)
+
+    def on_open(self):
+        #print('on_open')
+        pass
+
+phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.5, 0.5))
 
 class SmartHomeBad(BoxLayout):
     temp = StringProperty()
@@ -224,6 +243,46 @@ class Smarthome:
             elif ( device == "WzDeckenlampe" ):
                 if ( ev["reading"] == "STATE" ):
                     print("WzDeckenlampe: " + ev["value"])
+                    #main_screen.deckenlampe = ev["value"]
+
+
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 34), 'value': u'low', 'devicetype': u'HMLAN', 'device': u'hmusb', 'reading': u'loadLvl', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'call', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'01xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'disconnect', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0xxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_duration', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
+            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
+
+            elif ( device == "callmonitor" ):
+                if ( ev["reading"] == "external_name" ):
+                    print("external_name: " + ev["value"])
+
+                elif ( ev["reading"] == "external_number" ):
+                    print("external_number: " + ev["value"])
+                    phonecallpopup.number = ev["value"]
+
+                elif ( ev["reading"] == "event" ):
+                    print("event: " + ev["value"])
+
+                elif ( ev["reading"] == "direction" ):
+                    print("direction: " + ev["value"])
+                    phonecallpopup.title = ev["value"]
+
+
+                phonecallpopup.open()
+
                     #main_screen.deckenlampe = ev["value"]
             #else
             #    print('unknown device: ' + device)
