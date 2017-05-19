@@ -36,20 +36,50 @@ def toggle(dev):
             fh.send_cmd("set " + dev + " off")
 
 class PhoneCallPopup(Popup):
+    pnumber = Label(text='Number',id='phonenumber')
+    caller = Label(text='Caller',id='caller')
 
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(PhoneCallPopup,self).__init__(**kwargs)
         #self.my_widget = my_widget
         self.content = BoxLayout(orientation="vertical")
-        self.content.add_widget(Label(text='Thomas'))
-        self.content.add_widget(Label(text='PhoneCall',id='number'))
+        self.content.add_widget(self.caller)
+        #self.content.add_widget(Label(text='PhoneCall',id='number'))
+        self.content.add_widget(self.pnumber)
         self.button = Button(text='Ok', size_hint=(1.0, 0.5))
         self.button.bind(on_press=self.dismiss)
         self.content.add_widget(self.button)
 
     def on_open(self):
         #print('on_open')
+        #self.ids.number = 'asdf'
         pass
+
+    def handleCallmonitor(self, reading, value):
+        print('reading: ' + reading + ' value: ' + value)
+
+        if ( reading == "external_name" ):
+            print("external_name: " + value)
+            phonecallpopup.caller.text = value
+
+        elif ( reading == "external_number" ):
+            print("external_number: " + value)
+            phonecallpopup.pnumber.text = value
+
+        elif ( reading == "event" ):
+            print("event: " + value)
+            if ( value == "call" or value == "ring" ):
+                self.open()
+            elif ( value == "disconnect" ):
+                self.dismiss()
+
+        elif ( reading == "direction" ):
+            print("direction: " + value)
+            phonecallpopup.title = value
+
+
+        #phonecallpopup.open()
+
 
 phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.5, 0.5))
 
@@ -266,22 +296,7 @@ class Smarthome:
             #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
 
             elif ( device == "callmonitor" ):
-                if ( ev["reading"] == "external_name" ):
-                    print("external_name: " + ev["value"])
-
-                elif ( ev["reading"] == "external_number" ):
-                    print("external_number: " + ev["value"])
-                    phonecallpopup.number = ev["value"]
-
-                elif ( ev["reading"] == "event" ):
-                    print("event: " + ev["value"])
-
-                elif ( ev["reading"] == "direction" ):
-                    print("direction: " + ev["value"])
-                    phonecallpopup.title = ev["value"]
-
-
-                phonecallpopup.open()
+                phonecallpopup.handleCallmonitor(ev["reading"], ev["value"])
 
                     #main_screen.deckenlampe = ev["value"]
             #else
