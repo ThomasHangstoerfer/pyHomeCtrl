@@ -28,12 +28,12 @@ except:
 global fh
 
 def toggle(dev):
-        dev_state_temp = fh.get_dev_reading(dev, "state")
-        print('toggle ', dev, ' current state: ', dev_state_temp)
-        if dev_state_temp == 'off':
-            fh.send_cmd("set " + dev + " on")
-        else:
-            fh.send_cmd("set " + dev + " off")
+    dev_state_temp = fc.fh.get_dev_reading(dev, "state")
+    print('toggle ', dev, ' current state: ', dev_state_temp)
+    if dev_state_temp == 'off':
+        fc.fh.send_cmd("set " + dev + " on")
+    else:
+        fc.fh.send_cmd("set " + dev + " off")
 
 class PhoneCallPopup(Popup):
     pnumber = Label(text='Number',id='phonenumber')
@@ -52,7 +52,6 @@ class PhoneCallPopup(Popup):
 
     def on_open(self):
         #print('on_open')
-        #self.ids.number = 'asdf'
         pass
 
     def handleCallmonitor(self, reading, value):
@@ -77,10 +76,6 @@ class PhoneCallPopup(Popup):
             print("direction: " + value)
             phonecallpopup.title = value
 
-
-        #phonecallpopup.open()
-
-
 phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.5, 0.5))
 
 class SmartHomeBad(BoxLayout):
@@ -93,15 +88,15 @@ class SmartHomeBad(BoxLayout):
     # set BadThermostat_Climate desired-temp 18
     def tempDown(self):
         print('tempDown()')
-        t = float(fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+        t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
         newt = t - 0.5
-        fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
 
     def tempUp(self):
         print('tempUp()')
-        t = float(fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+        t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
         newt = t + 0.5
-        fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
 
 
 class SmartHomeWohnzimmer(BoxLayout):
@@ -142,7 +137,7 @@ class SmartHomeWohnzimmer(BoxLayout):
         print('redHex ' + redHex )
         print('greenHex ' + greenHex )
         print('blueHex ' + blueHex )
-        fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
+        fc.fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
 
     def redDown(self):
         print('redDown() self.led_r ', self.led_r)
@@ -182,123 +177,93 @@ class SmartHomeWohnzimmer(BoxLayout):
 
     def rolladen_hoch(self):
         print('rolladen_hoch')
-        fh.send_cmd("set WzRolladen on")
+        fc.fh.send_cmd("set WzRolladen on")
 
     def rolladen_runter(self):
         print('rolladen_runter')
-        fh.send_cmd("set WzRolladen off")
+        fc.fh.send_cmd("set WzRolladen off")
 
 
 class Smarthome:
     def __init__(self, server, ctrl):
         print('Smarthome.__init__' )
 
-        self.fhem_server = server
+        self.fc = server
         self.homectrlTabbedPanel = ctrl
-        self.fh = fhem.Fhem(self.fhem_server)
-        fh = self.fh
-        global fh
-        self.connect()
+#        self.fh = fhem.Fhem(self.fhem_server)
+        fc = self.fc
+        global fc
+        #self.connect()
+        fc.addListener(self.update)
+        self.init()
 
-    def connect(self, *args):
-        print('Smarthome.connect')
-        #self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = 'SDF'
-        self.fh.connect()
-        if ( self.fh.connected() == False ):
-            print('FHEM not connected. Retrying.')
-            Clock.schedule_once(self.connect, 2)
-        else:
-            time.sleep(0.5)
-            try:
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = self.fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fh.get_dev_reading("LED", "RGB") )
-            except Exception as e:
-                print('Smarthome.connect(): ', e)
+    def init(self):
+        try:
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fc.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = self.fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fc.fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fc.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fc.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fc.fh.get_dev_reading("LED", "RGB") )
+        except Exception as e:
+            print('Smarthome.update(): ', e)
 
-            start_new_thread(self.queue_thread,(0,))
+    def update(self, ev):
+        #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
+        #    print("key={0}, val={1}".format(key, val))
+        #print(homectrlTabbedPanel.ids.smarthome.sh_tab_panel)
+        print(ev)
+        device = ev["device"]
+        if ( device == "BadThermostat_Climate" ):
+            if ( ev["reading"] == "humidity" ):
+                print("BadThermostat_Climate: Humidity: " + ev["value"])
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = ev["value"] + "%"
+            elif ( ev["reading"] == "measured-temp" ):
+                print("BadThermostat_Climate: measured-temp: " + ev["value"])
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = ev["value"] + u"°C"
+            elif ( ev["reading"] == "desired-temp" ):
+                print("BadThermostat_Climate: desired-temp: " + ev["value"])
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
+        elif ( device == "BadFenster" ):
+            print("BadFenster: " + ev["value"])
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+        elif ( device == "BadHeizung" ):
+            if ( ev["reading"] == "actuator" ):
+                print("BadHeizung: actuator: " + ev["value"])
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = ev["value"] + u"%"
+        elif ( device == "LEDswitch" ):
+            print("LEDswitch: " + ev["value"])
+        elif ( device == "LED" ):
+            if ( ev["reading"] == "RGB" ):
+                print("LED: RGB: " + ev["value"])
+                self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb = ev["value"]
+        elif ( device == "WzStehlampe" ):
+            if ( ev["reading"] == "STATE" ):
+                print("WzStehlampe: " + ev["value"])
+                #main_screen.stehlampe = ev["value"]
+        elif ( device == "WzDeckenlampe" ):
+            if ( ev["reading"] == "STATE" ):
+                print("WzDeckenlampe: " + ev["value"])
+                #main_screen.deckenlampe = ev["value"]
 
-    def queue_thread(self, a):
-        self.que = queue.Queue()
-        self.fhemev = fhem.FhemEventQueue(self.fhem_server, self.que)
+        elif ( device == "callmonitor" ):
+            phonecallpopup.handleCallmonitor(ev["reading"], ev["value"])
 
-        while True:
-            ev = self.que.get()
-            # FHEM events are parsed into a Python dictionary:
-            #print('###########################')
-            #homectrlTabbedPanel.weatherItem.img='gfx/music_r.png'
-            #homectrlTabbedPanel.weatherItem.subwidget.wwlabel.text='blabla'
-            #homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb='WZ'
-            #homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp='1111'
-            #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
-            #    print("key={0}, val={1}".format(key, val))
-            #print(homectrlTabbedPanel.ids.smarthome.sh_tab_panel)
-            #print('###########################')
-
-            #{'timestamp': datetime.datetime(2017, 3, 20, 22, 30, 47), 'value': u'AB0000', 'devicetype': u'WifiLight', 'device': u'LED', 'reading': u'RGB', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 3, 20, 22, 26, 30), 'value': u'59', 'devicetype': u'CUL_HM', 'device': u'BadThermostat_Climate', 'reading': u'humidity', 'unit': ''}
-            #ev = {'timestamp': 'datetime.datetime(2017, 3, 20, 22, 26, 30)', 'value': u'22.1', 'devicetype': u'CUL_HM', 'device': u'BadThermostat_Climate', 'reading': u'measured-temp', 'unit': ''}
-            print(ev)
-            device = ev["device"]
-            if ( device == "BadThermostat_Climate" ):
-                if ( ev["reading"] == "humidity" ):
-                    print("BadThermostat_Climate: Humidity: " + ev["value"])
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = ev["value"] + "%"
-                elif ( ev["reading"] == "measured-temp" ):
-                    print("BadThermostat_Climate: measured-temp: " + ev["value"])
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = ev["value"] + u"°C"
-                elif ( ev["reading"] == "desired-temp" ):
-                    print("BadThermostat_Climate: desired-temp: " + ev["value"])
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
-            elif ( device == "BadFenster" ):
-                print("BadFenster: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
-            elif ( device == "BadHeizung" ):
-                if ( ev["reading"] == "actuator" ):
-                    print("BadHeizung: actuator: " + ev["value"])
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = ev["value"] + u"%"
-            elif ( device == "LEDswitch" ):
-                print("LEDswitch: " + ev["value"])
-            elif ( device == "LED" ):
-                if ( ev["reading"] == "RGB" ):
-                    print("LED: RGB: " + ev["value"])
-                    self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb = ev["value"]
-            elif ( device == "WzStehlampe" ):
-                if ( ev["reading"] == "STATE" ):
-                    print("WzStehlampe: " + ev["value"])
-                    #main_screen.stehlampe = ev["value"]
-            elif ( device == "WzDeckenlampe" ):
-                if ( ev["reading"] == "STATE" ):
-                    print("WzDeckenlampe: " + ev["value"])
-                    #main_screen.deckenlampe = ev["value"]
-
-
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 34), 'value': u'low', 'devicetype': u'HMLAN', 'device': u'hmusb', 'reading': u'loadLvl', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'call', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'01xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'disconnect', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0xxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_duration', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
-            #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
-
-            elif ( device == "callmonitor" ):
-                phonecallpopup.handleCallmonitor(ev["reading"], ev["value"])
-
-                    #main_screen.deckenlampe = ev["value"]
-            #else
-            #    print('unknown device: ' + device)
-            self.que.task_done()
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 34), 'value': u'low', 'devicetype': u'HMLAN', 'device': u'hmusb', 'reading': u'loadLvl', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'call', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'01xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'disconnect', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'unknown', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_name', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0xxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_number', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'07xxxxxx', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_number', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_id', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'0', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'call_duration', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'outgoing', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'direction', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'DECT_1', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'internal_connection', 'unit': ''}
+        #{'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 41), 'value': u'POTS', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'external_connection', 'unit': ''}

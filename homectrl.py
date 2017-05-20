@@ -33,6 +33,7 @@ import sys
 import carousel
 
 
+import fhem_connect
 from upnp import *
 
 
@@ -61,6 +62,12 @@ running_on_pi = os.path.isfile(bl_power_file)
 
 Builder.load_file("homectrl_main.kv")
 
+fc = fhem_connect.FhemConnect(fhem_server);
+
+
+def test(ev):
+    print('DATA: ' + ev["device"] + ': ' + ev["reading"])
+fc.addListener(test)
 
 def get_ip_address():
     s = socket(AF_INET, SOCK_DGRAM)
@@ -84,6 +91,10 @@ class NetworkInfoPopup(Popup):
         self.button = Button(text='Ok', size_hint=(1.0, 0.5))
         self.button.bind(on_press=self.dismiss)
         self.content.add_widget(self.button)
+        fc.addListener(self.update)
+
+    def update(self, ev):
+        self.title = "HIER"
 
     def on_open(self):
         #print('on_open')
@@ -334,7 +345,7 @@ def on_motion(self, etype, motionevent):
 Window.bind(on_motion=on_motion)
 
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
-sh = smarthome.Smarthome(fhem_server, homectrlTabbedPanel)
+sh = smarthome.Smarthome(fc, homectrlTabbedPanel)
 
 class HomeCtrlApp(App):
     def build(self):
