@@ -32,7 +32,9 @@ class DisplayOffPopup(Popup):
 
 class DisplayControl:
     __instance = None
-
+    display_off_active = True
+    old_display_off_active = display_off_active
+    display_off_timeout = 10.0
     def __new__(cls, val): # http://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
         if DisplayControl.__instance is None:
             DisplayControl.__instance = object.__new__(cls)
@@ -41,15 +43,20 @@ class DisplayControl:
 
     def __init__(self,**kwargs):
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
-        self.display_off_active = True
-        self.display_off_timeout = 10.0
         global dc
         dc = self
 
+    def lock(self):
+        DisplayControl.old_display_off_active = DisplayControl.display_off_active
+        DisplayControl.display_off_active = False
+
+    def unlock(self):
+        DisplayControl.display_off_active = DisplayControl.old_display_off_active
+
     def displayOff(self, arg):
-        print('displayOff() display_off_active = ', self.display_off_active)
+        print('displayOff() display_off_active = ', DisplayControl.display_off_active)
         #p.export_to_png("/tmp/kivy.png")
-        if ( self.display_off_active ):
+        if ( DisplayControl.display_off_active ):
             if ( running_on_pi ):
                 os.system('echo 1 > ' + bl_power_file)
             self.popup.open()

@@ -43,6 +43,7 @@ def toggle(dev):
 class PhoneCallPopup(Popup):
     caller = Label(text='',id='caller', font_size='60sp', size_hint=(1.0, 0.5))
     pnumber = Label(text='',id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
+    old_display_status = False
 
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(PhoneCallPopup,self).__init__(**kwargs)
@@ -57,7 +58,13 @@ class PhoneCallPopup(Popup):
         print('PhoneCallPopup()__init__ end')
 
     def on_open(self):
-        #print('on_open')
+        print('on_open')
+        displayCtrl.lock()
+        pass
+
+    def on_dismiss(self):
+        print('on_dismiss')
+        displayCtrl.unlock()
         pass
 
     def setExternalName(self, name):

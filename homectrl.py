@@ -148,7 +148,7 @@ class SettingsPopup(Popup):
         self.reboot_button = Button(text='REBOOT', size_hint=(0.5, 0.5))
         self.reboot_button.bind(on_press=self.reboot)
         self.displayoff_label = Label(text='Turn display off', size_hint=(0.5, 0.5))
-        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=displayCtrl.display_off_active)
+        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=DisplayControl.display_off_active)
         self.displayoff_checkbox.bind(active=self.on_checkbox_active)
 
 
@@ -164,9 +164,8 @@ class SettingsPopup(Popup):
 
     def on_checkbox_active(self, a, checked):
         print('on_checkbox_active(', checked)
-        #global display_off_active
-        displayCtrl.display_off_active = checked
-        print('on_checkbox_active() display_off_active = ', displayCtrl.display_off_active)
+        DisplayControl.display_off_active = checked
+        print('on_checkbox_active() display_off_active = ', DisplayControl.display_off_active)
         pass
 
     def shutdown(self, a):
@@ -298,7 +297,7 @@ class SlideshowWidget:
 def on_motion(self, etype, motionevent):
     # will receive all motion events.
     #displayOn()
-    print('on_motion -> Reset display-sleep-timer display_off_active = ', displayCtrl.display_off_active)
+    print('on_motion -> Reset display-sleep-timer display_off_active = ', DisplayControl.display_off_active)
     #print('etype', etype)
     rt.stop()
     rt.start()
