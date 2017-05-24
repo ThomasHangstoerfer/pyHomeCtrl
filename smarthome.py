@@ -225,6 +225,7 @@ class Smarthome:
         self.fc = server
         self.homectrlTabbedPanel = ctrl
 #        self.fh = fhem.Fhem(self.fhem_server)
+        global fc
         fc = self.fc
         #self.connect()
         fc.addListener(self.update)
