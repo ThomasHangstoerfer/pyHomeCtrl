@@ -88,15 +88,21 @@ class SmartHomeBad(BoxLayout):
     # set BadThermostat_Climate desired-temp 18
     def tempDown(self):
         print('tempDown()')
-        t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
-        newt = t - 0.5
-        fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        try:
+            t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+            newt = t - 0.5
+            fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        except Exception as e:
+            print('EXCEPTION in SmartHomeBad.tempDown(): ', e)
 
     def tempUp(self):
         print('tempUp()')
-        t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
-        newt = t + 0.5
-        fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        try:
+            t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+            newt = t + 0.5
+            fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+        except Exception as e:
+            print('EXCEPTION in SmartHomeBad.tempUp(): ', e)
 
 
 class SmartHomeWohnzimmer(BoxLayout):
@@ -206,7 +212,7 @@ class Smarthome:
             self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fc.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
             self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fc.fh.get_dev_reading("LED", "RGB") )
         except Exception as e:
-            print('Smarthome.update(): ', e)
+            print('EXCEPTION in Smarthome.init(): ', e)
 
     def update(self, ev):
         #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
