@@ -19,22 +19,22 @@ from callback_list import CallbackList
 
 class FhemConnect:
     def __init__(self, server):
-        print('FhemConnect.__init__' )
 
         self.callbacks_update = CallbackList()
         
         self.fhem_server = server
-        self.fh = fhem.Fhem(self.fhem_server)
-        fh = self.fh
+        self.fh = fhem.Fhem(self.fhem_server, loglevel=0)
         global fh
+        fh = self.fh
         self.connect()
 
+
     def connect(self, *args):
-        print('FhemConnect.connect')
+        #print('FhemConnect.connect')
         #self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = 'SDF'
         self.fh.connect()
         if ( self.fh.connected() == False ):
-            print('FHEM not connected. Retrying.')
+            #print('FHEM not connected. Retrying.')
             Clock.schedule_once(self.connect, 2)
         else:
             time.sleep(0.5)

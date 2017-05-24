@@ -32,10 +32,9 @@ import signal
 import sys
 import carousel
 
-
 import fhem_connect
 from upnp import *
-
+from display_ctrl import DisplayControl
 
 import fhem # https://github.com/domschl/python-fhem
 
@@ -54,15 +53,14 @@ global sh # Smarthome
 
 fhem_server = "pi"
 
-display_off_timeout = 20.0
-display_off_active = True
-
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 running_on_pi = os.path.isfile(bl_power_file)
 
 Builder.load_file("homectrl_main.kv")
 
 fc = fhem_connect.FhemConnect(fhem_server);
+
+displayCtrl = DisplayControl()
 
 
 def test(ev):
@@ -137,7 +135,7 @@ class WifiState(ButtonBehavior, Image):
                 self.source = 'gfx/wifi4.png'
         except Exception as e:
             self.source = 'gfx/wifi0.png'
-            print('WifiState.update(): ', e)
+            #print('WifiState.update(): ', e)
 
 
 class SettingsPopup(Popup):
@@ -150,7 +148,7 @@ class SettingsPopup(Popup):
         self.reboot_button = Button(text='REBOOT', size_hint=(0.5, 0.5))
         self.reboot_button.bind(on_press=self.reboot)
         self.displayoff_label = Label(text='Turn display off', size_hint=(0.5, 0.5))
-        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=display_off_active)
+        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=displayCtrl.display_off_active)
         self.displayoff_checkbox.bind(active=self.on_checkbox_active)
 
 
@@ -166,22 +164,22 @@ class SettingsPopup(Popup):
 
     def on_checkbox_active(self, a, checked):
         print('on_checkbox_active(', checked)
-        global display_off_active
-        display_off_active = checked
-        print('on_checkbox_active() display_off_active = ', display_off_active)
+        #global display_off_active
+        displayCtrl.display_off_active = checked
+        print('on_checkbox_active() display_off_active = ', displayCtrl.display_off_active)
         pass
 
     def shutdown(self, a):
         print('SHUTDOWN')
         if ( running_on_pi ):
-            displayOff(0)
+            displayCtrl.displayOff(0)
             os.system('sync; sleep 1; /sbin/poweroff -f')
         pass
 
     def reboot(self, a):
         print('REBOOT')
         if ( running_on_pi ):
-            displayOff(0)
+            displayCtrl.displayOff(0)
             os.system('sync; sleep 1; /sbin/reboot -f now')
         pass
 
@@ -190,41 +188,6 @@ class SettingsPopup(Popup):
         pass
 
 settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
-
-class DisplayOffPopup(Popup):
-
-    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
-        super(DisplayOffPopup,self).__init__(**kwargs)
-        self.content = Button(text='', size_hint=(1.0, 1.0))
-        self.content.bind(on_release=self.dismiss)
-
-    def on_open(self):
-        #print('on_open')
-        pass
-
-    def on_dismiss(self):
-        print('on_dismiss')
-        displayOn()
-        pass
-
-displayoffpopup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
-
-def displayOff(arg):
-    print('displayOff() display_off_active = ', display_off_active)
-    #p.export_to_png("/tmp/kivy.png")
-    if ( display_off_active ):
-        if ( running_on_pi ):
-            os.system('echo 1 > ' + bl_power_file)
-        displayoffpopup.open()
-
-def displayOn():
-    print('displayOn')
-    #displayoffpopup.dismiss()
-    if ( running_on_pi ):
-        os.system('echo 0 > ' + bl_power_file)
-
-
-
 
 
 class SettingsButton(ButtonBehavior, Image):
@@ -319,13 +282,13 @@ class RepeatedTimer(object):
         self._timer.cancel()
         self.is_running = False
 
-displayOn()
-rt = RepeatedTimer(display_off_timeout, displayOff, "") # it auto-starts, no need of rt.start()
+displayCtrl.displayOn()
+rt = RepeatedTimer(displayCtrl.display_off_timeout, displayCtrl.displayOff, "") # it auto-starts, no need of rt.start()
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     rt.stop()
-    displayOn()
+    displayCtrl.displayOn()
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -335,7 +298,7 @@ class SlideshowWidget:
 def on_motion(self, etype, motionevent):
     # will receive all motion events.
     #displayOn()
-    print('on_motion -> Reset display-sleep-timer display_off_active = ', display_off_active)
+    print('on_motion -> Reset display-sleep-timer display_off_active = ', displayCtrl.display_off_active)
     #print('etype', etype)
     rt.stop()
     rt.start()

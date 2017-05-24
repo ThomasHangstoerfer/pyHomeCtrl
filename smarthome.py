@@ -16,6 +16,8 @@ from kivy.graphics import Line
 from kivy.network.urlrequest import UrlRequest
 from thread import start_new_thread
 
+from display_ctrl import DisplayControl
+
 import time
 
 import fhem # https://github.com/domschl/python-fhem
@@ -26,6 +28,9 @@ except:
     import Queue as queue # Python 2.x
 
 global fh
+global fc
+
+displayCtrl = DisplayControl()
 
 def toggle(dev):
     dev_state_temp = fc.fh.get_dev_reading(dev, "state")
@@ -36,47 +41,68 @@ def toggle(dev):
         fc.fh.send_cmd("set " + dev + " off")
 
 class PhoneCallPopup(Popup):
-    pnumber = Label(text='Number',id='phonenumber')
-    caller = Label(text='Caller',id='caller')
+    caller = Label(text='',id='caller', font_size='60sp', size_hint=(1.0, 0.5))
+    pnumber = Label(text='',id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
 
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(PhoneCallPopup,self).__init__(**kwargs)
-        #self.my_widget = my_widget
+        print('PhoneCallPopup()__init__')
         self.content = BoxLayout(orientation="vertical")
         self.content.add_widget(self.caller)
         #self.content.add_widget(Label(text='PhoneCall',id='number'))
         self.content.add_widget(self.pnumber)
-        self.button = Button(text='Ok', size_hint=(1.0, 0.5))
+        self.button = Button(text='Ok', size_hint=(1.0, 0.2))
         self.button.bind(on_press=self.dismiss)
         self.content.add_widget(self.button)
+        print('PhoneCallPopup()__init__ end')
 
     def on_open(self):
         #print('on_open')
         pass
+
+    def setExternalName(self, name):
+        if ( phonecallpopup.caller.text != "" and ( name == "unknown" or name == "" ) ):
+            phonecallpopup.pnumber.text = phonecallpopup.caller.text # transfer number from name-label to number-label
+            phonecallpopup.caller.text = name
+        else:
+            phonecallpopup.caller.text = name
+
+    def setExternalNumber(self, num):
+        if ( phonecallpopup.caller.text == "unknown" or phonecallpopup.caller.text == "" ):
+            phonecallpopup.caller.text = num # caller is unknown, show number in name-label
+            phonecallpopup.pnumber.text = ""
+        else:
+            phonecallpopup.pnumber.text = num
 
     def handleCallmonitor(self, reading, value):
         print('reading: ' + reading + ' value: ' + value)
 
         if ( reading == "external_name" ):
             print("external_name: " + value)
-            phonecallpopup.caller.text = value
+            self.setExternalName(value)
 
         elif ( reading == "external_number" ):
             print("external_number: " + value)
-            phonecallpopup.pnumber.text = value
+            self.setExternalNumber(value)
 
         elif ( reading == "event" ):
             print("event: " + value)
             if ( value == "call" or value == "ring" ):
+                displayCtrl.displayOn()
                 self.open()
             elif ( value == "disconnect" ):
                 self.dismiss()
+                phonecallpopup.caller.text = ""
+                phonecallpopup.pnumber.text = ""
 
         elif ( reading == "direction" ):
             print("direction: " + value)
-            phonecallpopup.title = value
+            if ( value == "outgoing" ):
+                phonecallpopup.title = "Ausgehender Anruf"
+            elif ( value == "incomming" ):
+                phonecallpopup.title = "Eingehender Anruf"
 
-phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.5, 0.5))
+phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.9, 0.9))
 
 class SmartHomeBad(BoxLayout):
     temp = StringProperty()
@@ -104,7 +130,6 @@ class SmartHomeBad(BoxLayout):
         except Exception as e:
             print('EXCEPTION in SmartHomeBad.tempUp(): ', e)
 
-
 class SmartHomeWohnzimmer(BoxLayout):
     led_r = NumericProperty()
     led_g = NumericProperty()
@@ -118,6 +143,10 @@ class SmartHomeWohnzimmer(BoxLayout):
     def toggle_WzDeckenlampe(self):
         print('toggle_WzDeckenlampe')
         toggle('WzDeckenlampe')
+        #phonecallpopup.handleCallmonitor("external_name", "Thomas")
+        #phonecallpopup.handleCallmonitor("external_number", "0173-1234567")
+        #phonecallpopup.handleCallmonitor("direction", "incomming")
+        #phonecallpopup.handleCallmonitor("event", "call")
 
     def toggle_WzStehlampe(self):
         print('toggle_WzStehlampe')
@@ -192,13 +221,11 @@ class SmartHomeWohnzimmer(BoxLayout):
 
 class Smarthome:
     def __init__(self, server, ctrl):
-        print('Smarthome.__init__' )
 
         self.fc = server
         self.homectrlTabbedPanel = ctrl
 #        self.fh = fhem.Fhem(self.fhem_server)
         fc = self.fc
-        global fc
         #self.connect()
         fc.addListener(self.update)
         self.init()
