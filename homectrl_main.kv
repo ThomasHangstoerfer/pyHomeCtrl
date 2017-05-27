@@ -5,6 +5,7 @@
 #:include weather.kv
 #:include slideshow.kv
 #:include verboseclock.kv
+#:include calllist.kv
 
 <TabbedPanelStrip>:
     canvas:
@@ -82,6 +83,7 @@
     #size: (200,200)
     weatherItem: weatherItem
     musicItem: musicItem
+ #   calllistItem: calllistItem
     smarthomeItem: smarthomeItem
     slideshowItem: slideshowItem
 
@@ -91,6 +93,13 @@
 #        subwidget: vClock
 #        VerboseClock:
 #            id: vClock
+
+#    TabbedIconPanelItem:
+#        id: calllistItem
+#        img: 'gfx/empty.png'
+#        subwidget: calllist
+#        CallList:
+#            id: calllist
 
     TabbedIconPanelItem:
         id: weatherItem
@@ -122,28 +131,3 @@
 <HomeCtrl>:
     id: layout
     width: 100
-#    on_touch_down: self.on_touch_down(layout)
-#    HomeCtrlTabbedPanel:
-#        id: sh_tab_panel
-
-
-#    canvas:
-#        Rectangle:
-#            pos: self.center_x - 5, 0
-#            size: 10, self.height
-#            
-#    Label:
-#        font_size: 70  
-#        center_x: root.width / 4
-#        top: root.top - 50
-#        text: "0"
-#        
-#    Label:
-#        font_size: 70  
-#        center_x: root.width * 3 / 4
-#        top: root.top - 50
-#        text: "0"
-#
-#    LCARSButton:
-#        center_x: root.center_x
-#        center_y: root.center_y

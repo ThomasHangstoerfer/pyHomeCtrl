@@ -48,6 +48,7 @@ import smarthome
 import weather
 import slideshow
 import verboseclock
+import calllist
 
 global sh # Smarthome
 
@@ -243,7 +244,6 @@ class HomeCtrlTabbedPanel(TabbedPanel):
     smarthomeItem = ObjectProperty()
     def __init__(self, *args, **kwargs):
         super(HomeCtrlTabbedPanel, self).__init__(*args, **kwargs)
-        print('HIER')
         #self.set_def_tab(self.tab_list[0])
         #self.switch_to(self.musicItem)
 
@@ -326,6 +326,7 @@ class HomeCtrlApp(App):
         p.add_widget(settingsbutton)
 
         #print('IP: ', get_ip_address() )
+#        homectrlTabbedPanel.calllistItem.subwidget.setCtrl(fc)
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
