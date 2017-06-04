@@ -31,6 +31,7 @@ import socket
 import signal
 import sys
 import carousel
+import calendarlist
 
 import fhem_connect
 from upnp import *
@@ -326,7 +327,8 @@ class HomeCtrlApp(App):
         p.add_widget(settingsbutton)
 
         #print('IP: ', get_ip_address() )
-#        homectrlTabbedPanel.calllistItem.subwidget.setCtrl(fc)
+        homectrlTabbedPanel.calllistItem.subwidget.setCtrl(fc)
+        homectrlTabbedPanel.calendarItem.subwidget.update()
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()

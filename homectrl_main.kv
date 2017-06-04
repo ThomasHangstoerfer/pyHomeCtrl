@@ -83,23 +83,31 @@
     #size: (200,200)
     weatherItem: weatherItem
     musicItem: musicItem
- #   calllistItem: calllistItem
+    calllistItem: calllistItem
     smarthomeItem: smarthomeItem
     slideshowItem: slideshowItem
+    calendarItem: calendarItem
 
 #    TabbedIconPanelItem:
 #        id: emptyItem
-#        img: 'gfx/empty.png'
+#        img: 'gfx/clock.png'
 #        subwidget: vClock
 #        VerboseClock:
 #            id: vClock
 
-#    TabbedIconPanelItem:
-#        id: calllistItem
-#        img: 'gfx/empty.png'
-#        subwidget: calllist
-#        CallList:
-#            id: calllist
+    TabbedIconPanelItem:
+        id: calendarItem
+        img: 'gfx/calendar_r.png'
+        subwidget: calendar
+        Calendar:
+            id: calendar
+
+    TabbedIconPanelItem:
+        id: calllistItem
+        img: 'gfx/phone_r.png'
+        subwidget: calllist
+        CallList:
+            id: calllist
 
     TabbedIconPanelItem:
         id: weatherItem
