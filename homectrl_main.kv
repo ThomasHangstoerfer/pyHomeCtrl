@@ -6,6 +6,7 @@
 #:include slideshow.kv
 #:include verboseclock.kv
 #:include calllist.kv
+#:include calendarlist.kv
 
 <TabbedPanelStrip>:
     canvas:
@@ -99,7 +100,7 @@
         id: calendarItem
         img: 'gfx/calendar_r.png'
         subwidget: calendar
-        Calendar:
+        CalendarList:
             id: calendar
 
     TabbedIconPanelItem:

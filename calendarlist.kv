@@ -1,3 +1,16 @@
-<Calendar>:
-#    ListView:
-#        id: lv
+#:import sla kivy.adapters.simplelistadapter
+#:import label kivy.uix.label
+#:import ListItemButton kivy.uix.listview.ListItemButton
+#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import DictAdapter kivy.adapters.dictadapter.DictAdapter
+#:import Factory kivy.factory.Factory
+
+<ListItemButtonCal@ListItemButton>:
+    font_size: 30
+    size_hint_y: None
+    height: 60
+    line_height: 1
+
+
+<CalendarList>:
+    adapter: ListAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=root.args_converter )

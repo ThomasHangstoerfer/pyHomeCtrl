@@ -57,10 +57,37 @@ def get_credentials():
     return credentials
 
 
-class Calendar(ListView):
+class CalendarList(ListView):
     def __init__(self, **kwargs):
-        super(Calendar, self).__init__()
+        super(CalendarList, self).__init__()
         self.calendarId = 'set calendar-id here'
+
+    def args_converter(self, row_index, an_obj):
+        if row_index % 2:
+            background = [1, 1, 1, 0]
+        else:
+            background = [1, 1, 1, .5]
+        print('an_obj: ', an_obj)
+        #return {'text': an_obj['summary'],
+        return {'text': an_obj, #['summary'],
+                'size_hint_y': None,
+                'deselected_color': background}
+
+#    args_converter = lambda row_index, rec: {
+#        'text': rec['text'],
+#        'size_hint_y': None,
+#        'height': 25,
+#        'cls_dicts': [{'cls': ListItemButton,
+#                       'kwargs': {'text': rec['text']}},
+#                       {
+#                           'cls': ListItemLabel,
+#                           'kwargs': {
+#                               'text': rec['ts'],
+#                               'is_representing_cls': True}},
+#                       {
+#                           'cls': ListItemButton,
+#                           'kwargs': {'text': rec['text']}}]}
+
 
     def update(self):
         print('Calendar.update()')
@@ -84,7 +111,7 @@ class Calendar(ListView):
             for event in events['items']:
                 start = event['start'].get('dateTime', event['start'].get('date'))
                 self.item_strings.append(start + ": " + event['summary'])
-
+                
                 print (start + ": " + event['summary'])
             page_token = events.get('nextPageToken')
             if not page_token:
