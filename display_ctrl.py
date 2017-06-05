@@ -14,6 +14,7 @@ import os
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 running_on_pi = os.path.isfile(bl_power_file)
+default_display_off_timeout = 60.0
 
 
 class DisplayOffPopup(Popup):
@@ -34,7 +35,7 @@ class DisplayControl:
     __instance = None
     display_off_active = True
     old_display_off_active = display_off_active
-    display_off_timeout = 10.0
+    display_off_timeout = default_display_off_timeout
     def __new__(cls, val): # http://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
         if DisplayControl.__instance is None:
             DisplayControl.__instance = object.__new__(cls)
