@@ -1,0 +1,19 @@
+
+<DoorCam>:
+    camimage: camimage
+    image_timestamp: image_timestamp
+    pos_hint: {'x': -0.6, 'y': 0.5}
+    Image:
+        id: camimage
+        size_hint: root.size_hint
+        size: root.size
+        background_normal: ''
+        #source: '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+    Label:
+        id: image_timestamp
+        text: ''
+        #color: (0,1,0.5,0.5)
+        color: (0,0,0,1)
+        font_size: '20sp'
+        size_hint: (0.48, 0.05)
+        pos_hint: {'x': 0.0, 'y':0.1}

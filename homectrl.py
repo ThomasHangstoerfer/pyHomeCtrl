@@ -9,6 +9,7 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.behaviors import ButtonBehavior
@@ -19,6 +20,7 @@ from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.network.urlrequest import UrlRequest
 
+import datetime
 from thread import start_new_thread
 import threading
 from threading import Timer
@@ -31,7 +33,7 @@ import socket
 import signal
 import sys
 import carousel
-import calendarlist
+#import calendarlist
 
 import fhem_connect
 from upnp import *
@@ -53,6 +55,40 @@ import calllist
 
 global sh # Smarthome
 
+import collections
+import os, sys
+from stat import *
+
+#cam_path = '/qnap/BTSync/pyHomeCtrl/cam'
+cam_path = '/qnap/Download/'
+
+def getLatestFile(folder):
+    #print('getLatestFile(%s)' % folder)
+    max_mtime = 0
+    max_mtime_pathname = ''
+    for f in os.listdir(folder):
+        pathname = os.path.join(folder, f)
+        mode = os.stat(pathname).st_mode
+        if S_ISDIR(mode):
+            #print 'Skipping %s' % pathname
+            pass
+        elif S_ISREG(mode):
+            #print pathname
+            mtime = os.stat(pathname).st_mtime
+            print 'pathname %s - old %i  new %i' % (pathname, mtime, os.stat(pathname).st_mtime)
+            if mtime > max_mtime:
+                max_mtime = mtime
+                max_mtime_pathname = pathname
+        else:
+            #print 'Skipping %s' % pathname
+            pass
+    #print 'max_mtime = %i' % max_mtime
+    #print 'max_mtime_pathname %s' % max_mtime_pathname
+    return max_mtime_pathname
+
+#print 'latest file: %s' % getLatestFile('/qnap/BTSync/pyHomeCtrl/cam')
+
+
 fhem_server = "pi"
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
@@ -65,9 +101,9 @@ fc = fhem_connect.FhemConnect(fhem_server);
 displayCtrl = DisplayControl()
 
 
-def test(ev):
-    print('DATA: ' + ev["device"] + ': ' + ev["reading"])
-fc.addListener(test)
+#def test(ev):
+#    print('DATA: ' + ev["device"] + ': ' + ev["reading"])
+#fc.addListener(test)
 
 def get_ip_address():
     s = socket(AF_INET, SOCK_DGRAM)
@@ -200,6 +236,15 @@ class SettingsButton(ButtonBehavior, Image):
         settingspopup.open()
 
 
+class DoorCam(ScatterLayout):
+    def update(self, e):
+        #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+        filepath = getLatestFile(cam_path)
+        print 'DoorCam.update() %s' % filepath
+        self.camimage.source = filepath
+        self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+
+
 class LCARSButton(Button):
     def on_release(self):
         print('RELEASE')
@@ -326,13 +371,18 @@ class HomeCtrlApp(App):
         settingsbutton = SettingsButton()
         p.add_widget(settingsbutton)
 
+
         #print('IP: ', get_ip_address() )
         homectrlTabbedPanel.calllistItem.subwidget.setCtrl(fc)
-        homectrlTabbedPanel.calendarItem.subwidget.update()
+        #homectrlTabbedPanel.calendarItem.subwidget.update()
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
         homectrlTabbedPanel.slideshowItem.subwidget.carousel.stop_automatic()
+        #homectrlTabbedPanel.doorCamItem.subwidget.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-55.jpg'
+        homectrlTabbedPanel.doorCamItem.subwidget.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+
+        Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 5)
         return p
 
 

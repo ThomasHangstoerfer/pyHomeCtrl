@@ -14,7 +14,7 @@ import os
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 running_on_pi = os.path.isfile(bl_power_file)
-default_display_off_timeout = 60.0
+default_display_off_timeout = 90.0
 
 
 class DisplayOffPopup(Popup):

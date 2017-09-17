@@ -7,6 +7,7 @@
 #:include verboseclock.kv
 #:include calllist.kv
 #:include calendarlist.kv
+#:include doorcam.kv
 
 <TabbedPanelStrip>:
     canvas:
@@ -83,11 +84,12 @@
     spacing: 20
     #size: (200,200)
     weatherItem: weatherItem
-    musicItem: musicItem
+#    musicItem: musicItem
+    doorCamItem: doorCamItem
     calllistItem: calllistItem
     smarthomeItem: smarthomeItem
     slideshowItem: slideshowItem
-    calendarItem: calendarItem
+#    calendarItem: calendarItem
 
 #    TabbedIconPanelItem:
 #        id: emptyItem
@@ -96,12 +98,12 @@
 #        VerboseClock:
 #            id: vClock
 
-    TabbedIconPanelItem:
-        id: calendarItem
-        img: 'gfx/calendar_r.png'
-        subwidget: calendar
-        CalendarList:
-            id: calendar
+#    TabbedIconPanelItem:
+#        id: calendarItem
+#        img: 'gfx/calendar_r.png'
+#        subwidget: calendar
+#        CalendarList:
+#            id: calendar
 
     TabbedIconPanelItem:
         id: calllistItem
@@ -118,14 +120,21 @@
         WeatherWidget:
             id: ww
 
+#    TabbedIconPanelItem:
+#        id: musicItem
+#        img: 'gfx/music_r.png'
+#        LCARSButton2:
+
     TabbedIconPanelItem:
-        id: musicItem
-        img: 'gfx/music_r.png'
-        LCARSButton2:
+        id: doorCamItem
+        img: 'gfx/view_r.png'
+        subwidget: doorcam
+        DoorCam:
+            id: doorcam
 
     TabbedIconPanelItem:
         id: slideshowItem
-        img: 'gfx/view_r.png'
+        img: 'gfx/music_r.png'
         subwidget: ss
         SlideshowWidget:
             id: ss

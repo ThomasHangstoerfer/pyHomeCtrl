@@ -4,6 +4,9 @@ from __future__ import print_function
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.listview import ListView
+from kivy.adapters.listadapter import ListAdapter
+from kivy.adapters.dictadapter import DictAdapter
+from kivy.factory import Factory
 
 import httplib2
 import os
@@ -60,34 +63,38 @@ def get_credentials():
 class CalendarList(ListView):
     def __init__(self, **kwargs):
         super(CalendarList, self).__init__()
-        self.calendarId = 'set calendar-id here'
+        #self.calendarId = 'set calendar-id here'
+        self.calendarId = 'mergtn05h7dbffq2b4n2941j9k@group.calendar.google.com'
 
-    def args_converter(self, row_index, an_obj):
-        if row_index % 2:
-            background = [1, 1, 1, 0]
-        else:
-            background = [1, 1, 1, .5]
-        print('an_obj: ', an_obj)
-        #return {'text': an_obj['summary'],
-        return {'text': an_obj, #['summary'],
-                'size_hint_y': None,
-                'deselected_color': background}
+        self.args_converter = lambda row_index, rec: {
+            'text': rec['text'],
+            'size_hint_y': None,
+            'height': 25,
+            'cls_dicts': [{'cls': ListItemButton,
+                           'kwargs': {'text': rec['text']}},
+                           {
+                               'cls': ListItemLabel,
+                               'kwargs': {
+                                   'text': rec['ts'],
+                                   'is_representing_cls': True}},
+                           {
+                               'cls': ListItemButton,
+                               'kwargs': {'text': rec['text']}}]}
+        self.adapter = ListAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
+        #self.adapter = DictAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
 
-#    args_converter = lambda row_index, rec: {
-#        'text': rec['text'],
-#        'size_hint_y': None,
-#        'height': 25,
-#        'cls_dicts': [{'cls': ListItemButton,
-#                       'kwargs': {'text': rec['text']}},
-#                       {
-#                           'cls': ListItemLabel,
-#                           'kwargs': {
-#                               'text': rec['ts'],
-#                               'is_representing_cls': True}},
-#                       {
-#                           'cls': ListItemButton,
-#                           'kwargs': {'text': rec['text']}}]}
 
+
+#    def args_converter(self, row_index, an_obj):
+#        if row_index % 2:
+#            background = [1, 1, 1, 0]
+#        else:
+#            background = [1, 1, 1, .5]
+#        print('an_obj: ', an_obj)
+#        #return {'text': an_obj['summary'],
+#        return {'text': an_obj, #['summary'],
+#                'size_hint_y': None,
+#                'deselected_color': background}
 
     def update(self):
         print('Calendar.update()')
