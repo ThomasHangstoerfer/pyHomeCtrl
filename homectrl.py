@@ -130,7 +130,8 @@ class NetworkInfoPopup(Popup):
         fc.addListener(self.update)
 
     def update(self, ev):
-        self.title = "HIER"
+        #self.title = "FhemConnect - update listener"
+        pass
 
     def on_open(self):
         #print('on_open')
