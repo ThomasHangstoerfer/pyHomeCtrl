@@ -267,7 +267,7 @@ class Smarthome:
                 self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
         elif ( device == "BadFenster" ):
             print("BadFenster: " + ev["value"])
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fc.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
         elif ( device == "BadHeizung" ):
             if ( ev["reading"] == "actuator" ):
                 print("BadHeizung: actuator: " + ev["value"])
