@@ -384,16 +384,13 @@ class HomeCtrlApp(App):
         settingsbutton = SettingsButton()
         p.add_widget(settingsbutton)
 
-
-        #print('IP: ', get_ip_address() )
         homectrlTabbedPanel.calllistItem.subwidget.setCtrl(fc)
         #homectrlTabbedPanel.calendarItem.subwidget.update()
 
         homectrlTabbedPanel.weatherItem.subwidget.clear_widget()
         homectrlTabbedPanel.weatherItem.subwidget.update()
-        homectrlTabbedPanel.slideshowItem.subwidget.carousel.stop_automatic()
-        #homectrlTabbedPanel.doorCamItem.subwidget.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-55.jpg'
-        homectrlTabbedPanel.doorCamItem.subwidget.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+        #homectrlTabbedPanel.slideshowItem.subwidget.carousel.stop_automatic()
+        homectrlTabbedPanel.doorCamItem.subwidget.camimage.source = 'images/cam-20170921-222342.jpg'
 
         Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
         return p
