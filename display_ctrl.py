@@ -17,6 +17,7 @@ running_on_pi = os.path.isfile(bl_power_file)
 default_display_off_timeout = 90.0
 
 
+
 class DisplayOffPopup(Popup):
 
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
@@ -34,6 +35,7 @@ class DisplayOffPopup(Popup):
 class DisplayControl:
     __instance = None
     display_off_active = True
+    display_is_off = False
     old_display_off_active = display_off_active
     display_off_timeout = default_display_off_timeout
     def __new__(cls, val): # http://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
@@ -61,9 +63,13 @@ class DisplayControl:
             if ( running_on_pi ):
                 os.system('echo 1 > ' + bl_power_file)
             self.popup.open()
+            self.display_is_off = True
+            print 'self.display_is_off %i' % self.display_is_off
+
 
     def displayOn(self):
         print('displayOn')
         #self.popup.dismiss()
         if ( running_on_pi ):
             os.system('echo 0 > ' + bl_power_file)
+        self.display_is_off = False

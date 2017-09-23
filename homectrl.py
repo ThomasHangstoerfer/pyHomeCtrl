@@ -247,7 +247,11 @@ class DoorCam(ScatterLayout):
         #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
         #filepath = getLatestFile(cam_path)
         #self.camimage.source = filepath
-        if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab ):
+        #if ( displayCtrl.display_is_off == True ):
+        #    print 'Display Off'
+        #else:
+        #    print 'Display On'
+        if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab and displayCtrl.display_is_off == False ):
             #print 'update doorCam'
             self.camimage.source = 'http://pi:9615/latest.jpg'
             self.camimage.reload()
