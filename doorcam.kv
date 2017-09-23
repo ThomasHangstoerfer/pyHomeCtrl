@@ -3,6 +3,13 @@
     camimage: camimage
     image_timestamp: image_timestamp
     pos_hint: {'x': -0.6, 'y': 0.5}
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
     AsyncImage:
         id: camimage
         size_hint: root.size_hint
