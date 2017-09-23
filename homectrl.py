@@ -238,12 +238,19 @@ class SettingsButton(ButtonBehavior, Image):
 
 
 class DoorCam(ScatterLayout):
+    def on_touch_down( self, touch ):
+        print 'on_touch_down'
+        self.update('')
+
     def update(self, e):
+        #print 'DoorCam.update()'
         #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
-        filepath = getLatestFile(cam_path)
-        print 'DoorCam.update() %s' % filepath
-        self.camimage.source = filepath
-        self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+        #filepath = getLatestFile(cam_path)
+        #self.camimage.source = filepath
+        if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab ):
+            #print 'update doorCam'
+            self.camimage.source = 'http://pi:9615/latest.jpg'
+            #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
 
 
 class LCARSButton(Button):
@@ -383,7 +390,7 @@ class HomeCtrlApp(App):
         #homectrlTabbedPanel.doorCamItem.subwidget.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-55.jpg'
         homectrlTabbedPanel.doorCamItem.subwidget.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
 
-        Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 5)
+        Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
         return p
 
 
