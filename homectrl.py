@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from kivy.app import App
@@ -38,6 +39,7 @@ import carousel
 import fhem_connect
 from upnp import *
 from display_ctrl import DisplayControl
+from functools import partial
 
 import fhem # https://github.com/domschl/python-fhem
 
@@ -179,6 +181,8 @@ class WifiState(ButtonBehavior, Image):
 
 class SettingsPopup(Popup):
 
+    offlinemode = False
+
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(SettingsPopup,self).__init__(**kwargs)
 
@@ -190,22 +194,43 @@ class SettingsPopup(Popup):
         self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=DisplayControl.display_off_active)
         self.displayoff_checkbox.bind(active=self.on_checkbox_active)
 
+        self.offlinemode_label = Label(text='Offline mode', size_hint=(0.5, 0.5))
+        self.offlinemode_checkbox = CheckBox(size_hint=(0.5, 0.5), active=self.offlinemode)
+        self.offlinemode_checkbox.bind(active=self.on_checkbox_offlinemode)
+
 
         self.content = BoxLayout(orientation="vertical")
-        self.settingslayout = BoxLayout(orientation="horizontal")
-        self.settingslayout.add_widget(self.displayoff_label)
-        self.settingslayout.add_widget(self.displayoff_checkbox)
+        self.displayoff_layout = BoxLayout(orientation="horizontal")
+        self.displayoff_layout.add_widget(self.displayoff_label)
+        self.displayoff_layout.add_widget(self.displayoff_checkbox)
+        self.offlinemode_layout = BoxLayout(orientation="horizontal")
+        self.offlinemode_layout.add_widget(self.offlinemode_label)
+        self.offlinemode_layout.add_widget(self.offlinemode_checkbox)
         self.shutdownlayout = BoxLayout(orientation="horizontal")
         self.shutdownlayout.add_widget(self.shutdown_button)
         self.shutdownlayout.add_widget(self.reboot_button)
-        self.content.add_widget(self.settingslayout)
+
+        self.content.add_widget(self.displayoff_layout)
+        self.content.add_widget(self.offlinemode_layout)
         self.content.add_widget(self.shutdownlayout)
 
     def on_checkbox_active(self, a, checked):
         print('on_checkbox_active(', checked)
         DisplayControl.display_off_active = checked
-        print('on_checkbox_active() display_off_active = ', DisplayControl.display_off_active)
+        #print('on_checkbox_active() display_off_active = ', DisplayControl.display_off_active)
         pass
+
+    def on_checkbox_offlinemode(self, a, checked):
+        print('on_checkbox_offlinemode(', checked)
+        #DisplayControl.display_off_active = checked
+        #print('on_checkbox_offlinemode() display_off_active = ', DisplayControl.display_off_active)
+        self.offlinemode = checked
+        self.update()
+        pass
+
+    def update(self):
+        homectrlTabbedPanel.weatherItem.subwidget.setOfflineMode( self.offlinemode )
+        sh.setOfflineMode( self.offlinemode )
 
     def shutdown(self, a):
         print('SHUTDOWN')
@@ -251,11 +276,15 @@ class DoorCam(ScatterLayout):
         #    print 'Display Off'
         #else:
         #    print 'Display On'
-        if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab and displayCtrl.display_is_off == False ):
-            #print 'update doorCam'
-            self.camimage.source = 'http://pi:9615/latest.jpg'
-            self.camimage.reload()
-            #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+
+        if ( settingspopup.offlinemode == True ):
+            self.camimage.source = 'images/cam-20170921-222342.jpg'
+        else:
+            if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab and displayCtrl.display_is_off == False ):
+                #print 'update doorCam'
+                self.camimage.source = 'http://pi:9615/latest.jpg'
+                self.camimage.reload()
+                #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
 
 
 class LCARSButton(Button):
@@ -304,9 +333,11 @@ class HomeCtrlTabbedPanel(TabbedPanel):
     def __init__(self, *args, **kwargs):
         super(HomeCtrlTabbedPanel, self).__init__(*args, **kwargs)
         #self.set_def_tab(self.tab_list[0])
-        #self.switch_to(self.musicItem)
+        #self.switch_to(self.smarthomeItem)
 
-    pass
+    def switch(self, tab, *args):
+        print 'HomeCtrlTabbedPanel.switch()'
+        self.switch_to(tab)
 
 
 class RepeatedTimer(object):
@@ -392,7 +423,15 @@ class HomeCtrlApp(App):
         #homectrlTabbedPanel.slideshowItem.subwidget.carousel.stop_automatic()
         homectrlTabbedPanel.doorCamItem.subwidget.camimage.source = 'images/cam-20170921-222342.jpg'
 
+        settingspopup.update()
+
+        # switch asynchronuous to default-tab
+        Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.doorCamItem), 5)
+
         Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
+
+
+        print 'source: %s' % homectrlTabbedPanel.calllistItem.img
         return p
 
 

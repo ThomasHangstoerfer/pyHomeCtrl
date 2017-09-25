@@ -1,6 +1,6 @@
 # pyHomeCtrl
 
-Building a SmartHome-Control-Center with a [Raspberry Pi with touchscreen](https://www.amazon.de/gp/product/B01LZNCZ3A).
+Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](https://www.amazon.de/gp/product/B01LZNCZ3A).
 
 
 # Screenshots

@@ -249,6 +249,17 @@ class Smarthome:
         except Exception as e:
             print('EXCEPTION in Smarthome.init(): ', e)
 
+    def setOfflineMode(self, offlineMode ):
+        print 'Smarthome.setOfflineMode(%i)' % offlineMode
+        if ( offlineMode == True ):
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = u"21.5 °C"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = u"23.0 °C"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = u"42 %"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu"
+            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = u"100 %"
+        else:
+            self.init()
+
     def update(self, ev):
         #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
         #    print("key={0}, val={1}".format(key, val))

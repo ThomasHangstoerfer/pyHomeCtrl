@@ -12,8 +12,13 @@ class CallList(ListView):
     def setCtrl(self, ctrl):
         self.ctrl = ctrl
         self.ctrl.addListener(self.update)
+
+        self.init()
+
+    def init(self):
         try:
             #numberOfCalls = int(self.ctrl.fh.get_dev_reading("clist", "numberOfCalls"))
+            print "numberOfCalls %i" % numberOfCalls
             #numberOfCalls = 10
             numberOfCalls = 1
             while numberOfCalls > len(self.item_strings):
@@ -24,6 +29,7 @@ class CallList(ListView):
 
         except Exception as e:
             print("\n\n\n\n EXCEPTION in CallList.init(): ", e)
+
 
     def update(self, ev):
         print("CallList: ", ev)
