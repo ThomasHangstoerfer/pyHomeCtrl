@@ -448,7 +448,7 @@ class HomeCtrlApp(App):
         Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
 
         global dl
-        dl = DashListener('enp0s3', '08:00:27:50:83:ae',self.dash_pressed)
+        dl = DashListener('wlan0', '18:74:2e:35:30:8a',self.dash_pressed)
         dl.start()
 
         return p
