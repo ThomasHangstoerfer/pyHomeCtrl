@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+
+# pip install ipython
+# pip install scapy
+
+
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
@@ -282,9 +287,13 @@ class DoorCam(ScatterLayout):
         else:
             if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab and displayCtrl.display_is_off == False ):
                 #print 'update doorCam'
-                self.camimage.source = 'http://pi:9615/latest.jpg'
-                self.camimage.reload()
-                #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+                try:
+                    #if ( self.camimage.source == '' ):
+                    self.camimage.source = 'http://pi:9615/latest.jpg'
+                    self.camimage.reload()
+                    #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+                except Exception as e:
+                    pass
 
 
 class LCARSButton(Button):
@@ -378,6 +387,7 @@ def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     rt.stop()
     displayCtrl.displayOn()
+    dl.stop('','')
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -399,7 +409,14 @@ Window.bind(on_motion=on_motion)
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
 sh = smarthome.Smarthome(fc, homectrlTabbedPanel)
 
+from dash_listen import DashListener
+
+dl = None
+
 class HomeCtrlApp(App):
+    def on_stop(self):
+        print 'HomeCtrlApp.on_stop()'
+
     def build(self):
 
         p = HomeCtrl()
@@ -430,9 +447,15 @@ class HomeCtrlApp(App):
 
         Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
 
+        global dl
+        dl = DashListener('enp0s3', '08:00:27:50:83:ae',self.dash_pressed)
+        dl.start()
 
-        print 'source: %s' % homectrlTabbedPanel.calllistItem.img
         return p
+
+    def dash_pressed(self):
+        print 'dash_pressed'
+        homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
 
 
 if __name__ == '__main__':
