@@ -10,7 +10,7 @@
 # pip install scapy
 # sudo apt-get install tcpdump python-scapy
 
-from scapy.all import sniff, ARP
+from scapy.all import *
 from datetime import datetime, timedelta
 from functools import partial
 
@@ -41,7 +41,7 @@ class DashListener(threading.Thread):
         while (self.running):
             print 'Sniffing'
             if ( self.method == 'udp' ):
-                sniff(prn=partial(self.udp_filter), store=0, filter="udp", lfilter=lambda d: d.src in self.mac_id_list)
+                sniff(prn=partial(udp_filter, self), store=0, filter="udp",timeout=5, lfilter=lambda d: d.src in self.mac_id_list)
             elif ( self.method == 'arp' ):
                 sniff(prn=partial(arp_received, self), iface=self.iface, filter="arp", store=0, count=0,timeout=5)
             else:
@@ -49,14 +49,8 @@ class DashListener(threading.Thread):
         print 'DashListener.run() finished'
 
     def udp_filter(self, pkt):
-        print 'udp_filter'
-        options = pkt[DHCP].options
-        for option in options:
-            if isinstance(option, tuple):
-                if 'requested_addr' in option:
-                    # we've found the IP address, which means its the second and final UDP request, so we can trigger our action
-                    mac_to_action[pkt.src]()
-                    break
+        print 'DashListener.udp_filter()'
+        self.mac_to_action[pkt.src]()
 
     def arp_received(self):
         print 'DashListener.arp_received()'
@@ -79,6 +73,17 @@ def macToString(mac):
     elif 'd0:66:7b:7d:0c:28' == mac: return 'SamsungTV.fritz.box'
     else:
         return mac
+
+def udp_filter(dash_listener, pkt):
+    print 'udp_filter'
+    options = pkt[DHCP].options
+    for option in options:
+        if isinstance(option, tuple):
+            if 'requested_addr' in option:
+                # we've found the IP address, which means its the second and final UDP request, so we can trigger our action
+                #mac_to_action[pkt.src]()
+                dash_listener.udp_filter(pkt)
+                break
 
 def arp_received(dash_listener, packet):
     #print 'arp_received from %s to %s - dash_mac = %s ' % (macToString( packet[ARP].hwsrc), macToString(packet[ARP].hwdst), dash_listener.dash_mac)
