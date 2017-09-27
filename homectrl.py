@@ -354,6 +354,13 @@ class HomeCtrlTabbedPanel(TabbedPanel):
         print 'HomeCtrlTabbedPanel.switch()'
         self.switch_to(tab)
 
+        on_get_focus_op = getattr(tab.subwidget, "on_get_focus", None)
+        if callable(on_get_focus_op):
+            on_get_focus_op()
+
+        #homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
+
+
 DisplayControl().displayOn()
 
 def signal_handler(signal, frame):
@@ -405,7 +412,6 @@ class HomeCtrlApp(App):
 
         # switch asynchronuous to default-tab
         Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.doorCamItem), 5)
-        homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
 
         global dl
         dl = DashListener('wlan0', '18:74:2e:35:30:8a',self.dash_pressed,'udp')
@@ -417,6 +423,7 @@ class HomeCtrlApp(App):
     def dash_pressed(self):
         print 'dash_pressed'
         homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
+        homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
         DisplayControl().displayOn()
 
 if __name__ == '__main__':
