@@ -46,6 +46,13 @@ class WeatherWidget(FloatLayout):
             forecast_url = 'http://api.openweathermap.org/data/2.5/forecast?id=2808802&appid=83b6d799fe72c462f34c2e772188190d&units=metric'
             forecast_request = UrlRequest(forecast_url,on_success=self.new_forecast_data,on_failure=self.forecast_failure,on_redirect=self.forecast_redirect)
 
+
+    def on_get_focus(self):
+        print 'WeatherWidget.on_get_focus()'
+
+    def on_release_focus(self):
+        print 'WeatherWidget.on_release_focus()'
+        
     def setOfflineMode(self, offlineMode ):
         print 'WeatherWidget.setOfflineMode(%i)' % offlineMode
         if ( offlineMode == True ):

@@ -39,7 +39,7 @@ class DashListener(threading.Thread):
     def run(self):
         print 'DashListener.run()'
         while (self.running):
-            print 'Sniffing'
+            #print 'Sniffing'
             if ( self.method == 'udp' ):
                 sniff(prn=partial(udp_filter, self), store=0, filter="udp",timeout=5, lfilter=lambda d: d.src in self.mac_id_list)
             elif ( self.method == 'arp' ):

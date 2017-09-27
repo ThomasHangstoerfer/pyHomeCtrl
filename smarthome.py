@@ -30,7 +30,6 @@ except:
 global fh
 global fc
 
-displayCtrl = DisplayControl()
 
 def toggle(dev):
     dev_state_temp = fc.fh.get_dev_reading(dev, "state")
@@ -59,12 +58,12 @@ class PhoneCallPopup(Popup):
 
     def on_open(self):
         print('on_open')
-        displayCtrl.lock()
+        DisplayControl().lock()
         pass
 
     def on_dismiss(self):
         print('on_dismiss')
-        displayCtrl.unlock()
+        DisplayControl().unlock()
         pass
 
     def setExternalName(self, name):
@@ -95,7 +94,7 @@ class PhoneCallPopup(Popup):
         elif ( reading == "event" ):
             print("event: " + value)
             if ( value == "call" or value == "ring" ):
-                displayCtrl.displayOn()
+                DisplayControl().displayOn()
                 self.open()
             elif ( value == "disconnect" ):
                 self.dismiss()
@@ -126,7 +125,7 @@ class SmartHomeBad(BoxLayout):
             newt = t - 0.5
             fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print('EXCEPTION in SmartHomeBad.tempDown(): ', e)
+            print '\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e
 
     def tempUp(self):
         print('tempUp()')
@@ -135,7 +134,7 @@ class SmartHomeBad(BoxLayout):
             newt = t + 0.5
             fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print('EXCEPTION in SmartHomeBad.tempUp(): ', e)
+            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
 
 class SmartHomeWohnzimmer(BoxLayout):
     led_r = NumericProperty()
@@ -247,7 +246,7 @@ class Smarthome:
             self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fc.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
             self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fc.fh.get_dev_reading("LED", "RGB") )
         except Exception as e:
-            print('EXCEPTION in Smarthome.init(): ', e)
+            print 'EXCEPTION in Smarthome.init(): %s' % e
 
     def setOfflineMode(self, offlineMode ):
         print 'Smarthome.setOfflineMode(%i)' % offlineMode

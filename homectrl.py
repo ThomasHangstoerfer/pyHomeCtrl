@@ -7,7 +7,7 @@
 
 
 from kivy.app import App
-from kivy.core.window import Window
+#from kivy.core.window import Window
 from kivy.uix.widget import Widget
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.button import Button
@@ -59,6 +59,8 @@ import weather
 import slideshow
 import verboseclock
 import calllist
+import doorcam
+from settings import Settings
 
 global sh # Smarthome
 
@@ -104,10 +106,6 @@ running_on_pi = os.path.isfile(bl_power_file)
 Builder.load_file("homectrl_main.kv")
 
 fc = fhem_connect.FhemConnect(fhem_server);
-
-displayCtrl = DisplayControl()
-
-
 #def test(ev):
 #    print('DATA: ' + ev["device"] + ': ' + ev["reading"])
 #fc.addListener(test)
@@ -157,7 +155,7 @@ class WifiState(ButtonBehavior, Image):
     def update(self, *args):
         try:
             wlan_device = "wlan0"
-            output = subprocess.check_output("iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8", shell=True )
+            output = subprocess.check_output("iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8", shell=True, stderr=subprocess.STDOUT )
             #output = subprocess.check_output("ifconfig lo |grep 'RX packets'|tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 4", shell=True )
             #print('output = ' + output)
             bitrate = output[9:12]
@@ -186,8 +184,6 @@ class WifiState(ButtonBehavior, Image):
 
 class SettingsPopup(Popup):
 
-    offlinemode = False
-
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(SettingsPopup,self).__init__(**kwargs)
 
@@ -196,11 +192,11 @@ class SettingsPopup(Popup):
         self.reboot_button = Button(text='REBOOT', size_hint=(0.5, 0.5))
         self.reboot_button.bind(on_press=self.reboot)
         self.displayoff_label = Label(text='Turn display off', size_hint=(0.5, 0.5))
-        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=DisplayControl.display_off_active)
+        self.displayoff_checkbox = CheckBox(size_hint=(0.5, 0.5), active=Settings().display_off_active)
         self.displayoff_checkbox.bind(active=self.on_checkbox_active)
 
         self.offlinemode_label = Label(text='Offline mode', size_hint=(0.5, 0.5))
-        self.offlinemode_checkbox = CheckBox(size_hint=(0.5, 0.5), active=self.offlinemode)
+        self.offlinemode_checkbox = CheckBox(size_hint=(0.5, 0.5), active=Settings().offlinemode)
         self.offlinemode_checkbox.bind(active=self.on_checkbox_offlinemode)
 
 
@@ -221,35 +217,28 @@ class SettingsPopup(Popup):
 
     def on_checkbox_active(self, a, checked):
         print('on_checkbox_active(', checked)
-        DisplayControl.display_off_active = checked
-        #print('on_checkbox_active() display_off_active = ', DisplayControl.display_off_active)
-        pass
+        Settings().display_off_active = checked
 
     def on_checkbox_offlinemode(self, a, checked):
         print('on_checkbox_offlinemode(', checked)
-        #DisplayControl.display_off_active = checked
-        #print('on_checkbox_offlinemode() display_off_active = ', DisplayControl.display_off_active)
-        self.offlinemode = checked
+        Settings().offlinemode = checked
         self.update()
-        pass
 
     def update(self):
-        homectrlTabbedPanel.weatherItem.subwidget.setOfflineMode( self.offlinemode )
-        sh.setOfflineMode( self.offlinemode )
+        homectrlTabbedPanel.weatherItem.subwidget.setOfflineMode( Settings().offlinemode )
+        sh.setOfflineMode( Settings().offlinemode )
 
     def shutdown(self, a):
         print('SHUTDOWN')
         if ( running_on_pi ):
-            displayCtrl.displayOff(0)
+            DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/poweroff -f')
-        pass
 
     def reboot(self, a):
         print('REBOOT')
         if ( running_on_pi ):
-            displayCtrl.displayOff(0)
+            DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/reboot -f now')
-        pass
 
     def on_open(self):
         #print('on_open')
@@ -265,35 +254,6 @@ class SettingsButton(ButtonBehavior, Image):
 
     def on_release(self):
         settingspopup.open()
-
-
-class DoorCam(ScatterLayout):
-    def on_touch_down( self, touch ):
-        print 'on_touch_down'
-        self.update('')
-
-    def update(self, e):
-        #print 'DoorCam.update()'
-        #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
-        #filepath = getLatestFile(cam_path)
-        #self.camimage.source = filepath
-        #if ( displayCtrl.display_is_off == True ):
-        #    print 'Display Off'
-        #else:
-        #    print 'Display On'
-
-        if ( settingspopup.offlinemode == True ):
-            self.camimage.source = 'images/cam-20170921-222342.jpg'
-        else:
-            if ( homectrlTabbedPanel.doorCamItem == homectrlTabbedPanel.current_tab and displayCtrl.display_is_off == False ):
-                #print 'update doorCam'
-                try:
-                    #if ( self.camimage.source == '' ):
-                    self.camimage.source = 'http://pi:9615/latest.jpg'
-                    self.camimage.reload()
-                    #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
-                except Exception as e:
-                    pass
 
 
 class LCARSButton(Button):
@@ -322,6 +282,47 @@ class ExTabbedPanelItem(TabbedPanelItem):
 
 class TabbedIconPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
+
+    def on_release(self, *largs):
+        #print '\n++++++++++++++++++++++++++TabbedIconPanelItem.on_release()'
+        #print 'self.parent.current_tab %s' % self.parent.current_tab
+        #print 'homectrlTabbedPanel.current_tab.subwidget %s' % homectrlTabbedPanel.current_tab.subwidget
+
+        on_release_focus_op = getattr(homectrlTabbedPanel.current_tab.subwidget, "on_release_focus", None)
+        if callable(on_release_focus_op):
+            on_release_focus_op()
+
+        super(TabbedIconPanelItem, self).on_release(largs)
+
+        if ( homectrlTabbedPanel.current_tab.subwidget == self.subwidget ):
+            #print 'same widget'
+            on_get_focus_op = getattr(self.subwidget, "on_get_focus", None)
+            if callable(on_get_focus_op):
+                on_get_focus_op()
+        #else:
+        #    print 'other widget'
+        #print '++++++++++++++++++++++++++TabbedIconPanelItem.on_release() end\n\n'
+
+
+
+    def on_touch_down(self, touch):
+#        print '\n--------------------------TabbedIconPanelItem.on_touch_down()'
+#        print 'TabbedIconPanelItem.on_touch_down() subwidget   %s' % self.subwidget
+#        print 'TabbedIconPanelItem.on_touch_down() current_tab %s' % homectrlTabbedPanel.current_tab.subwidget
+#        
+#        if ( homectrlTabbedPanel.current_tab.subwidget == self.subwidget ):
+#            print 'same widget %s' % homectrlTabbedPanel.current_tab.subwidget
+#            on_release_focus_op = getattr(self.subwidget, "on_release_focus", None)
+#            if callable(on_release_focus_op):
+#                on_release_focus_op()
+#        else:
+#            print 'other widget'
+#
+        super(TabbedIconPanelItem, self).on_touch_down(touch)
+#
+#        print 'TabbedIconPanelItem.on_touch_down() new current_tab %s' % homectrlTabbedPanel.current_tab.subwidget
+#        print '--------------------------TabbedIconPanelItem.on_touch_down() end\n'
+
     pass
 
 class HomeCtrl(FloatLayout):
@@ -333,7 +334,12 @@ class RotatedImage(Image):
 class SmartHomeTabbedPanel(TabbedPanel):
     wohnzimmerItem = ObjectProperty()
     badItem = ObjectProperty()
-    pass
+
+    def on_get_focus(self):
+        print 'SmartHomeTabbedPanel.on_get_focus()'
+
+    def on_release_focus(self):
+        print 'SmartHomeTabbedPanel.on_release_focus()'
 
 class HomeCtrlTabbedPanel(TabbedPanel):
     weatherItem = ObjectProperty()
@@ -348,63 +354,18 @@ class HomeCtrlTabbedPanel(TabbedPanel):
         print 'HomeCtrlTabbedPanel.switch()'
         self.switch_to(tab)
 
-
-class RepeatedTimer(object):
-    def __init__(self, interval, function, *args, **kwargs):
-        self._timer     = None
-        self.function   = function
-        self.interval   = interval
-        self.args       = args
-        self.kwargs     = kwargs
-        self.is_running = False
-        self.ignore_next = True
-        self.start()
-
-    def _run(self):
-        self.is_running = False
-        self.start()
-        print('RepeatedTimer()_run ignore_next = ', self.ignore_next)
-        if ( self.ignore_next ):
-            print('ignore first display_off')
-            self.ignore_next = False
-        else:
-            self.function(*self.args, **self.kwargs)
-
-    def start(self):
-        if not self.is_running:
-            self._timer = Timer(self.interval, self._run)
-            self._timer.start()
-            self.is_running = True
-
-    def stop(self):
-        self._timer.cancel()
-        self.is_running = False
-
-displayCtrl.displayOn()
-rt = RepeatedTimer(displayCtrl.display_off_timeout, displayCtrl.displayOff, "") # it auto-starts, no need of rt.start()
+DisplayControl().displayOn()
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
-    rt.stop()
-    displayCtrl.displayOn()
+    DisplayControl().displayOn()
+    DisplayControl().stop()
     dl.stop('','')
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
 class SlideshowWidget:
     carousel = ObjectProperty()
-
-def on_motion(self, etype, motionevent):
-    # will receive all motion events.
-    #displayOn()
-    print('on_motion -> Reset display-sleep-timer display_off_active = ', DisplayControl.display_off_active)
-    #print('etype', etype)
-    rt.stop()
-    rt.start()
-    # TODO ignore the first touch event from 'begin' to 'end' when the display was off
-    #ret = super(..., self).on_motion(etype, motionevent)
-    #return ret
-Window.bind(on_motion=on_motion)
 
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
 sh = smarthome.Smarthome(fc, homectrlTabbedPanel)
@@ -444,11 +405,11 @@ class HomeCtrlApp(App):
 
         # switch asynchronuous to default-tab
         Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.doorCamItem), 5)
-
-        Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
+        homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
 
         global dl
         dl = DashListener('wlan0', '18:74:2e:35:30:8a',self.dash_pressed,'udp')
+        #dl = DashListener('enp0s3', '08:00:27:50:83:ae',self.dash_pressed,'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
         dl.start()
 
         return p
@@ -456,7 +417,7 @@ class HomeCtrlApp(App):
     def dash_pressed(self):
         print 'dash_pressed'
         homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
-
+        DisplayControl().displayOn()
 
 if __name__ == '__main__':
     HomeCtrlApp().run()
