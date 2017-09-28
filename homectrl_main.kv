@@ -4,7 +4,7 @@
 #:include lcarsbuttons.kv
 #:include weather.kv
 #:include slideshow.kv
-#:include verboseclock.kv
+# #:include verboseclock.kv
 #:include calllist.kv
 #:include calendarlist.kv
 #:include doorcam.kv
@@ -91,12 +91,12 @@
 #    slideshowItem: slideshowItem
 #    calendarItem: calendarItem
 
-#    TabbedIconPanelItem:
-#        id: emptyItem
-#        img: 'gfx/clock.png'
-#        subwidget: vClock
-#        VerboseClock:
-#            id: vClock
+    TabbedIconPanelItem:
+        id: emptyItem
+        img: 'gfx/clock.png'
+        subwidget: vClock
+        VerboseClock:
+            id: vClock
 
 #    TabbedIconPanelItem:
 #        id: calendarItem
