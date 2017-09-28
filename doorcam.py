@@ -42,6 +42,8 @@ class DoorCam(ScatterLayout):
                     self.camimage.source = 'http://pi:9615/latest.jpg'
                     self.camimage.reload()
                     #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
+
+                    # TODO dont start a timer on each update if there is already one running (see VerboseClock)
                     self.update_event = Clock.schedule_once(self.update, 2)
             except Exception as e:
                 pass
