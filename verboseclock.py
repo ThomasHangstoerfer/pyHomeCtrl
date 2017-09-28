@@ -24,6 +24,8 @@ import datetime
 
 Builder.load_string("""
 <ColoredGridLayout@GridLayout>:
+  size_hint: None, 1
+  size: self.height, self.height
   bcolor: 1, 1, 1, 1
   canvas.before:
     Color:
