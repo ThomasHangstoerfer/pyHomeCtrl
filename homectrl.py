@@ -117,9 +117,18 @@ def get_ip_address():
 
 
 class SimpleClock(Label):
+
     def update(self, *args):
-        #self.text = time.asctime()
         self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
+
+    def on_touch_down( self, touch ):
+        if ( touch.pos[0] > self.pos[0] + self.size[0]-10 ) or ( touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]-30) :
+            #print 'OUTSIDE SimpleClock'
+            pass
+        else:
+            #print 'INSIDE SimpleClock'
+            Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.clockItem), 0)
+            pass
 
 class NetworkInfoPopup(Popup):
 

@@ -27,6 +27,7 @@ Builder.load_string("""
   size_hint: None, 1
   size: self.height, self.height
   bcolor: 1, 1, 1, 1
+  #pos_hint: {'center': (.5, .5)}
   canvas.before:
     Color:
       rgba: self.bcolor
@@ -53,8 +54,11 @@ class VerboseClock(ColoredGridLayout):
     has_focus = False
 
     def on_touch_down( self, touch ):
-        print 'VerboseClock.on_touch_down()'
-        self.active_theme = ( self.active_theme + 1 ) % min( len(self.color_highlighted),  len(self.color_inactive) )
+        if (touch.pos[0] > self.pos[0] + self.size[0]) or ( touch.pos[0] < self.pos[0]):
+            pass
+        else:
+            #print 'INSIDE'
+            self.active_theme = ( self.active_theme + 1 ) % min( len(self.color_highlighted),  len(self.color_inactive) )
 
     def highlight_label(self, label):
         label.color = self.color_highlighted[self.active_theme]
@@ -65,7 +69,7 @@ class VerboseClock(ColoredGridLayout):
         for buchstabe in self.woerter[text]:
             str += buchstabe.text
             self.highlight_label(buchstabe)
-        print str
+        #print str
 
     def update(self, arg):
         time_str = time.strftime("%d %b %y %H:%M:%S", time.localtime())
@@ -77,7 +81,7 @@ class VerboseClock(ColoredGridLayout):
         else:
             hour = time.localtime()[3]
             minute = time.localtime()[4]
-        print '%i:%02i' % (hour, minute)
+        #print '%i:%02i' % (hour, minute)
 
         # reset all
         for wort in self.w_order:
@@ -148,6 +152,12 @@ class VerboseClock(ColoredGridLayout):
 
         self.highlight('UHR')
 
+        #print 'self.has_focus = %s' % self.has_focus
+        #print 'self.update_event = %s' % self.update_event
+
+        if self.update_event is not None:
+            self.update_event.cancel()
+
         if ( self.has_focus is True ):
             self.update_event = Clock.schedule_once(self.update, 2)
 
@@ -159,6 +169,7 @@ class VerboseClock(ColoredGridLayout):
         self.row_force_default=True
         self.row_default_height=40
         self.row_default_width=40
+
         layout = self
 
         self.hours = ['ZWOLF', 'EINS', 'ZWEI', 'DREI', 'VIER', 'FUENF', 'SECHS', 'SIEBEN', 'ACHT', 'EUN', 'ZEHN', 'ELF']
@@ -249,6 +260,7 @@ class VerboseClock(ColoredGridLayout):
         if self.update_event is not None:
             print 'self.update_event.cancel()'
             self.update_event.cancel()
+            self.update_event = None
 
 
 class MainApp(App):
@@ -273,7 +285,7 @@ class MainApp(App):
 
         self.title = 'Verbose Clock'
 
-        self.vClock = VerboseClock()
+        self.vClock = VerboseClock(center=self.parent.center)
         l = BoxLayout(orientation='vertical')
         l.add_widget(self.vClock)
         
