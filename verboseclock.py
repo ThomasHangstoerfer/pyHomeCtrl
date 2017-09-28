@@ -36,8 +36,6 @@ Builder.load_string("""
 class ColoredGridLayout(GridLayout):
   bcolor = ListProperty([1,1,1,1])
 
-#Factory.register('KivyB', module='ColoredGridLayout')
-
 class VerboseClock(ColoredGridLayout):
 
     test_mode = False
@@ -203,6 +201,7 @@ class VerboseClock(ColoredGridLayout):
                 #print '  %s' % buchstabe.text
                 buchstabe.size_x = 20
                 buchstabe.size_y = 20
+                buchstabe.font_size = '40sp'
                 buchstabe.color = self.color_inactive[self.active_theme]
                 layout.add_widget(buchstabe)
 
