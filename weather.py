@@ -18,6 +18,8 @@ import time
 import json
 import socket
 
+from settings import Settings
+
 
 weather_theme = "w"
 
@@ -32,6 +34,11 @@ class WeatherWidget(FloatLayout):
     ww_temp_min_max = ObjectProperty()
     ww_wind_speed = ObjectProperty()
     forecast = ObjectProperty()
+
+    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
+        super(WeatherWidget, self).__init__(**kwargs)
+        Settings().addListener(self.update)
+
     def update(self):
         print('WeatherWidget.update()')
         self.clear_widget()

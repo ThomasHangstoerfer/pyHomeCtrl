@@ -12,60 +12,13 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 import os
 from threading import Timer
-from settings import singleton
+
 from settings import Settings
+from utils import singleton, RepeatedTimer
+
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 running_on_pi = os.path.isfile(bl_power_file)
-#default_display_off_timeout = 90.0
-
-
-
-class RepeatedTimer(object):
-    def __init__(self, interval, function, *args, **kwargs):
-        self._timer     = None
-        self.function   = function
-        self.interval   = interval
-        self.args       = args
-        self.kwargs     = kwargs
-        self.is_running = False
-        #self.ignore_next = True
-        self.ignore_next = False
-        self.to_be_stopped = False
-        self.start()
-
-    def _run(self):
-        self.is_running = False
-        #print 'self.to_be_stopped = %s' % self.to_be_stopped
-        if ( self.to_be_stopped == False ):
-            self.start()
-        #print('RepeatedTimer._run() ignore_next = ', self.ignore_next)
-        if ( self.ignore_next ):
-            #print('ignore first display_off')
-            self.ignore_next = False
-        else:
-            self.function(*self.args, **self.kwargs)
-
-    def start(self):
-        if not self.is_running:
-            self._timer = Timer(self.interval, self._run)
-            self._timer.start()
-            self.is_running = True
-
-    def stop(self):
-        #print 'RepeatedTimer.stop()'
-        self._timer.cancel()
-        self.is_running = False
-
-    def restart(self):
-        #print 'RepeatedTimer.restart()'
-        self.stop()
-        self.start()
-
-    def finish(self):
-        #print 'RepeatedTimer.finish()'
-        self.to_be_stopped = True
-        self.stop()
 
 
 class DisplayOffPopup(Popup):
@@ -101,22 +54,9 @@ class DisplayControl(object):
     #display_off_active = True
     display_off_locked = False
     display_is_off = False
-    #old_display_off_active = display_off_active
-    #display_off_timeout = default_display_off_timeout
-    #def __new__(cls, *args, **kwargs):
-    #    print 'HIER'
-    #    if not cls.__instance:
-    #        cls.__instance = super(DisplayControl, cls).__new__(
-    #                            cls, *args, **kwargs)
-    #    return cls.__instance
-    #def __new__(cls, val): # http://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
-    #    if DisplayControl.__instance is None:
-    #        DisplayControl.__instance = object.__new__(cls)
-    #    DisplayControl.__instance.val = val
-    #    return DisplayControl.__instance
 
     def __init__(self,**kwargs):
-        #print '\n\n\n DisplayControl \n\n\n'
+        print '\n\n\n DisplayControl \n\n\n'
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "") # it auto-starts, no need of rt.start()
 
@@ -168,3 +108,4 @@ class DisplayControl(object):
         if ( running_on_pi ):
             os.system('echo 0 > ' + bl_power_file)
         self.display_is_off = False
+        print 'DisplayControl.display_is_off %s' % self.display_is_off

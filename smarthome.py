@@ -21,6 +21,7 @@ from display_ctrl import DisplayControl
 import time
 
 import fhem # https://github.com/domschl/python-fhem
+from settings import Settings
 
 try:
     import queue # Python 3.x
@@ -237,6 +238,9 @@ class Smarthome:
         fc.addListener(self.update)
         self.init()
 
+        Settings().addListener(self.updateSettings)
+
+
     def init(self):
         try:
             self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fc.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
@@ -247,6 +251,9 @@ class Smarthome:
             self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fc.fh.get_dev_reading("LED", "RGB") )
         except Exception as e:
             print 'EXCEPTION in Smarthome.init(): %s' % e
+
+    def updateSettings(self):
+        self.setOfflineMode( Settings().offlinemode == True )
 
     def setOfflineMode(self, offlineMode ):
         print 'Smarthome.setOfflineMode(%i)' % offlineMode

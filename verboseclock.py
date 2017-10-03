@@ -209,7 +209,7 @@ class VerboseClock(ColoredGridLayout):
                 }
 
         for wort in self.w_order:
-            print wort
+            #print wort
             for buchstabe in self.woerter[wort]:
                 #print '  %s' % buchstabe.text
                 buchstabe.size_x = 20
