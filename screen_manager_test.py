@@ -8,12 +8,15 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.image import Image
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 
 import verboseclock
 import smarthome
 import doorcam
+import calllist
+import fhem_connect
 
 from display_ctrl import DisplayControl
 
@@ -32,55 +35,53 @@ Builder.load_string("""
 
 
 <HomeCtrl>:
+    _screen_manager: _screen_manager
     AnchorLayout:
+        id: a1
+        name: 'a1'
         anchor_x: 'right'
         anchor_y: 'center'
         ScreenManager:
             id: _screen_manager
+            screen_calllist: screen_calllist
             size_hint: .9, 1
             transition: FadeTransition()
 
             Screen:
                 name: 'smarthome'
+                id: screen_smarthome
+                SmartHomeTabbedPanel:
+                    id: smarthome_tabbed_panel
 
             Screen:
                 name: 'weather'
+                on_pre_enter: print 'weather: on_pre_enter'
+                on_enter:     print 'weather: on_enter'
+                on_pre_leave: print 'weather: on_pre_leave'
+                on_leave:     print 'weather: on_leave'
                 Label:
                     markup: True
                     text: '[size=24]Welcome to [color=dd88ff]Weather[/color][/size]'
 
             Screen:
                 name: 'calllist'
-                GridLayout:
-                    cols: 3
-                    padding: 50
-                    Button:
-                        text: "1"
-                    Button:
-                        text: "2"
-                    Button:
-                        text: "3"
-                    Button:
-                        text: "4"
-                    Button:
-                        text: "5"
-                    Button:
-                        text: "6"
-                    Button:
-                        text: "7"
-                    Button:
-                        text: "8"
-                    Button:
-                        text: "9"
-                    Button:
-                        text: "*"
-                    Button:
-                        text: "0"
-                    Button:
-                        text: "#"
+                id: screen_calllist
+                calllist: calllist
+
+                on_pre_enter: calllist.on_get_focus()
+                #on_enter:     print 'calllist: on_enter'
+                #on_pre_leave: print 'calllist: on_pre_leave'
+                on_leave:     calllist.on_release_focus()
+                CallList:
+                    id: calllist
+
             Screen:
                 name: 'doorcam'
                 doorcam: doorcam
+                on_pre_enter: doorcam.on_get_focus()
+                #on_enter:     print 'doorcam: on_enter'
+                #on_pre_leave: print 'doorcam: on_pre_leave'
+                on_leave:     doorcam.on_release_focus()
                 DoorCam:
                     id: doorcam
                     size_hint: 1, 1
@@ -88,13 +89,22 @@ Builder.load_string("""
 
             Screen:
                 name: 'verboseclock'
-                VerboseClock:
-                    pos_hint: {'center_x': .5, 'center_y': .5}
+                #on_pre_enter: verboseclock.on_get_focus()
+                ##on_enter:     print 'verboseclock: on_enter'
+                ##on_pre_leave: print 'verboseclock: on_pre_leave'
+                #on_leave:     verboseclock.on_release_focus()
+                #VerboseClock:
+                #    id: verboseclock
+                #    pos_hint: {'center_x': .5, 'center_y': .5}
 
     AnchorLayout:
+        id: a2
+        name: 'a2'
         anchor_x: 'left'
         anchor_y: 'center'
         BoxLayout:
+            id: boxlayout_mainbuttons
+            name: 'boxlayout_mainbuttons'
             orientation: 'vertical'
             size_hint: .1, 1
             spacing: 40 #spacing between children
@@ -144,7 +154,7 @@ Builder.load_string("""
                 valign: 'bottom'
                 size_hint_x: 1.0 # use complete width of parent for the touch-area
                 text: '29.09.2017\\n14:28:31'
-#                on_touch_down: _screen_manager.current = 'verboseclock'
+                on_touch_down: _screen_manager.current = 'verboseclock'
                 canvas:
                     Color:
                         rgba: 0,1,0,.5
@@ -165,15 +175,35 @@ class ImageButton(ButtonBehavior, Image):
         pass
         #self.source = 'gfx/wifi0.png'
 
+class SmartHomeTabbedPanel(TabbedPanel):
+    wohnzimmerItem = ObjectProperty()
+    badItem = ObjectProperty()
+
+    def on_get_focus(self):
+        print 'SmartHomeTabbedPanel.on_get_focus()'
+
+    def on_release_focus(self):
+        print 'SmartHomeTabbedPanel.on_release_focus()'
+
+class ExTabbedPanelItem(TabbedPanelItem):
+    subwidget = ObjectProperty()
+    pass
+
 
 class HomeCtrl(FloatLayout):
     pass
+
+fhem_server = "pi"
+fc = fhem_connect.FhemConnect(fhem_server);
+
 
 class TestApp(App):
     def build(self):
         DisplayControl().displayOn()
         print 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off
-        return HomeCtrl()
+        hc = HomeCtrl()
+        hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
+        return hc
 
 if __name__ == '__main__':
     TestApp().run()

@@ -25,7 +25,18 @@ class CallList(ListView):
                 self.item_strings.append('')
             for i in range(0, numberOfCalls):
                 print('i: ' + str(i) )
-                self.item_strings[i] = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-name") + " - " + self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-number") + " - " + self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-timestamp")
+                name = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-name")
+                number = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-number")
+                timestamp = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-timestamp")
+                if name is None:
+                    name = "Unbekannt"
+                if number is None:
+                    number = "Unbekannt"
+                if timestamp is None:
+                    timestamp = ""
+
+                self.item_strings[i] = name + " - " + number + " - " + timestamp
+
             self.is_initialized = True
 
         except Exception as e:

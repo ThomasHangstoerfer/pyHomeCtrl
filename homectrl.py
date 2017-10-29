@@ -273,7 +273,8 @@ class TabbedIconPanelItem(TabbedPanelItem):
 
     pass
 
-class HomeCtrl(FloatLayout):
+#class HomeCtrl(FloatLayout):
+class HomeCtrl(BoxLayout):
     pass
 
 class RotatedImage(Image):
