@@ -36,130 +36,123 @@ Builder.load_string("""
 
 <HomeCtrl>:
     _screen_manager: _screen_manager
-    AnchorLayout:
-        id: a1
-        name: 'a1'
-        anchor_x: 'right'
-        anchor_y: 'center'
-        ScreenManager:
-            id: _screen_manager
-            screen_calllist: screen_calllist
-            size_hint: .9, 1
-            transition: FadeTransition()
+    orientation: 'horizontal'
 
-            Screen:
-                name: 'smarthome'
-                id: screen_smarthome
-                SmartHomeTabbedPanel:
-                    id: smarthome_tabbed_panel
+    BoxLayout:
+        id: boxlayout_mainbuttons
+        name: 'boxlayout_mainbuttons'
+        orientation: 'vertical'
+        size_hint: .1, 1
+        spacing: 40 #spacing between children
 
-            Screen:
-                name: 'weather'
-                on_pre_enter: print 'weather: on_pre_enter'
-                on_enter:     print 'weather: on_enter'
-                on_pre_leave: print 'weather: on_pre_leave'
-                on_leave:     print 'weather: on_leave'
-                Label:
-                    markup: True
-                    text: '[size=24]Welcome to [color=dd88ff]Weather[/color][/size]'
+        canvas:
+            Color:
+                rgba: 1,0,0,.5
+            Line:
+                rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
-            Screen:
-                name: 'calllist'
-                id: screen_calllist
-                calllist: calllist
-
-                on_pre_enter: calllist.on_get_focus()
-                #on_enter:     print 'calllist: on_enter'
-                #on_pre_leave: print 'calllist: on_pre_leave'
-                on_leave:     calllist.on_release_focus()
-                CallList:
-                    id: calllist
-
-            Screen:
-                name: 'doorcam'
-                doorcam: doorcam
-                on_pre_enter: doorcam.on_get_focus()
-                #on_enter:     print 'doorcam: on_enter'
-                #on_pre_leave: print 'doorcam: on_pre_leave'
-                on_leave:     doorcam.on_release_focus()
-                DoorCam:
-                    id: doorcam
-                    size_hint: 1, 1
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-
-            Screen:
-                name: 'verboseclock'
-                #on_pre_enter: verboseclock.on_get_focus()
-                ##on_enter:     print 'verboseclock: on_enter'
-                ##on_pre_leave: print 'verboseclock: on_pre_leave'
-                #on_leave:     verboseclock.on_release_focus()
-                #VerboseClock:
-                #    id: verboseclock
-                #    pos_hint: {'center_x': .5, 'center_y': .5}
-
-    AnchorLayout:
-        id: a2
-        name: 'a2'
-        anchor_x: 'left'
-        anchor_y: 'center'
-        BoxLayout:
-            id: boxlayout_mainbuttons
-            name: 'boxlayout_mainbuttons'
-            orientation: 'vertical'
-            size_hint: .1, 1
-            spacing: 40 #spacing between children
-
+        ImageButton:
+            img: 'gfx/settings.png'
+            #on_press:
+            #    _screen_manager.current = 'smarthome'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
             canvas:
                 Color:
                     rgba: 1,0,0,.5
                 Line:
                     rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
-            ImageButton:
-                img: 'gfx/settings.png'
-                #on_press:
-                #    _screen_manager.current = 'smarthome'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                canvas:
-                    Color:
-                        rgba: 1,0,0,.5
-                    Line:
-                        rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+        ImageButton:
+            img: 'gfx/home.png'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            on_press:
+                _screen_manager.current = 'smarthome'
+        ImageButton:
+            img: 'gfx/view.png'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            on_press:
+                _screen_manager.current = 'doorcam'
+                doorcam.on_get_focus()
+        ImageButton:
+            img: 'gfx/weather.png'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            on_press:
+                _screen_manager.current = 'weather'
+        ImageButton:
+            img: 'gfx/phone.png'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            on_press:
+                _screen_manager.current = 'calllist'
 
-            ImageButton:
-                img: 'gfx/home.png'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                on_press:
-                    _screen_manager.current = 'smarthome'
-            ImageButton:
-                img: 'gfx/view.png'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                on_press:
-                    _screen_manager.current = 'doorcam'
-                    doorcam.on_get_focus()
-            ImageButton:
-                img: 'gfx/weather.png'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                on_press:
-                    _screen_manager.current = 'weather'
-            ImageButton:
-                img: 'gfx/phone.png'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                on_press:
-                    _screen_manager.current = 'calllist'
-            #Button:
-            #    text: 'VB'
+        Label:
+            halign: 'center'
+            valign: 'bottom'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            text: '29.09.2017\\n14:28:31'
+            on_touch_down: _screen_manager.current = 'verboseclock'
+            canvas:
+                Color:
+                    rgba: 0,1,0,.5
+                Line:
+                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+
+    ScreenManager:
+        id: _screen_manager
+        screen_calllist: screen_calllist
+        size_hint: .9, 1
+        pos_hint: {'right': 1}
+        transition: FadeTransition()
+
+        Screen:
+            name: 'smarthome'
+            id: screen_smarthome
+            SmartHomeTabbedPanel:
+                id: smarthome_tabbed_panel
+
+        Screen:
+            name: 'weather'
+            on_pre_enter: print 'weather: on_pre_enter'
+            on_enter:     print 'weather: on_enter'
+            on_pre_leave: print 'weather: on_pre_leave'
+            on_leave:     print 'weather: on_leave'
             Label:
-                halign: 'center'
-                valign: 'bottom'
-                size_hint_x: 1.0 # use complete width of parent for the touch-area
-                text: '29.09.2017\\n14:28:31'
-                on_touch_down: _screen_manager.current = 'verboseclock'
-                canvas:
-                    Color:
-                        rgba: 0,1,0,.5
-                    Line:
-                        rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+                markup: True
+                text: '[size=24]Welcome to [color=dd88ff]Weather[/color][/size]'
+
+        Screen:
+            name: 'calllist'
+            id: screen_calllist
+            calllist: calllist
+
+            on_pre_enter: calllist.on_get_focus()
+            #on_enter:     print 'calllist: on_enter'
+            #on_pre_leave: print 'calllist: on_pre_leave'
+            on_leave:     calllist.on_release_focus()
+            CallList:
+                id: calllist
+
+        Screen:
+            name: 'doorcam'
+            doorcam: doorcam
+            on_pre_enter: doorcam.on_get_focus()
+            #on_enter:     print 'doorcam: on_enter'
+            #on_pre_leave: print 'doorcam: on_pre_leave'
+            on_leave:     doorcam.on_release_focus()
+            DoorCam:
+                id: doorcam
+                size_hint: 1, 1
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
+        Screen:
+            name: 'verboseclock'
+            on_pre_enter: verboseclock.on_get_focus()
+            #on_enter:     print 'verboseclock: on_enter'
+            #on_pre_leave: print 'verboseclock: on_pre_leave'
+            on_leave:     verboseclock.on_release_focus()
+            VerboseClock:
+                id: verboseclock
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
 """)
 
 
