@@ -111,8 +111,6 @@ Builder.load_string("""
             on_press:
                 _screen_manager.current = 'calllist'
 
-        Label:
-        Label:
         WifiState:
             id: wifistate
             size_hint_x: 1.0 # use complete width of parent for the touch-area
