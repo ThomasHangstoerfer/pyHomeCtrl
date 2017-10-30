@@ -18,8 +18,9 @@ class CallList(ListView):
 
     def init(self):
         try:
+            # TODO load only the first entry here, the rest asynchronuously
             numberOfCalls = int(self.ctrl.fh.get_dev_reading("clist", "numberOfCalls"))
-            #numberOfCalls = 10
+            numberOfCalls = min(numberOfCalls, 10)
             print "numberOfCalls %i" % numberOfCalls
             while numberOfCalls > len(self.item_strings):
                 self.item_strings.append('')

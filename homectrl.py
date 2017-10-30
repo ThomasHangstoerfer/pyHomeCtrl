@@ -363,8 +363,8 @@ class HomeCtrlApp(App):
         Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.doorCamItem), 5)
 
         global dl
-        dl = DashListener('wlan0', '18:74:2e:35:30:8a',self.dash_pressed,'udp')
-        #dl = DashListener('enp0s3', '08:00:27:50:83:ae',self.dash_pressed,'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
+        dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
+        #dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
         dl.start()
 
         return p

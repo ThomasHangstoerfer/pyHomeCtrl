@@ -10,7 +10,13 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
+from kivy.clock import Clock
+
+import datetime
+from threading import Timer
+import time
 
 import verboseclock
 import smarthome
@@ -19,6 +25,8 @@ import calllist
 import fhem_connect
 
 from display_ctrl import DisplayControl
+
+from dash_listen import DashListener
 
 
 Builder.load_string("""
@@ -36,11 +44,13 @@ Builder.load_string("""
 
 <HomeCtrl>:
     _screen_manager: _screen_manager
+    boxlayout_mainbuttons: boxlayout_mainbuttons
     orientation: 'horizontal'
 
     BoxLayout:
         id: boxlayout_mainbuttons
         name: 'boxlayout_mainbuttons'
+        simpleclock: simpleclock
         orientation: 'vertical'
         size_hint: .1, 1
         spacing: 40 #spacing between children
@@ -72,7 +82,7 @@ Builder.load_string("""
             size_hint_x: 1.0 # use complete width of parent for the touch-area
             on_press:
                 _screen_manager.current = 'doorcam'
-                doorcam.on_get_focus()
+                #doorcam.on_get_focus()
         ImageButton:
             img: 'gfx/weather.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
@@ -85,16 +95,30 @@ Builder.load_string("""
                 _screen_manager.current = 'calllist'
 
         Label:
-            halign: 'center'
-            valign: 'bottom'
+        Label:
+        #    id: simpleclock
+
+        SimpleClock:
+            id: simpleclock
             size_hint_x: 1.0 # use complete width of parent for the touch-area
-            text: '29.09.2017\\n14:28:31'
-            on_touch_down: _screen_manager.current = 'verboseclock'
+#            on_touch_down: _screen_manager.current = 'verboseclock'
             canvas:
                 Color:
                     rgba: 0,1,0,.5
                 Line:
                     rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+
+#        Label:
+#            halign: 'center'
+#            valign: 'bottom'
+#            size_hint_x: 1.0 # use complete width of parent for the touch-area
+#            text: '29.09.2017\\n14:28:31'
+#            on_touch_down: _screen_manager.current = 'verboseclock'
+#            canvas:
+#                Color:
+#                    rgba: 0,1,0,.5
+#                Line:
+#                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
     ScreenManager:
         id: _screen_manager
@@ -106,6 +130,12 @@ Builder.load_string("""
         Screen:
             name: 'smarthome'
             id: screen_smarthome
+
+            #on_pre_enter: smarthome_tabbed_panel.on_get_focus()
+            on_enter:     smarthome_tabbed_panel.on_get_focus()
+            #on_pre_leave: print 'smarthome_tabbed_panel: on_pre_leave'
+            on_leave:     smarthome_tabbed_panel.on_release_focus()
+
             SmartHomeTabbedPanel:
                 id: smarthome_tabbed_panel
 
@@ -124,8 +154,8 @@ Builder.load_string("""
             id: screen_calllist
             calllist: calllist
 
-            on_pre_enter: calllist.on_get_focus()
-            #on_enter:     print 'calllist: on_enter'
+            #on_pre_enter: calllist.on_get_focus()
+            on_enter:     calllist.on_get_focus()
             #on_pre_leave: print 'calllist: on_pre_leave'
             on_leave:     calllist.on_release_focus()
             CallList:
@@ -134,8 +164,8 @@ Builder.load_string("""
         Screen:
             name: 'doorcam'
             doorcam: doorcam
-            on_pre_enter: doorcam.on_get_focus()
-            #on_enter:     print 'doorcam: on_enter'
+            #on_pre_enter: doorcam.on_get_focus()
+            on_enter: doorcam.on_get_focus()
             #on_pre_leave: print 'doorcam: on_pre_leave'
             on_leave:     doorcam.on_release_focus()
             DoorCam:
@@ -145,8 +175,8 @@ Builder.load_string("""
 
         Screen:
             name: 'verboseclock'
-            on_pre_enter: verboseclock.on_get_focus()
-            #on_enter:     print 'verboseclock: on_enter'
+            #on_pre_enter: verboseclock.on_get_focus()
+            on_enter:     verboseclock.on_get_focus()
             #on_pre_leave: print 'verboseclock: on_pre_leave'
             on_leave:     verboseclock.on_release_focus()
             VerboseClock:
@@ -182,20 +212,55 @@ class ExTabbedPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
     pass
 
+class SimpleClock(Label):
+
+    def update(self, *args):
+        self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
+
+    def on_touch_down( self, touch ):
+        #print 'touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1])
+        if ( touch.pos[0] > self.pos[0] + self.size[0] ) or ( touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]) :
+            #print 'OUTSIDE SimpleClock'
+            pass
+        else:
+            #print 'INSIDE SimpleClock'
+            #Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.clockItem), 0)
+            hc._screen_manager.current = 'verboseclock'
+            pass
 
 class HomeCtrl(FloatLayout):
     pass
 
+
 fhem_server = "pi"
 fc = fhem_connect.FhemConnect(fhem_server);
 
+dl = None
+hc = None
 
 class TestApp(App):
+    def dash_pressed(self):
+        print 'dash_pressed'
+        #homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
+        #homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
+        hc._screen_manager.current = 'doorcam'
+        DisplayControl().displayOn()
+
+
     def build(self):
         DisplayControl().displayOn()
         print 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off
+        global hc
         hc = HomeCtrl()
         hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
+
+        Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 1)
+
+        global dl
+        dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
+        #dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
+        dl.start()
+
         return hc
 
 if __name__ == '__main__':
