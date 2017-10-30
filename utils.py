@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
+
+from socket import socket
+from socket import AF_INET
+from socket import SOCK_DGRAM
 from threading import Timer
+
+import subprocess
 
 
 def singleton(cls):
@@ -16,6 +22,24 @@ def singleton(cls):
         pass
     return cls
 
+
+def get_ip_address():
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
+
+def get_network_info(wlan_device):
+    output = subprocess.check_output("iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8", shell=True, stderr=subprocess.STDOUT )
+    #output = subprocess.check_output("ifconfig lo |grep 'RX packets'|tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 4", shell=True )
+    #print('output = ' + output)
+    bitrate = output[9:12]
+
+    tokens = output.split()
+    raw = tokens[2][-5:]
+    q = raw.split("/")[0]
+    t = raw.split("/")[1]
+    quality = ( int(q) * 100 ) / int(t)
+    return bitrate, quality
 
 
 class RepeatedTimer(object):

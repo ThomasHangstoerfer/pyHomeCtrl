@@ -25,8 +25,9 @@ import calllist
 import weather
 import fhem_connect
 from popup_settings import SettingsPopup
+from popup_networkinfo import NetworkInfoPopup
 from fhem_connect import FhemConnect
-
+from wifi_state import WifiState
 from display_ctrl import DisplayControl
 
 from dash_listen import DashListener
@@ -40,6 +41,12 @@ Builder.load_string("""
 #:include smarthome.kv
 #:include weather.kv
 
+<WifiState>:
+    source: root.img
+    #pos: (20,60)
+    size: (30,30)
+    size_hint: (None, None)
+
 <ImageButton>:
     source: root.img
     pos_hint: {'center_x': .5, 'center_y': .5}
@@ -50,6 +57,7 @@ Builder.load_string("""
 <HomeCtrl>:
     _screen_manager: _screen_manager
     settings_button: boxlayout_mainbuttons.settings_button
+    wifistate: boxlayout_mainbuttons.wifistate
     boxlayout_mainbuttons: boxlayout_mainbuttons
     orientation: 'horizontal'
 
@@ -58,6 +66,7 @@ Builder.load_string("""
         name: 'boxlayout_mainbuttons'
         simpleclock: simpleclock
         settings_button: settings_button
+        wifistate: wifistate
         orientation: 'vertical'
         size_hint: .1, 1
         spacing: 40 #spacing between children
@@ -104,6 +113,9 @@ Builder.load_string("""
 
         Label:
         Label:
+        WifiState:
+            id: wifistate
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
 
         SimpleClock:
             id: simpleclock
@@ -240,6 +252,7 @@ hc = None
 sh = None
 
 settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
+netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
 
 class TestApp(App):
     def dash_pressed(self):
@@ -249,10 +262,6 @@ class TestApp(App):
         hc._screen_manager.current = 'doorcam'
         DisplayControl().displayOn()
 
-#    def openSettings(self):
-#        global settingspopup
-#        settingspopup.open()
-
     def build(self):
         DisplayControl().displayOn()
         print 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off
@@ -260,6 +269,7 @@ class TestApp(App):
         hc = HomeCtrl()
         hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
         hc.settings_button.on_press = settingspopup.open
+        hc.wifistate.on_press = netinfopopup.open
 
         FhemConnect().connect()
 
