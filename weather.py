@@ -56,6 +56,7 @@ class WeatherWidget(FloatLayout):
 
     def on_get_focus(self):
         print 'WeatherWidget.on_get_focus()'
+        self.update()
 
     def on_release_focus(self):
         print 'WeatherWidget.on_release_focus()'

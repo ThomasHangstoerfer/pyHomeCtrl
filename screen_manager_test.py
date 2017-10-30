@@ -22,6 +22,7 @@ import verboseclock
 import smarthome
 import doorcam
 import calllist
+import weather
 import fhem_connect
 
 from display_ctrl import DisplayControl
@@ -35,6 +36,8 @@ Builder.load_string("""
 #:import ButtonBehavior kivy.uix.behaviors  
 #:import Image kivy.uix.image
 #:include smarthome.kv
+#:include weather.kv
+
 <ImageButton>:
     source: root.img
     pos_hint: {'center_x': .5, 'center_y': .5}
@@ -141,13 +144,14 @@ Builder.load_string("""
 
         Screen:
             name: 'weather'
-            on_pre_enter: print 'weather: on_pre_enter'
-            on_enter:     print 'weather: on_enter'
-            on_pre_leave: print 'weather: on_pre_leave'
-            on_leave:     print 'weather: on_leave'
-            Label:
-                markup: True
-                text: '[size=24]Welcome to [color=dd88ff]Weather[/color][/size]'
+            id: screen_weather
+            weather: weather
+            #on_pre_enter: print 'weather: on_pre_enter'
+            on_enter:     weather.on_get_focus()
+            #on_pre_leave: print 'weather: on_pre_leave'
+            on_leave:     weather.on_release_focus()
+            WeatherWidget:
+                id: weather
 
         Screen:
             name: 'calllist'
