@@ -29,16 +29,17 @@ except:
     import Queue as queue # Python 2.x
 
 global fh
-global fc
 
+
+from fhem_connect import FhemConnect
 
 def toggle(dev):
-    dev_state_temp = fc.fh.get_dev_reading(dev, "state")
+    dev_state_temp = FhemConnect().fh.get_dev_reading(dev, "state")
     print('toggle ', dev, ' current state: ', dev_state_temp)
     if dev_state_temp == 'off':
-        fc.fh.send_cmd("set " + dev + " on")
+        FhemConnect().fh.send_cmd("set " + dev + " on")
     else:
-        fc.fh.send_cmd("set " + dev + " off")
+        FhemConnect().fh.send_cmd("set " + dev + " off")
 
 class PhoneCallPopup(Popup):
     caller = Label(text='',id='caller', font_size='60sp', size_hint=(1.0, 0.5))
@@ -122,18 +123,18 @@ class SmartHomeBad(BoxLayout):
     def tempDown(self):
         print('tempDown()')
         try:
-            t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+            t = float(FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
             newt = t - 0.5
-            fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+            FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
             print '\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e
 
     def tempUp(self):
         print('tempUp()')
         try:
-            t = float(fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
+            t = float(FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp"))
             newt = t + 0.5
-            fc.fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
+            FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
             print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
 
@@ -179,7 +180,7 @@ class SmartHomeWohnzimmer(BoxLayout):
         print('redHex ' + redHex )
         print('greenHex ' + greenHex )
         print('blueHex ' + blueHex )
-        fc.fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
+        FhemConnect().fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
 
     def redDown(self):
         print('redDown() self.led_r ', self.led_r)
@@ -219,36 +220,38 @@ class SmartHomeWohnzimmer(BoxLayout):
 
     def rolladen_hoch(self):
         print('rolladen_hoch')
-        fc.fh.send_cmd("set WzRolladen on")
+        FhemConnect().fh.send_cmd("set WzRolladen on")
 
     def rolladen_runter(self):
         print('rolladen_runter')
-        fc.fh.send_cmd("set WzRolladen off")
+        FhemConnect().fh.send_cmd("set WzRolladen off")
 
 
 class Smarthome:
     def __init__(self, server, ctrl):
 
-        self.fc = server
-        self.homectrlTabbedPanel = ctrl
+        #print '\n\n\n\n SMARTHOME \n\n\n'
+        #self.fc = server
+        self.smarthomewidget = ctrl
 #        self.fh = fhem.Fhem(self.fhem_server)
-        global fc
-        fc = self.fc
+        #global fc
+        #fc = self.fc
         #self.connect()
-        fc.addListener(self.update)
+        FhemConnect().addListener(self.update)
         self.init()
 
         Settings().addListener(self.updateSettings)
 
 
     def init(self):
+        #print '\n\n\n\n SMARTHOME.init() \n\n\n'
         try:
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = self.fc.fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = self.fc.fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = self.fc.fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fc.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = self.fc.fh.get_dev_reading("BadHeizung", "actuator")+u"%"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.setRGB( self.fc.fh.get_dev_reading("LED", "RGB") )
+            self.smarthomewidget.badItem.subwidget.temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
+            self.smarthomewidget.badItem.subwidget.desired_temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
+            self.smarthomewidget.badItem.subwidget.hum = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
+            self.smarthomewidget.badItem.subwidget.window = "zu" if (FhemConnect().fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+            self.smarthomewidget.badItem.subwidget.actuator = FhemConnect().fh.get_dev_reading("BadHeizung", "actuator")+u"%"
+            self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( FhemConnect().fh.get_dev_reading("LED", "RGB") )
         except Exception as e:
             print 'EXCEPTION in Smarthome.init(): %s' % e
 
@@ -258,11 +261,11 @@ class Smarthome:
     def setOfflineMode(self, offlineMode ):
         print 'Smarthome.setOfflineMode(%i)' % offlineMode
         if ( offlineMode == True ):
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = u"21.5 °C"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = u"23.0 °C"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = u"42 %"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu"
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = u"100 %"
+            self.smarthomewidget.badItem.subwidget.temp = u"21.5 °C"
+            self.smarthomewidget.badItem.subwidget.desired_temp = u"23.0 °C"
+            self.smarthomewidget.badItem.subwidget.hum = u"42 %"
+            self.smarthomewidget.badItem.subwidget.window = "zu"
+            self.smarthomewidget.badItem.subwidget.actuator = u"100 %"
         else:
             self.init()
 
@@ -275,26 +278,26 @@ class Smarthome:
         if ( device == "BadThermostat_Climate" ):
             if ( ev["reading"] == "humidity" ):
                 print("BadThermostat_Climate: Humidity: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.hum = ev["value"] + "%"
+                self.smarthomewidget.badItem.subwidget.hum = ev["value"] + "%"
             elif ( ev["reading"] == "measured-temp" ):
                 print("BadThermostat_Climate: measured-temp: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.temp = ev["value"] + u"°C"
+                self.smarthomewidget.badItem.subwidget.temp = ev["value"] + u"°C"
             elif ( ev["reading"] == "desired-temp" ):
                 print("BadThermostat_Climate: desired-temp: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
+                self.smarthomewidget.badItem.subwidget.desired_temp = ev["value"] + u"°C"
         elif ( device == "BadFenster" ):
             print("BadFenster: " + ev["value"])
-            self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.window = "zu" if (self.fc.fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+            self.smarthomewidget.badItem.subwidget.window = "zu" if (FhemConnect().fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
         elif ( device == "BadHeizung" ):
             if ( ev["reading"] == "actuator" ):
                 print("BadHeizung: actuator: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.badItem.subwidget.actuator = ev["value"] + u"%"
+                self.smarthomewidget.badItem.subwidget.actuator = ev["value"] + u"%"
         elif ( device == "LEDswitch" ):
             print("LEDswitch: " + ev["value"])
         elif ( device == "LED" ):
             if ( ev["reading"] == "RGB" ):
                 print("LED: RGB: " + ev["value"])
-                self.homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.subwidget.rgb = ev["value"]
+                self.smarthomewidget.wohnzimmerItem.subwidget.rgb = ev["value"]
         elif ( device == "WzStehlampe" ):
             if ( ev["reading"] == "STATE" ):
                 print("WzStehlampe: " + ev["value"])

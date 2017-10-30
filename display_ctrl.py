@@ -35,19 +35,6 @@ class DisplayOffPopup(Popup):
         dc.displayOn()
         pass
 
-#def singleton(cls):
-#    # https://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons
-#    # 'Duck()'
-#    obj = cls()
-#    # Always return the same object
-#    cls.__new__ = staticmethod(lambda cls: obj)
-#    # Disable __init__
-#    try:
-#        del cls.__init__
-#    except AttributeError:
-#        pass
-#    return cls
-
 @singleton
 class DisplayControl(object):
     __instance = None
@@ -56,7 +43,7 @@ class DisplayControl(object):
     display_is_off = False
 
     def __init__(self,**kwargs):
-        print '\n\n\n DisplayControl \n\n\n'
+        #print '\n\n\n DisplayControl \n\n\n'
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "") # it auto-starts, no need of rt.start()
 

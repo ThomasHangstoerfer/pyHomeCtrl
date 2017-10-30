@@ -24,6 +24,8 @@ import doorcam
 import calllist
 import weather
 import fhem_connect
+from popup_settings import SettingsPopup
+from fhem_connect import FhemConnect
 
 from display_ctrl import DisplayControl
 
@@ -47,6 +49,7 @@ Builder.load_string("""
 
 <HomeCtrl>:
     _screen_manager: _screen_manager
+    settings_button: boxlayout_mainbuttons.settings_button
     boxlayout_mainbuttons: boxlayout_mainbuttons
     orientation: 'horizontal'
 
@@ -54,26 +57,28 @@ Builder.load_string("""
         id: boxlayout_mainbuttons
         name: 'boxlayout_mainbuttons'
         simpleclock: simpleclock
+        settings_button: settings_button
         orientation: 'vertical'
         size_hint: .1, 1
         spacing: 40 #spacing between children
 
-        canvas:
-            Color:
-                rgba: 1,0,0,.5
-            Line:
-                rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#        canvas:
+#            Color:
+#                rgba: 1,0,0,.5
+#            Line:
+#                rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
         ImageButton:
+            id: settings_button
             img: 'gfx/settings.png'
             #on_press:
             #    _screen_manager.current = 'smarthome'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
-            canvas:
-                Color:
-                    rgba: 1,0,0,.5
-                Line:
-                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#            canvas:
+#                Color:
+#                    rgba: 1,0,0,.5
+#                Line:
+#                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
         ImageButton:
             img: 'gfx/home.png'
@@ -99,33 +104,22 @@ Builder.load_string("""
 
         Label:
         Label:
-        #    id: simpleclock
 
         SimpleClock:
             id: simpleclock
             size_hint_x: 1.0 # use complete width of parent for the touch-area
-#            on_touch_down: _screen_manager.current = 'verboseclock'
-            canvas:
-                Color:
-                    rgba: 0,1,0,.5
-                Line:
-                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-
-#        Label:
-#            halign: 'center'
-#            valign: 'bottom'
-#            size_hint_x: 1.0 # use complete width of parent for the touch-area
-#            text: '29.09.2017\\n14:28:31'
-#            on_touch_down: _screen_manager.current = 'verboseclock'
 #            canvas:
 #                Color:
 #                    rgba: 0,1,0,.5
 #                Line:
 #                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
+
     ScreenManager:
         id: _screen_manager
         screen_calllist: screen_calllist
+        screen_smarthome: screen_smarthome
+        screen_weather: screen_weather
         size_hint: .9, 1
         pos_hint: {'right': 1}
         transition: FadeTransition()
@@ -133,6 +127,7 @@ Builder.load_string("""
         Screen:
             name: 'smarthome'
             id: screen_smarthome
+            smarthome_tabbed_panel: smarthome_tabbed_panel
 
             #on_pre_enter: smarthome_tabbed_panel.on_get_focus()
             on_enter:     smarthome_tabbed_panel.on_get_focus()
@@ -237,10 +232,14 @@ class HomeCtrl(FloatLayout):
 
 
 fhem_server = "pi"
-fc = fhem_connect.FhemConnect(fhem_server);
+#fc = fhem_connect.FhemConnect(fhem_server);
+fc = fhem_connect.FhemConnect();
 
 dl = None
 hc = None
+sh = None
+
+settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
 
 class TestApp(App):
     def dash_pressed(self):
@@ -250,6 +249,9 @@ class TestApp(App):
         hc._screen_manager.current = 'doorcam'
         DisplayControl().displayOn()
 
+#    def openSettings(self):
+#        global settingspopup
+#        settingspopup.open()
 
     def build(self):
         DisplayControl().displayOn()
@@ -257,6 +259,12 @@ class TestApp(App):
         global hc
         hc = HomeCtrl()
         hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
+        hc.settings_button.on_press = settingspopup.open
+
+        FhemConnect().connect()
+
+        global sh
+        sh = smarthome.Smarthome(fc, hc._screen_manager.screen_smarthome.smarthome_tabbed_panel)
 
         Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 1)
 

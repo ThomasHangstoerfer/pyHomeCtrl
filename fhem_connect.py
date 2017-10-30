@@ -16,12 +16,17 @@ except:
     import Queue as queue # Python 2.x
 
 from callback_list import CallbackList 
+from utils import singleton
 
-class FhemConnect:
-    def __init__(self, server):
+@singleton
+class FhemConnect(object):
+    __instance = None
+
+#    def __init__(self, server):
+    def __init__(self, **kwargs):
 
         self.callbacks_update = CallbackList()
-        
+        server = 'pi'
         self.fhem_server = server
         self.fh = fhem.Fhem(self.fhem_server, loglevel=0)
         global fh
@@ -58,7 +63,7 @@ class FhemConnect:
             #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
             #    print("key={0}, val={1}".format(key, val))
             #print(homectrlTabbedPanel.ids.smarthome.sh_tab_panel)
-            print(ev)
+#            print(ev)
 
             self.callbacks_update.fire(ev)
 
@@ -67,4 +72,7 @@ class FhemConnect:
             #    if ( ev["reading"] == "humidity" ):
             #        print("FHEM-CONNECT: BadThermostat_Climate: Humidity: " + ev["value"])
 
-            self.que.task_done()
+            try:
+                self.que.task_done()
+            except Exception as e:
+                print '\n\nfhem_connect.queue_thread(): %s' % e

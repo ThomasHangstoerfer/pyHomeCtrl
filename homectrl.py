@@ -324,7 +324,7 @@ class SlideshowWidget:
     carousel = ObjectProperty()
 
 homectrlTabbedPanel = HomeCtrlTabbedPanel()
-sh = smarthome.Smarthome(fc, homectrlTabbedPanel)
+sh = smarthome.Smarthome(fc, homectrlTabbedPanel.smarthomeItem)
 
 from dash_listen import DashListener
 
