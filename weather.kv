@@ -16,11 +16,17 @@
     ww_temp_min_max: ww_temp_min_max
     ww_wind_speed: ww_wind_speed
     forecast: forecast
-    Button:
+    ImageButton:
+        img: 'gfx/reload1.png'
+        size_hint: (0.1, 0.1)
+        right: root.right-self.width
         on_release: root.update()
-        size_hint: (0.2, 0.1)
-        right: root.right-self.width/8
-        text: 'Update'
+
+#    Button:
+#        on_release: root.update()
+#        size_hint: (0.2, 0.1)
+#        right: root.right-self.width/8
+#        text: 'Update'
     BoxLayout:
         BoxLayout:
             orientation: 'vertical'

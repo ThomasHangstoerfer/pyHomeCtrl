@@ -24,6 +24,7 @@ import doorcam
 import calllist
 import weather
 import fhem_connect
+import image_button
 from popup_settings import SettingsPopup
 from popup_networkinfo import NetworkInfoPopup
 from fhem_connect import FhemConnect
@@ -40,16 +41,11 @@ Builder.load_string("""
 #:import Image kivy.uix.image
 #:include smarthome.kv
 #:include weather.kv
+#:include image_button.kv
 
 <WifiState>:
     source: root.img
     #pos: (20,60)
-    size: (30,30)
-    size_hint: (None, None)
-
-<ImageButton>:
-    source: root.img
-    pos_hint: {'center_x': .5, 'center_y': .5}
     size: (30,30)
     size_hint: (None, None)
 
@@ -66,7 +62,7 @@ Builder.load_string("""
         name: 'boxlayout_mainbuttons'
         simpleclock: simpleclock
         settings_button: settings_button
-        wifistate: wifistate
+        wifistate: status_layout.wifistate
         orientation: 'vertical'
         size_hint: .1, 1
         spacing: 40 #spacing between children
@@ -78,51 +74,74 @@ Builder.load_string("""
 #                rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
         ImageButton:
-            id: settings_button
-            img: 'gfx/settings.png'
-            #on_press:
-            #    _screen_manager.current = 'smarthome'
-            size_hint_x: 1.0 # use complete width of parent for the touch-area
-#            canvas:
-#                Color:
-#                    rgba: 1,0,0,.5
-#                Line:
-#                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-
-        ImageButton:
             img: 'gfx/home.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'smarthome'
         ImageButton:
             img: 'gfx/view.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'doorcam'
                 #doorcam.on_get_focus()
         ImageButton:
             img: 'gfx/weather.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'weather'
         ImageButton:
             img: 'gfx/phone.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'calllist'
 
-        WifiState:
-            id: wifistate
+        ImageButton:
+            id: settings_button
+            img: 'gfx/settings.png'
+            #on_press:
+            #    _screen_manager.current = 'smarthome'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.05
+#            canvas:
+#                Color:
+#                    rgba: 1,0,0,.5
+#                Line:
+#                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
-        SimpleClock:
-            id: simpleclock
-            size_hint_x: 1.0 # use complete width of parent for the touch-area
+        BoxLayout:
+            id: status_layout
+            wifistate: wifistate
+            simpleclock: simpleclock
+            orientation: 'vertical'
+            size_hint_y: 0.15
 #            canvas:
 #                Color:
 #                    rgba: 0,1,0,.5
 #                Line:
 #                    rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            WifiState:
+                id: wifistate
+                size_hint_x: 1.0 # use complete width of parent for the touch-area
+                size_hint_y: 0.25
+#                canvas:
+#                    Color:
+#                        rgba: 1,1,0,.5
+#                    Line:
+#                        rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+
+            SimpleClock:
+                id: simpleclock
+                size_hint_x: 1.0 # use complete width of parent for the touch-area
+                size_hint_y: 0.5
+#                canvas:
+#                    Color:
+#                        rgba: 0,1,1,.5
+#                    Line:
+#                        rectangle: self.x+1, self.y+1, self.width-1, self.height-1
 
 
     ScreenManager:
@@ -194,18 +213,6 @@ Builder.load_string("""
 
 """)
 
-
-class ImageButton(ButtonBehavior, Image):
-    #source = 'gfx/wifi4.png'
-    img = StringProperty()
-    #img = 'gfx/wifi0.png'
- 
-    def on_release(self):
-        pass
-
-    def update(self, *args):
-        pass
-        #self.source = 'gfx/wifi0.png'
 
 class SmartHomeTabbedPanel(TabbedPanel):
     wohnzimmerItem = ObjectProperty()
