@@ -14,11 +14,7 @@ import os
 from threading import Timer
 
 from settings import Settings
-from utils import singleton, RepeatedTimer
-
-
-bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
-running_on_pi = os.path.isfile(bl_power_file)
+from utils import singleton, RepeatedTimer, running_on_pi, setBacklight
 
 
 class DisplayOffPopup(Popup):
@@ -81,8 +77,8 @@ class DisplayControl(object):
         print 'DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (DisplayControl.display_off_locked, Settings().display_off_active )
         #p.export_to_png("/tmp/kivy.png")
         if ( Settings().display_off_active and not DisplayControl.display_off_locked ):
-            if ( running_on_pi ):
-                os.system('echo 1 > ' + bl_power_file)
+            if ( running_on_pi() ):
+                setBacklight(True)
             self.popup.open()
             self.display_is_off = True
             print 'DisplayControl.display_is_off %i' % self.display_is_off
@@ -92,7 +88,7 @@ class DisplayControl(object):
         print('DisplayControl.displayOn()')
         self.rt.restart()
         self.popup.content.trigger_action()
-        if ( running_on_pi ):
-            os.system('echo 0 > ' + bl_power_file)
+        if ( running_on_pi() ):
+            setBacklight(False)
         self.display_is_off = False
         print 'DisplayControl.display_is_off %s' % self.display_is_off

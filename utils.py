@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-from socket import socket
-from socket import AF_INET
-from socket import SOCK_DGRAM
+from socket import socket, AF_INET, SOCK_DGRAM
 from threading import Timer
-
+import os
 import subprocess
+
+bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 
 
 def singleton(cls):
@@ -21,6 +21,12 @@ def singleton(cls):
     except AttributeError:
         pass
     return cls
+
+def setBacklight(on):
+    if on:
+        os.system('echo 1 > ' + bl_power_file)
+    else:
+        os.system('echo 0 > ' + bl_power_file)
 
 
 def get_ip_address():
@@ -41,6 +47,8 @@ def get_network_info(wlan_device):
     quality = ( int(q) * 100 ) / int(t)
     return bitrate, quality
 
+def running_on_pi():
+    return os.path.isfile(bl_power_file)
 
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):

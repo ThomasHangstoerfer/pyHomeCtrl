@@ -8,7 +8,7 @@ from kivy.uix.checkbox import CheckBox
 from kivy.uix.boxlayout import BoxLayout
 
 from settings import Settings
-
+from utils import running_on_pi
 
 
 class SettingsPopup(Popup):
@@ -59,14 +59,14 @@ class SettingsPopup(Popup):
         pass
 
     def shutdown(self, a):
-        print('SHUTDOWN')
-        if ( running_on_pi ):
+        print 'SHUTDOWN running_on_pi() = %s' % running_on_pi()
+        if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/poweroff -f')
 
     def reboot(self, a):
-        print('REBOOT')
-        if ( running_on_pi ):
+        print 'REBOOT running_on_pi() = %s' % running_on_pi()
+        if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/reboot -f now')
 
