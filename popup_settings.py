@@ -7,8 +7,11 @@ from kivy.uix.label import Label
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.boxlayout import BoxLayout
 
+import os
+
 from settings import Settings
 from utils import running_on_pi
+from display_ctrl import DisplayControl
 
 
 class SettingsPopup(Popup):
