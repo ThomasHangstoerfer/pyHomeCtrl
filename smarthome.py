@@ -19,6 +19,7 @@ from thread import start_new_thread
 from display_ctrl import DisplayControl
 
 import time
+import datetime
 
 import fhem # https://github.com/domschl/python-fhem
 from settings import Settings
@@ -30,7 +31,7 @@ except:
 
 global fh
 
-
+from popup_phonecall import PhoneCallPopup
 from fhem_connect import FhemConnect
 
 def toggle(dev):
@@ -41,75 +42,6 @@ def toggle(dev):
     else:
         FhemConnect().fh.send_cmd("set " + dev + " off")
 
-class PhoneCallPopup(Popup):
-    caller = Label(text='',id='caller', font_size='60sp', size_hint=(1.0, 0.5))
-    pnumber = Label(text='',id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
-    old_display_status = False
-
-    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
-        super(PhoneCallPopup,self).__init__(**kwargs)
-        print('PhoneCallPopup()__init__')
-        self.content = BoxLayout(orientation="vertical")
-        self.content.add_widget(self.caller)
-        #self.content.add_widget(Label(text='PhoneCall',id='number'))
-        self.content.add_widget(self.pnumber)
-        self.button = Button(text='Ok', size_hint=(1.0, 0.2))
-        self.button.bind(on_press=self.dismiss)
-        self.content.add_widget(self.button)
-        print('PhoneCallPopup()__init__ end')
-
-    def on_open(self):
-        print('on_open')
-        DisplayControl().lock()
-        pass
-
-    def on_dismiss(self):
-        print('on_dismiss')
-        DisplayControl().unlock()
-        pass
-
-    def setExternalName(self, name):
-        if ( phonecallpopup.caller.text != "" and ( name == "unknown" or name == "" ) ):
-            phonecallpopup.pnumber.text = phonecallpopup.caller.text # transfer number from name-label to number-label
-            phonecallpopup.caller.text = name
-        else:
-            phonecallpopup.caller.text = name
-
-    def setExternalNumber(self, num):
-        if ( phonecallpopup.caller.text == "unknown" or phonecallpopup.caller.text == "" ):
-            phonecallpopup.caller.text = num # caller is unknown, show number in name-label
-            phonecallpopup.pnumber.text = ""
-        else:
-            phonecallpopup.pnumber.text = num
-
-    def handleCallmonitor(self, reading, value):
-        print('reading: ' + reading + ' value: ' + value)
-
-        if ( reading == "external_name" ):
-            print("external_name: " + value)
-            self.setExternalName(value)
-
-        elif ( reading == "external_number" ):
-            print("external_number: " + value)
-            self.setExternalNumber(value)
-
-        elif ( reading == "event" ):
-            print("event: " + value)
-            if ( value == "call" or value == "ring" ):
-                DisplayControl().displayOn()
-                self.open()
-            elif ( value == "disconnect" ):
-                self.dismiss()
-                phonecallpopup.caller.text = ""
-                phonecallpopup.pnumber.text = ""
-
-        elif ( reading == "direction" ):
-            print("direction: " + value)
-            if ( value == "outgoing" ):
-                phonecallpopup.title = "Ausgehender Anruf"
-            elif ( value == "incomming" ):
-                phonecallpopup.title = "Eingehender Anruf"
-
 phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.9, 0.9))
 
 class SmartHomeBad(BoxLayout):
@@ -118,6 +50,9 @@ class SmartHomeBad(BoxLayout):
     hum = StringProperty()
     window = StringProperty()
     actuator = StringProperty()
+
+    def on_get_focus(self):
+        print 'SmartHomeBad.on_get_focus()'
 
     # set BadThermostat_Climate desired-temp 18
     def tempDown(self):
@@ -138,6 +73,180 @@ class SmartHomeBad(BoxLayout):
         except Exception as e:
             print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
 
+class SmartHomeHolidayMode(BoxLayout):
+    temp = NumericProperty(18)
+    
+    year = NumericProperty(2017)
+    day = NumericProperty(11)
+    month = NumericProperty(11)
+    hour = NumericProperty(19)
+    minute = NumericProperty(58)
+    second = NumericProperty(0)
+    wday = NumericProperty(0)
+    yday = NumericProperty(0)
+    isdst = NumericProperty(0)
+
+    year_str = StringProperty()
+    day_str = StringProperty()
+    month_str = StringProperty()
+    hour_str = StringProperty()
+    minute_str = StringProperty()
+
+    timestamp = NumericProperty(time.time())
+
+    def get(self, formatstr):
+        return datetime.datetime.fromtimestamp(self.timestamp).strftime(formatstr)
+
+    def on_get_focus(self):
+
+        print 'SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp
+
+        self.minuteUp()
+        #self.update()
+
+    def update(self):
+        print 'SmartHomeHolidayMode.update()'
+
+        print 'timestamp : %s' % datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        lts = datetime.datetime.fromtimestamp(self.timestamp)
+        print 'day : %i' % lts.day
+        print 'month : %i' % lts.month
+        print 'hour : %i' % lts.hour
+        print 'minute : %i' % lts.minute
+
+        self.day_str = str(lts.day)
+        self.month_str = str(lts.month)
+        self.hour_str = str(lts.hour)
+        self.minute_str = '{:02d}'.format(lts.minute)
+        
+    def tempUp(self):
+        print('tempUp()')
+        if self.temp < 28:
+          self.temp = self.temp + 1
+
+    def tempDown(self):
+        print('tempDown()')
+        if self.temp > 14:
+            self.temp = self.temp - 1
+
+    def yearUp(self):
+        print('yearUp()')
+        lt = time.localtime( self.timestamp )
+        print 'lt.tm_year %i' % lt.tm_year
+        l = list(lt) # convert to a sequence
+        l[0] += 1 # increment year
+        lt = time.struct_time(l) # convert to a struct_time
+        self.timestamp = time.mktime(lt)
+
+    def yearDown(self):
+        print('yearDown()')
+        lt = time.localtime( self.timestamp )
+        print 'lt.tm_year %i' % lt.tm_year
+        l = list(lt) # convert to a sequence
+        l[0] -= 1 # decrement year
+        lt = time.struct_time(l) # convert to a struct_time
+        self.timestamp = time.mktime(lt)
+        lt = time.localtime( self.timestamp )
+        print 'lt.tm_year %i' % lt.tm_year
+
+    def dayUp(self):
+        print('dayUp()')
+        self.timestamp = self.timestamp + ( 60 * 60 * 24 )
+        self.update()
+
+    def dayDown(self):
+        print('dayDown()')
+        self.timestamp = self.timestamp - ( 60 * 60 * 24 )
+        self.update()
+
+    def monthUp(self):
+        print('monthUp()')
+
+        lt = time.localtime( self.timestamp )
+        print 'lt.tm_mon %i' % lt.tm_mon
+        l = list(lt) # convert to a sequence
+        if lt.tm_mon == 12:
+            self.yearUp()
+            l[1] = 1
+        else:
+            l[1] += 1 # increment month
+        lt = time.struct_time(l) # convert to a struct_time
+        self.timestamp = time.mktime(lt)
+        self.update()
+
+
+    def monthDown(self):
+        print('monthDown()')
+
+        lt = time.localtime( self.timestamp )
+        print 'lt.tm_mon %i' % lt.tm_mon
+        l = list(lt) # convert to a sequence
+        if lt.tm_mon == 1:
+            self.yearDown()
+            l[1] = 12
+        else:
+            l[1] -= 1 # decrement month
+        lt = time.struct_time(l) # convert to a struct_time
+        self.timestamp = time.mktime(lt)
+        self.update()
+
+    def hourUp(self):
+        print('hourUp()')
+        self.timestamp = self.timestamp + ( 60 * 60 )
+        self.update()
+
+    def hourDown(self):
+        print('hourDown()')
+        self.timestamp = self.timestamp - ( 60 * 60 )
+        self.update()
+
+    def minuteUp(self):
+        print('minuteUp()')
+
+        lt = time.localtime( self.timestamp )
+        l = list(lt) # convert to a sequence
+        if lt.tm_min < 30:
+            l[4] = 30
+        else:
+            self.hourUp()
+            lt = time.localtime( self.timestamp )
+            l = list(lt) # convert to a sequence
+            l[4] = 0
+        lt = time.struct_time(l) # convert to a struct_time
+        self.timestamp = time.mktime(lt)
+        self.update()
+
+    def minuteDown(self):
+        print('minuteDown()')
+        self.timestamp = self.timestamp - ( 60 * 30 )
+        self.update()
+
+    def holidayModeSet(self):
+        print('holidayModeSet()')
+
+        lts = datetime.datetime.fromtimestamp(self.timestamp)
+        print 'day : %i' % lts.day
+        print 'month : %i' % lts.month
+        print 'hour : %i' % lts.hour
+        print 'minute : %i' % lts.minute
+
+        #set BadHeizung_Clima controlParty 19 31.01.15 9:30 31.01.15 16:00
+        
+        cmd = "set BadHeizung_Clima controlParty %i 31.01.15 9:30 %02i.%02i.%02i %02i:%02i" % ( self.temp, lts.day, lts.month, (lts.year-2000), lts.hour, lts.minute )
+        print 'cmd: %s' % cmd
+        try:
+            FhemConnect().fh.send_cmd( cmd )
+        except Exception as e:
+            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
+
+    def holidayModeClear(self):
+        print('holidayModeClear()')
+        cmd = "set BadHeizung_Clima controlParty 19.0 21.08.07 10:00 30.07.10 10:00"
+        try:
+            FhemConnect().fh.send_cmd( cmd )
+        except Exception as e:
+            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
+
 class SmartHomeWohnzimmer(BoxLayout):
     led_r = NumericProperty()
     led_g = NumericProperty()
@@ -148,13 +257,19 @@ class SmartHomeWohnzimmer(BoxLayout):
     stehlampe = StringProperty()
     rolladen = StringProperty()
 
+    def on_get_focus(self):
+        print 'SmartHomeWohnzimmer.on_get_focus()'
+
     def toggle_WzDeckenlampe(self):
         print('toggle_WzDeckenlampe')
         toggle('WzDeckenlampe')
+        #global phonecallpopup
         #phonecallpopup.handleCallmonitor("external_name", "Thomas")
         #phonecallpopup.handleCallmonitor("external_number", "0173-1234567")
         #phonecallpopup.handleCallmonitor("direction", "incomming")
         #phonecallpopup.handleCallmonitor("event", "call")
+        #phonecallpopup.open()
+
 
     def toggle_WzStehlampe(self):
         print('toggle_WzStehlampe')

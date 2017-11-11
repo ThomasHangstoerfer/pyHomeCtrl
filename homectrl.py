@@ -200,7 +200,6 @@ Builder.load_string("""
                 id: doorcam
                 size_hint: 1, 1
                 pos_hint: {'center_x': .5, 'center_y': .5}
-
         Screen:
             name: 'verboseclock'
             #on_pre_enter: verboseclock.on_get_focus()
@@ -220,13 +219,25 @@ class SmartHomeTabbedPanel(TabbedPanel):
 
     def on_get_focus(self):
         print 'SmartHomeTabbedPanel.on_get_focus()'
+        self.bind(current_tab = self.on_current_tab)
+        self.current_tab.on_get_focus()
 
     def on_release_focus(self):
         print 'SmartHomeTabbedPanel.on_release_focus()'
 
+    def on_current_tab(self, a, b):
+        print 'SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab)
+        self.current_tab.on_get_focus()
+
 class ExTabbedPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
-    pass
+
+    def on_get_focus(self):
+        print 'ExTabbedPanelItem.on_get_focus()'
+        if self.subwidget is not None:
+            self.subwidget.on_get_focus()
+        else:
+            print 'subwidget not valid!'
 
 class SimpleClock(Label):
 

@@ -29,14 +29,39 @@ class CallList(ListView):
                 name = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-name")
                 number = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-number")
                 timestamp = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-timestamp")
+                state = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-state")
+                duration = self.ctrl.fh.get_dev_reading("clist", str(i+1)+"-duration")
                 if name is None:
                     name = "Unbekannt"
                 if number is None:
                     number = "Unbekannt"
                 if timestamp is None:
                     timestamp = ""
+                if state is None:
+                    state = ""
+                if duration is None:
+                    duration = ""
+                print 'state %s' % state
+                # state: '=>'     incomming
+                # state: '=> X'   incomming, missed?
+                # state: '=> O_O' incomming answering machine
+                # state: '<= X'   outgoing, busy?
+                # state: '<='     outgoing
+                statestring = ''
+                if state == '=>':
+                    statestring = 'incomming'
+                elif state == '=> X':
+                    statestring = 'incomming, missed'
+                elif state == '=> O_O':
+                    statestring = 'incomming, answering machine'
+                elif state == '<=':
+                    statestring = 'outgoing'
+                elif state == '<= X':
+                    statestring = 'outgoing, busy'
+                else:
+                    statestring = state
 
-                self.item_strings[i] = name + " - " + number + " - " + timestamp
+                self.item_strings[i] = name + " - " + number + " - " + timestamp + ' [' + statestring + ']'
 
             self.is_initialized = True
 
@@ -49,7 +74,7 @@ class CallList(ListView):
         if ( ev["device"] == "clist" ):
             field = ev["reading"]
             if ( ev["reading"] == "1-number" ):
-                print('1-number: ', ev["val"])
+                print('1-number: ', ev["value"])
 
     def on_get_focus(self):
         print 'CallList.on_get_focus()'

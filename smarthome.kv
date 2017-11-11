@@ -113,6 +113,83 @@
         Label:
             text: root.window
 
+<SmartHomeHolidayMode>:
+    orientation: 'horizontal'
+    id: first_row
+    Button:
+        id: clear
+        text: 'CLEAR'
+        on_release: root.holidayModeClear()
+    BoxLayout:
+        id: temp_layout
+        orientation: 'vertical'
+        Button:
+            id: temp_up
+            text: '+'
+            on_release: root.tempUp()
+        Label:
+            text: str(root.temp) + '°C'
+        Button:
+            id: temp_down
+            text: '-'
+            on_release: root.tempDown()
+    BoxLayout:
+        id: day_layout
+        orientation: 'vertical'
+        Button:
+            id: day_up
+            text: '+'
+            on_release: root.dayUp()
+        Label:
+            text: root.day_str
+        Button:
+            id: day_down
+            text: '-'
+            on_release: root.dayDown()
+    BoxLayout:
+        id: month_layout
+        orientation: 'vertical'
+        Button:
+            id: month_up
+            text: '+'
+            on_release: root.monthUp()
+        Label:
+            text: root.month_str
+        Button:
+            id: month_down
+            text: '-'
+            on_release: root.monthDown()
+    BoxLayout:
+        id: hour_layout
+        orientation: 'vertical'
+        Button:
+            id: hour_up
+            text: '+'
+            on_release: root.hourUp()
+        Label:
+            text: root.hour_str
+        Button:
+            id: hour_down
+            text: '-'
+            on_release: root.hourDown()
+    BoxLayout:
+        id: minute_layout
+        orientation: 'vertical'
+        Button:
+            id: minute_up
+            text: '+'
+            on_release: root.minuteUp()
+        Label:
+            text: root.minute_str
+        Button:
+            id: minute_down
+            text: '-'
+            on_release: root.minuteDown()
+    Button:
+        id: set
+        text: 'SET'
+        on_release: root.holidayModeSet()
+
 <SmartHomeTabbedPanel>:
     do_default_tab: False
     tab_pos: 'top_left'
@@ -133,3 +210,20 @@
         subwidget: smarthomebad
         SmartHomeBad:
             id: smarthomebad
+
+    ExTabbedPanelItem:
+        id: binDa
+        #background_normal: 'gfx/home_r.png'
+        text: 'Bin da'
+        Label:
+            text: 'Anwesenheits-Simulation'
+
+    ExTabbedPanelItem:
+        id: binNichtDa
+        #background_normal: 'gfx/home_r.png'
+        text: 'Bin nicht da'
+        subwidget: smarthomeholidaymode
+        SmartHomeHolidayMode:
+            id: smarthomeholidaymode
+
+
