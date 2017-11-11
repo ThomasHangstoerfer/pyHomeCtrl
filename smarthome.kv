@@ -116,10 +116,16 @@
 <SmartHomeHolidayMode>:
     orientation: 'horizontal'
     id: first_row
-    Button:
-        id: clear
-        text: 'CLEAR'
-        on_release: root.holidayModeClear()
+    padding: [10, 10, 10, 10]
+    spacing: 5
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+        Button:
+            id: clear
+            text: 'CLEAR'
+            on_release: root.holidayModeClear()
+        Label:
     BoxLayout:
         id: temp_layout
         orientation: 'vertical'
@@ -185,10 +191,14 @@
             id: minute_down
             text: '-'
             on_release: root.minuteDown()
-    Button:
-        id: set
-        text: 'SET'
-        on_release: root.holidayModeSet()
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+        Button:
+            id: set
+            text: 'SET'
+            on_release: root.holidayModeSet()
+        Label:
 
 <SmartHomeTabbedPanel>:
     do_default_tab: False
@@ -216,7 +226,7 @@
         #background_normal: 'gfx/home_r.png'
         text: 'Bin da'
         Label:
-            text: 'Anwesenheits-Simulation'
+            text: 'TODO: Anwesenheits-Simulation'
 
     ExTabbedPanelItem:
         id: binNichtDa
