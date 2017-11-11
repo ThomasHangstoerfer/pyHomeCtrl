@@ -99,6 +99,7 @@ class SmartHomeHolidayMode(BoxLayout):
 
     def on_get_focus(self):
 
+        self.timestamp = time.time()
         print 'SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp
 
         self.minuteUp()
