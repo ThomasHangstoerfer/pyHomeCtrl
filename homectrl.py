@@ -24,6 +24,7 @@ import doorcam
 import calllist
 import weather
 import fhem_connect
+import calendarlist
 import image_button
 from popup_settings import SettingsPopup
 from popup_networkinfo import NetworkInfoPopup
@@ -41,6 +42,7 @@ Builder.load_string("""
 #:import Image kivy.uix.image
 #:include smarthome.kv
 #:include weather.kv
+#:include calendarlist.kv
 #:include image_button.kv
 
 <WifiState>:
@@ -85,7 +87,6 @@ Builder.load_string("""
             size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'doorcam'
-                #doorcam.on_get_focus()
         ImageButton:
             img: 'gfx/weather.png'
             size_hint_x: 1.0 # use complete width of parent for the touch-area
@@ -98,6 +99,12 @@ Builder.load_string("""
             size_hint_y: 0.1
             on_press:
                 _screen_manager.current = 'calllist'
+        ImageButton:
+            img: 'gfx/calendar.png'
+            size_hint_x: 1.0 # use complete width of parent for the touch-area
+            size_hint_y: 0.1
+            on_press:
+                _screen_manager.current = 'calendar'
 
         ImageButton:
             id: settings_button
@@ -149,6 +156,7 @@ Builder.load_string("""
         screen_calllist: screen_calllist
         screen_smarthome: screen_smarthome
         screen_weather: screen_weather
+        screen_calendar: screen_calendar
         size_hint: .9, 1
         pos_hint: {'right': 1}
         transition: FadeTransition()
@@ -200,6 +208,7 @@ Builder.load_string("""
                 id: doorcam
                 size_hint: 1, 1
                 pos_hint: {'center_x': .5, 'center_y': .5}
+
         Screen:
             name: 'verboseclock'
             #on_pre_enter: verboseclock.on_get_focus()
@@ -209,6 +218,16 @@ Builder.load_string("""
             VerboseClock:
                 id: verboseclock
                 pos_hint: {'center_x': .5, 'center_y': .5}
+
+        Screen:
+            name: 'calendar'
+            id: screen_calendar
+            #on_pre_enter: calendar.on_get_focus()
+            on_enter:     calendar.on_get_focus()
+            #on_pre_leave: print 'calendar: on_pre_leave'
+            on_leave:     calendar.on_release_focus()
+            CalendarList:
+                id: calendar
 
 """)
 

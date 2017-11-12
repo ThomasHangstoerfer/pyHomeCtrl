@@ -1,21 +1,28 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
 from kivy.app import App
+
 from kivy.lang import Builder
-from kivy.uix.listview import ListView
 from kivy.adapters.listadapter import ListAdapter
 from kivy.adapters.dictadapter import DictAdapter
 from kivy.factory import Factory
 
+from kivy.uix.listview import ListView
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+
 import httplib2
 import os
+
 
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
+from datetime import timedelta
 import datetime
 
 try:
@@ -61,28 +68,38 @@ def get_credentials():
 
 
 class CalendarList(ListView):
+
     def __init__(self, **kwargs):
         super(CalendarList, self).__init__()
         #self.calendarId = 'set calendar-id here'
         self.calendarId = 'mergtn05h7dbffq2b4n2941j9k@group.calendar.google.com'
 
-        self.args_converter = lambda row_index, rec: {
-            'text': rec['text'],
-            'size_hint_y': None,
-            'height': 25,
-            'cls_dicts': [{'cls': ListItemButton,
-                           'kwargs': {'text': rec['text']}},
-                           {
-                               'cls': ListItemLabel,
-                               'kwargs': {
-                                   'text': rec['ts'],
-                                   'is_representing_cls': True}},
-                           {
-                               'cls': ListItemButton,
-                               'kwargs': {'text': rec['text']}}]}
-        self.adapter = ListAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
-        #self.adapter = DictAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
+#        try:
+#            self.args_converter = lambda row_index, rec: {
+#                'text': rec['text'],
+#                'size_hint_y': None,
+#                'height': 25,
+#                'cls_dicts': [{'cls': ListItemButton,
+#                               'kwargs': {'text': rec['text']}},
+#                               {
+#                                   'cls': ListItemLabel,
+#                                   'kwargs': {
+#                                       'text': rec['ts'],
+#                                       'is_representing_cls': True}},
+#                               {
+#                                   'cls': ListItemButton,
+#                                   'kwargs': {'text': rec['text']}}]}
+#            self.adapter = ListAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
+#            #self.adapter = DictAdapter(data=[], selection_mode='single', cls=Factory.ListItemButtonCal, args_converter=self.args_converter )
+#        except Exception as e:
+#            printf('CalendarList.__init__(): %s' % e)
 
+    def on_get_focus(self):
+        print( 'CalendarList.on_get_focus()')
+        self.update()
+
+    def on_release_focus(self):
+        print( 'CalendarList.on_release_focus()')
 
 
 #    def args_converter(self, row_index, an_obj):
@@ -103,6 +120,19 @@ class CalendarList(ListView):
         service = discovery.build('calendar', 'v3', http=http)
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        year = timedelta(days=365)
+        in_one_year_from_now = (datetime.datetime.utcnow() + year).isoformat() + 'Z' # 'Z' indicates UTC time
+        print('')
+        print('')
+        print('')
+        print('')
+        print('now %s' % now)
+        print('in_one_year_from_now %s' % in_one_year_from_now)
+        print('')
+        print('')
+        print('')
+        print('')
+
         print('Getting the upcoming 10 events')
 
         print('')
@@ -114,12 +144,35 @@ class CalendarList(ListView):
                 singleEvents=True,
                 orderBy='startTime',
                 timeMin=now,
+                timeMax=in_one_year_from_now,
                 maxResults=10).execute()
             for event in events['items']:
-                start = event['start'].get('dateTime', event['start'].get('date'))
-                self.item_strings.append(start + ": " + event['summary'])
-                
-                print (start + ": " + event['summary'])
+                #start = event['start'].get('dateTime', event['start'].get('date'))
+                start = '{:25}'.format(event['start'].get('dateTime', event['start'].get('date')))
+                event_name = '{:50}'.format( event['summary'].encode("utf-8") )
+                list_entry = start + "      " + event_name
+                self.item_strings.append(list_entry)
+
+                print (list_entry)
             page_token = events.get('nextPageToken')
             if not page_token:
                 break
+
+class CalendarApp(App):
+    def build(self):
+
+        self.title = 'Calendar'
+
+        self.calendarlist = CalendarList()
+        l = BoxLayout(orientation='vertical')
+        l.add_widget(self.calendarlist)
+
+        
+        self.calendarlist.on_get_focus()
+
+        return l
+
+
+if __name__ == "__main__":
+    app = CalendarApp()
+    app.run()
