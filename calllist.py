@@ -70,11 +70,12 @@ class CallList(ListView):
 
 
     def update(self, ev):
-        print("CallList: ", ev)
+        #print("CallList: ", ev)
         if ( ev["device"] == "clist" ):
             field = ev["reading"]
             if ( ev["reading"] == "1-number" ):
-                print('1-number: ', ev["value"])
+                #print('1-number: ', ev["value"])
+                pass
 
     def on_get_focus(self):
         print 'CallList.on_get_focus()'

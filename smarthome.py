@@ -389,7 +389,7 @@ class Smarthome:
         #for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
         #    print("key={0}, val={1}".format(key, val))
         #print(homectrlTabbedPanel.ids.smarthome.sh_tab_panel)
-        print(ev)
+        #print('SmartHome.update(): %s' % ev)
         device = ev["device"]
         if ( device == "BadThermostat_Climate" ):
             if ( ev["reading"] == "humidity" ):

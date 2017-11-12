@@ -53,7 +53,7 @@ class PhoneCallPopup(Popup):
             self.pnumber.text = num
 
     def handleCallmonitor(self, reading, value):
-        print('reading: ' + reading + ' value: ' + value)
+        #print('reading: ' + reading + ' value: ' + value)
 
         if ( reading == "external_name" ):
             print("external_name: " + value)
