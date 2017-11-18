@@ -1,5 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# pip install --force-reinstall google-api-python-client
+# sudo pip install httplib2
+# sudo pip install discovery
+
 from __future__ import print_function
 
 from kivy.app import App
@@ -15,7 +20,6 @@ from kivy.uix.label import Label
 
 import httplib2
 import os
-
 
 from apiclient import discovery
 from oauth2client import client
