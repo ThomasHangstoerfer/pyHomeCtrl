@@ -67,14 +67,16 @@ class DoorCam(ScatterLayout):
         self.update_event = None
         #self.camimage = ObjectProperty(AsyncImage)
         self.has_focus = False
+        self.index = 0
 
 
     def on_touch_down( self, touch ):
-        print 'on_touch_down'
+        self.index = self.index + 1
+        print 'on_touch_down index=%i' % self.index
         self.update('')
 
     def update(self, e):
-        print 'DoorCam.update() self %s' % self
+        print 'DoorCam.update() self %s index %i' % (self, self.index)
         #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
         #filepath = getLatestFile(cam_path)
         #self.camimage.source = filepath
@@ -96,7 +98,11 @@ class DoorCam(ScatterLayout):
                     #if ( self.camimage.source == '' ):
                     # nodejs webserver auf pi1:
                     # sudo /etc/init.d/cam-image-server start
-                    self.camimage.source = 'http://pi:9615/latest.jpg'
+                    if self.index > 0:
+                        self.camimage.source = 'http://pi:9615/latest-%i.jpg' % self.index
+                    else:
+                        self.camimage.source = 'http://pi:9615/latest.jpg'
+                    print 'self.camimage.source = %s' % self.camimage.source
                     self.camimage.reload()
                     #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -113,6 +119,7 @@ class DoorCam(ScatterLayout):
 
     def on_get_focus(self):
         print 'DoorCam.on_get_focus() self %s' % self
+        self.index = 0
         self.has_focus = True
         self.update('')
         #self.update_event = Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
