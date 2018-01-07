@@ -281,18 +281,20 @@ class SmartHomeWohnzimmer(BoxLayout):
         toggle('LEDswitch')
 
     def setRGB(self, rgb):
-        print('setRGB(' + rgb + ') rgb[4:6] = ' + rgb[4:6] )
-        # TODO split 'rgb' and set led_r etc
-        self.led_r = int(rgb[0:2], 16)/25
-        self.led_g = int(rgb[2:4], 16)/25
-        self.led_b = int(rgb[4:6], 16)/25
+        #print('setRGB(' + rgb + ') rgb[0:2] = ' + rgb[0:2] )
+        #print('setRGB(' + rgb + ') rgb[2:4] = ' + rgb[2:4] )
+        #print('setRGB(' + rgb + ') rgb[4:6] = ' + rgb[4:6] )
+
+        self.led_r = int(rgb[0:2], 16)/255.0
+        self.led_g = int(rgb[2:4], 16)/255.0
+        self.led_b = int(rgb[4:6], 16)/255.0
         print('setRGB led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
 
     def update_LEDswitch(self):
         print('update_LEDswitch led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
-        redHex = "%0.2X" % (self.led_r * 25)
-        greenHex = "%0.2X" % (self.led_g * 25)
-        blueHex = "%0.2X" % (self.led_b * 25)
+        redHex = "%0.2X" % (self.led_r * 255)
+        greenHex = "%0.2X" % (self.led_g * 255)
+        blueHex = "%0.2X" % (self.led_b * 255)
         print('redHex ' + redHex )
         print('greenHex ' + greenHex )
         print('blueHex ' + blueHex )
@@ -300,38 +302,50 @@ class SmartHomeWohnzimmer(BoxLayout):
 
     def redDown(self):
         print('redDown() self.led_r ', self.led_r)
-        if self.led_r > 0:
-            self.led_r -= 1
+        if self.led_r > .1:
+            self.led_r -= .1
+        else:
+            self.led_r = 0
         self.update_LEDswitch()
 
     def redUp(self):
         print('redUp() self.led_r ', self.led_r)
-        if self.led_r < 10:
-            self.led_r += 1
+        if self.led_r < 0.9:
+            self.led_r += .1
+        else:
+            self.led_r = 1.0
         self.update_LEDswitch()
 
     def greenDown(self):
         print('greenDown() self.led_g ', self.led_g)
-        if self.led_g > 0:
-            self.led_g -= 1
+        if self.led_g > .1:
+            self.led_g -= .1
+        else:
+            self.led_g = 0
         self.update_LEDswitch()
 
     def greenUp(self):
         print('greenUp() self.led_g ', self.led_g)
-        if self.led_g < 10:
-            self.led_g += 1
+        if self.led_g < 0.9:
+            self.led_g += .1
+        else:
+            self.led_g = 1.0
         self.update_LEDswitch()
 
     def blueDown(self):
         print('blueDown() self.led_b ', self.led_b)
-        if self.led_b > 0:
-            self.led_b -= 1
+        if self.led_b > .1:
+            self.led_b -= .1
+        else:
+            self.led_b = 0
         self.update_LEDswitch()
 
     def blueUp(self):
         print('blueUp() self.led_b ', self.led_b)
-        if self.led_b < 10:
-            self.led_b += 1
+        if self.led_b < 0.9:
+            self.led_b += .1
+        else:
+            self.led_b = 1.0
         self.update_LEDswitch()
 
     def rolladen_hoch(self):
@@ -413,7 +427,7 @@ class Smarthome:
         elif ( device == "LED" ):
             if ( ev["reading"] == "RGB" ):
                 print("LED: RGB: " + ev["value"])
-                self.smarthomewidget.wohnzimmerItem.subwidget.rgb = ev["value"]
+                self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( ev["value"] )
         elif ( device == "WzStehlampe" ):
             if ( ev["reading"] == "STATE" ):
                 print("WzStehlampe: " + ev["value"])
