@@ -314,13 +314,22 @@ class TestApp(App):
         hc._screen_manager.current = 'doorcam'
         DisplayControl().displayOn()
 
+    @mainthread
+    def on_connect(self, client, userdata, flags, rc):
+        print("Connected with result code "+str(rc))
+        # Subscribing in on_connect() means that if we lose the connection and
+        # reconnect then subscriptions will be renewed.
+        #client.subscribe("$SYS/#")
+        print("Subscribing to topic","cam/newImage")
+        client.subscribe("cam/newImage")
+
 
     @mainthread
     def on_message(self, client, userdata, message):
-        print("message received " ,str(message.payload.decode("utf-8")))
-        print("message topic=",message.topic)
-        print("message qos=",message.qos)
-        print("message retain flag=",message.retain)
+        print('mqtt-message for topic ' + message.topic + ' received ' + str(message.payload.decode("utf-8")))
+        #print("message topic=",message.topic)
+        #print("message qos=",message.qos)
+        #print("message retain flag=",message.retain)
         if message.topic == 'cam/newImage':
             print("new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
             try:
@@ -361,12 +370,11 @@ class TestApp(App):
         dl.start()
 
         client = mqtt.Client('homectrl')
-        client.on_message=self.on_message #attach function to callback
+        client.on_message=self.on_message
+        client.on_connect = self.on_connect
         print("connecting to broker")
-        client.connect('pi') #connect to broker
-        client.loop_start() #start the loop
-        print("Subscribing to topic","cam/newImage")
-        client.subscribe("cam/newImage")
+        client.connect('pi')
+        client.loop_start() # start threaded loop
 
 
         return hc
