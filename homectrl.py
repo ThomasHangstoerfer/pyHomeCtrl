@@ -12,11 +12,13 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 
 import datetime
 from threading import Timer
 import time
+
+import paho.mqtt.client as mqtt
 
 import verboseclock
 import smarthome
@@ -31,6 +33,7 @@ from popup_networkinfo import NetworkInfoPopup
 from fhem_connect import FhemConnect
 from wifi_state import WifiState
 from display_ctrl import DisplayControl
+from settings import Settings
 
 from dash_listen import DashListener
 
@@ -164,6 +167,7 @@ Builder.load_string("""
         Screen:
             name: 'smarthome'
             id: screen_smarthome
+            subwidget: smarthome_tabbed_panel
             smarthome_tabbed_panel: smarthome_tabbed_panel
 
             #on_pre_enter: smarthome_tabbed_panel.on_get_focus()
@@ -177,7 +181,9 @@ Builder.load_string("""
         Screen:
             name: 'weather'
             id: screen_weather
+            subwidget: weather
             weather: weather
+
             #on_pre_enter: print 'weather: on_pre_enter'
             on_enter:     weather.on_get_focus()
             #on_pre_leave: print 'weather: on_pre_leave'
@@ -188,6 +194,7 @@ Builder.load_string("""
         Screen:
             name: 'calllist'
             id: screen_calllist
+            subwidget: calllist
             calllist: calllist
 
             #on_pre_enter: calllist.on_get_focus()
@@ -199,7 +206,10 @@ Builder.load_string("""
 
         Screen:
             name: 'doorcam'
+            id: doorcam
+            subwidget: doorcam
             doorcam: doorcam
+
             #on_pre_enter: doorcam.on_get_focus()
             on_enter: doorcam.on_get_focus()
             #on_pre_leave: print 'doorcam: on_pre_leave'
@@ -211,6 +221,10 @@ Builder.load_string("""
 
         Screen:
             name: 'verboseclock'
+            id: verboseclock
+            subwidget: verboseclock
+            verboseclock: verboseclock
+
             #on_pre_enter: verboseclock.on_get_focus()
             on_enter:     verboseclock.on_get_focus()
             #on_pre_leave: print 'verboseclock: on_pre_leave'
@@ -222,6 +236,9 @@ Builder.load_string("""
         Screen:
             name: 'calendar'
             id: screen_calendar
+            subwidget: calendar
+            calendar: calendar
+
             #on_pre_enter: calendar.on_get_focus()
             on_enter:     calendar.on_get_focus()
             #on_pre_leave: print 'calendar: on_pre_leave'
@@ -297,15 +314,40 @@ class TestApp(App):
         hc._screen_manager.current = 'doorcam'
         DisplayControl().displayOn()
 
+
+    @mainthread
+    def on_message(self, client, userdata, message):
+        print("message received " ,str(message.payload.decode("utf-8")))
+        print("message topic=",message.topic)
+        print("message qos=",message.qos)
+        print("message retain flag=",message.retain)
+        if message.topic == 'cam/newImage':
+            print("new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
+            try:
+                hc._screen_manager.current = 'doorcam'
+            except Exception as e:
+                print 'Exception: %s' % e
+                pass
+        DisplayControl().displayOn()
+
+    def on_display_switched_on(self):
+        print 'on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current
+        try:
+            cur_screen = hc._screen_manager.get_screen(hc._screen_manager.current)
+            cur_screen.subwidget.on_get_focus()
+        except Exception as e:
+            print 'Exception: %s' % e
+            pass
+
     def build(self):
         DisplayControl().displayOn()
+        DisplayControl().on_DisplaySwitchedOn(self.on_display_switched_on)
         print 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off
         global hc
         hc = HomeCtrl()
         hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
         hc.settings_button.on_press = settingspopup.open
         hc.wifistate.on_press = netinfopopup.open
-
         FhemConnect().connect()
 
         global sh
@@ -317,6 +359,15 @@ class TestApp(App):
         dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
         #dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
         dl.start()
+
+        client = mqtt.Client('homectrl')
+        client.on_message=self.on_message #attach function to callback
+        print("connecting to broker")
+        client.connect('pi') #connect to broker
+        client.loop_start() #start the loop
+        print("Subscribing to topic","cam/newImage")
+        client.subscribe("cam/newImage")
+
 
         return hc
 
