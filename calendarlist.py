@@ -4,6 +4,8 @@
 # pip install --force-reinstall google-api-python-client
 # sudo pip install httplib2
 # sudo pip install discovery
+#
+# client-credentials in $HOME/.credentials/calendar-python-quickstart.json
 
 from __future__ import print_function
 

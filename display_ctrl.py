@@ -15,6 +15,7 @@ from threading import Timer
 
 from settings import Settings
 from utils import singleton, RepeatedTimer, running_on_pi, setBacklight
+from callback_list import CallbackList
 
 
 class DisplayOffPopup(Popup):
@@ -38,6 +39,8 @@ class DisplayControl(object):
     display_off_locked = False
     display_is_off = False
 
+    callbacks_DisplaySwitchedOn = CallbackList()
+
     def __init__(self,**kwargs):
         #print '\n\n\n DisplayControl \n\n\n'
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
@@ -47,6 +50,9 @@ class DisplayControl(object):
 
         global dc
         dc = self
+
+    def on_DisplaySwitchedOn(self, listener):
+        self.callbacks_DisplaySwitchedOn.append(listener)
 
     def on_motion(self, etype, motionevent, arg):
         # will receive all motion events.
@@ -91,4 +97,5 @@ class DisplayControl(object):
         if ( running_on_pi() ):
             setBacklight(False)
         self.display_is_off = False
+        self.callbacks_DisplaySwitchedOn.fire()
         print 'DisplayControl.display_is_off %s' % self.display_is_off
