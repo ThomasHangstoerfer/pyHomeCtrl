@@ -14,3 +14,10 @@ Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](h
         <td><img src="doc/pyHomeCtrl_Network.png" style="width: 200px;">Network</img></td>
     </tr>
 </table>
+
+Dependencies:
+sudo pip3 install paho-mqtt
+sudo pip3 install httplib2
+sudo pip3 install --upgrade google-api-python-client
+sudo pip3 install --upgrade oauth2client 
+sudo pip3 install scapy

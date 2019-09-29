@@ -12,11 +12,11 @@ class Settings(object):
     callbacks_update = CallbackList()
 
     display_off_active = True
-    display_off_timeout = 90.0
+    display_off_timeout = 20.0
     offlinemode = False
 
     def __init__(self, **kwargs):
-        #print '\n\n\nSettings:\n  display_off_active  = %s\n  display_off_timeout = %i\n  offlinemode         = %s\n\n\n' % (self.display_off_active, self.display_off_timeout, self.offlinemode)
+        #print( '\n\n\nSettings:\n  display_off_active  = %s\n  display_off_timeout = %i\n  offlinemode         = %s\n\n\n' % (self.display_off_active, self.display_off_timeout, self.offlinemode))
         pass
 
     def addListener(self, listener):
@@ -31,6 +31,6 @@ class Settings(object):
         self.notifyOnChange()
 
     def notifyOnChange(self):
-        print 'Settings.notifyOnChange()'
-        print 'TODO let clients register for changes of Settings and trigger callbacks'
+        print( 'Settings.notifyOnChange()')
+        print( 'TODO let clients register for changes of Settings and trigger callbacks')
         self.callbacks_update.fire()

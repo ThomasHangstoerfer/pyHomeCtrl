@@ -57,7 +57,7 @@ class VerboseClock(ColoredGridLayout):
         if (touch.pos[0] > self.pos[0] + self.size[0]) or ( touch.pos[0] < self.pos[0]):
             pass
         else:
-            #print 'INSIDE'
+            #print( 'INSIDE')
             self.active_theme = ( self.active_theme + 1 ) % min( len(self.color_highlighted),  len(self.color_inactive) )
 
     def highlight_label(self, label):
@@ -69,11 +69,11 @@ class VerboseClock(ColoredGridLayout):
         for buchstabe in self.woerter[text]:
             str += buchstabe.text
             self.highlight_label(buchstabe)
-        #print str
+        #print( str)
 
     def update(self, arg):
         time_str = time.strftime("%d %b %y %H:%M:%S", time.localtime())
-        print 'VerboseClock.update() %s' % time_str
+        print( 'VerboseClock.update() %s' % time_str)
 
         if self.test_mode == True:
             hour = self.test_mode_hour
@@ -81,7 +81,7 @@ class VerboseClock(ColoredGridLayout):
         else:
             hour = time.localtime()[3]
             minute = time.localtime()[4]
-        #print '%i:%02i' % (hour, minute)
+        #print( '%i:%02i' % (hour, minute))
 
         # reset all
         for wort in self.w_order:
@@ -152,8 +152,8 @@ class VerboseClock(ColoredGridLayout):
 
         self.highlight('UHR')
 
-        #print 'self.has_focus = %s' % self.has_focus
-        #print 'self.update_event = %s' % self.update_event
+        #print( 'self.has_focus = %s' % self.has_focus)
+        #print( 'self.update_event = %s' % self.update_event)
 
         if self.update_event is not None:
             self.update_event.cancel()
@@ -209,9 +209,9 @@ class VerboseClock(ColoredGridLayout):
                 }
 
         for wort in self.w_order:
-            #print wort
+            #print( wort)
             for buchstabe in self.woerter[wort]:
-                #print '  %s' % buchstabe.text
+                #print( '  %s' % buchstabe.text)
                 buchstabe.size_x = 20
                 buchstabe.size_y = 20
                 buchstabe.font_size = '40sp'
@@ -225,7 +225,7 @@ class VerboseClock(ColoredGridLayout):
         self.bind(size=self._update_rect, pos=self._update_rect, active_theme=self._update_rect)
 
     def _update_rect(self, instance, value):
-        print '_update_rect'
+        print( '_update_rect')
         self.bcolor = self.color_background[self.active_theme]
         self.update(0)
 
@@ -246,7 +246,7 @@ class VerboseClock(ColoredGridLayout):
         self.update(0)
 
     def on_get_focus(self):
-        print 'VerboseClock.on_get_focus() self %s' % self
+        print( 'VerboseClock.on_get_focus() self %s' % self)
         self.update(0)
         #self.update_event = Clock.schedule_interval(homectrlTabbedPanel.doorCamItem.subwidget.update, 2)
         #if self.update_event is not None:
@@ -255,10 +255,10 @@ class VerboseClock(ColoredGridLayout):
         self.has_focus = True
 
     def on_release_focus(self):
-        print 'VerboseClock.on_release_focus() self %s' % self
+        print( 'VerboseClock.on_release_focus() self %s' % self)
         self.has_focus = False
         if self.update_event is not None:
-            print 'self.update_event.cancel()'
+            print( 'self.update_event.cancel()')
             self.update_event.cancel()
             self.update_event = None
 

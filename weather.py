@@ -55,14 +55,14 @@ class WeatherWidget(FloatLayout):
 
 
     def on_get_focus(self):
-        print 'WeatherWidget.on_get_focus()'
+        print( 'WeatherWidget.on_get_focus()')
         self.update()
 
     def on_release_focus(self):
-        print 'WeatherWidget.on_release_focus()'
+        print( 'WeatherWidget.on_release_focus()')
         
     def setOfflineMode(self, offlineMode ):
-        print 'WeatherWidget.setOfflineMode(%i)' % offlineMode
+        print( 'WeatherWidget.setOfflineMode(%i)' % offlineMode)
         if ( offlineMode == True ):
             self.fake_data = 1
         else:

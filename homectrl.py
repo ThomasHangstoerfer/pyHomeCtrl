@@ -254,26 +254,26 @@ class SmartHomeTabbedPanel(TabbedPanel):
     badItem = ObjectProperty()
 
     def on_get_focus(self):
-        print 'SmartHomeTabbedPanel.on_get_focus()'
+        print ('SmartHomeTabbedPanel.on_get_focus()')
         self.bind(current_tab = self.on_current_tab)
         self.current_tab.on_get_focus()
 
     def on_release_focus(self):
-        print 'SmartHomeTabbedPanel.on_release_focus()'
+        print( 'SmartHomeTabbedPanel.on_release_focus()')
 
     def on_current_tab(self, a, b):
-        print 'SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab)
+        print ('SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab) )
         self.current_tab.on_get_focus()
 
 class ExTabbedPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
 
     def on_get_focus(self):
-        print 'ExTabbedPanelItem.on_get_focus()'
+        print ('ExTabbedPanelItem.on_get_focus()')
         if self.subwidget is not None:
             self.subwidget.on_get_focus()
         else:
-            print 'subwidget not valid!'
+            print( 'subwidget not valid!')
 
 class SimpleClock(Label):
 
@@ -281,12 +281,12 @@ class SimpleClock(Label):
         self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
 
     def on_touch_down( self, touch ):
-        #print 'touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1])
+        #print( 'touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1]))
         if ( touch.pos[0] > self.pos[0] + self.size[0] ) or ( touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]) :
-            #print 'OUTSIDE SimpleClock'
+            #print( 'OUTSIDE SimpleClock')
             pass
         else:
-            #print 'INSIDE SimpleClock'
+            #print( 'INSIDE SimpleClock')
             #Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.clockItem), 0)
             hc._screen_manager.current = 'verboseclock'
             pass
@@ -295,7 +295,8 @@ class HomeCtrl(FloatLayout):
     pass
 
 
-fhem_server = "pi"
+#fhem_server = "pi"
+fhem_server = "apollo"
 #fc = fhem_connect.FhemConnect(fhem_server);
 fc = fhem_connect.FhemConnect();
 
@@ -308,7 +309,7 @@ netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_h
 
 class TestApp(App):
     def dash_pressed(self):
-        print 'dash_pressed'
+        print( 'dash_pressed')
         #homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
         #homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
         hc._screen_manager.current = 'doorcam'
@@ -335,23 +336,23 @@ class TestApp(App):
             try:
                 hc._screen_manager.current = 'doorcam'
             except Exception as e:
-                print 'Exception: %s' % e
+                print( 'Exception: %s' % e)
                 pass
         DisplayControl().displayOn()
 
     def on_display_switched_on(self):
-        print 'on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current
+        print( 'on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)
         try:
             cur_screen = hc._screen_manager.get_screen(hc._screen_manager.current)
             cur_screen.subwidget.on_get_focus()
         except Exception as e:
-            print 'Exception: %s' % e
+            print( 'Exception: %s' % e)
             pass
 
     def build(self):
         DisplayControl().displayOn()
         DisplayControl().on_DisplaySwitchedOn(self.on_display_switched_on)
-        print 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off
+        print( 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off)
         global hc
         hc = HomeCtrl()
         hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
@@ -373,8 +374,13 @@ class TestApp(App):
         client.on_message=self.on_message
         client.on_connect = self.on_connect
         print("connecting to broker")
-        client.connect('pi')
-        client.loop_start() # start threaded loop
+        #client.connect('pi')
+        try:
+            client.connect('apollo')
+            client.loop_start() # start threaded loop
+        except Exception as e:
+            print('Exception: %s' % e)
+            pass
 
 
         return hc

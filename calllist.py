@@ -21,7 +21,7 @@ class CallList(ListView):
             # TODO load only the first entry here, the rest asynchronuously
             numberOfCalls = int(self.ctrl.fh.get_dev_reading("clist", "numberOfCalls"))
             numberOfCalls = min(numberOfCalls, 10)
-            print "numberOfCalls %i" % numberOfCalls
+            print( "numberOfCalls %i" % numberOfCalls)
             while numberOfCalls > len(self.item_strings):
                 self.item_strings.append('')
             for i in range(0, numberOfCalls):
@@ -41,7 +41,7 @@ class CallList(ListView):
                     state = ""
                 if duration is None:
                     duration = ""
-                print 'state %s' % state
+                print( 'state %s' % state)
                 # state: '=>'     incomming
                 # state: '=> X'   incomming, missed?
                 # state: '=> O_O' incomming answering machine
@@ -66,7 +66,7 @@ class CallList(ListView):
             self.is_initialized = True
 
         except Exception as e:
-            print "\n\n\n\n EXCEPTION in CallList.init(): %s" % e
+            print( "\n\n\n\n EXCEPTION in CallList.init(): %s" % e)
 
 
     def update(self, ev):
@@ -78,9 +78,9 @@ class CallList(ListView):
                 pass
 
     def on_get_focus(self):
-        print 'CallList.on_get_focus()'
+        print( 'CallList.on_get_focus()')
         if not self.is_initialized: 
             self.init()
 
     def on_release_focus(self):
-        print 'CallList.on_release_focus()'
+        print( 'CallList.on_release_focus()')

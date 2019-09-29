@@ -14,7 +14,7 @@ from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.network.urlrequest import UrlRequest
-from thread import start_new_thread
+from _thread import start_new_thread
 
 from display_ctrl import DisplayControl
 
@@ -52,7 +52,7 @@ class SmartHomeBad(BoxLayout):
     actuator = StringProperty()
 
     def on_get_focus(self):
-        print 'SmartHomeBad.on_get_focus()'
+        print( 'SmartHomeBad.on_get_focus()')
 
     # set BadThermostat_Climate desired-temp 18
     def tempDown(self):
@@ -62,7 +62,7 @@ class SmartHomeBad(BoxLayout):
             newt = t - 0.5
             FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print '\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e
+            print( '\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e)
 
     def tempUp(self):
         print('tempUp()')
@@ -71,7 +71,7 @@ class SmartHomeBad(BoxLayout):
             newt = t + 0.5
             FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
+            print( '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
 class SmartHomeHolidayMode(BoxLayout):
     temp = NumericProperty(18)
@@ -100,20 +100,20 @@ class SmartHomeHolidayMode(BoxLayout):
     def on_get_focus(self):
 
         self.timestamp = time.time()
-        print 'SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp
+        print( 'SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp)
 
         self.minuteUp()
         #self.update()
 
     def update(self):
-        print 'SmartHomeHolidayMode.update()'
+        print( 'SmartHomeHolidayMode.update()')
 
-        print 'timestamp : %s' % datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        print( 'timestamp : %s' % datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         lts = datetime.datetime.fromtimestamp(self.timestamp)
-        print 'day : %i' % lts.day
-        print 'month : %i' % lts.month
-        print 'hour : %i' % lts.hour
-        print 'minute : %i' % lts.minute
+        print( 'day : %i' % lts.day)
+        print( 'month : %i' % lts.month)
+        print( 'hour : %i' % lts.hour)
+        print( 'minute : %i' % lts.minute)
 
         self.day_str = str(lts.day)
         self.month_str = str(lts.month)
@@ -133,7 +133,7 @@ class SmartHomeHolidayMode(BoxLayout):
     def yearUp(self):
         print('yearUp()')
         lt = time.localtime( self.timestamp )
-        print 'lt.tm_year %i' % lt.tm_year
+        print( 'lt.tm_year %i' % lt.tm_year)
         l = list(lt) # convert to a sequence
         l[0] += 1 # increment year
         lt = time.struct_time(l) # convert to a struct_time
@@ -142,13 +142,13 @@ class SmartHomeHolidayMode(BoxLayout):
     def yearDown(self):
         print('yearDown()')
         lt = time.localtime( self.timestamp )
-        print 'lt.tm_year %i' % lt.tm_year
+        print( 'lt.tm_year %i' % lt.tm_year)
         l = list(lt) # convert to a sequence
         l[0] -= 1 # decrement year
         lt = time.struct_time(l) # convert to a struct_time
         self.timestamp = time.mktime(lt)
         lt = time.localtime( self.timestamp )
-        print 'lt.tm_year %i' % lt.tm_year
+        print( 'lt.tm_year %i' % lt.tm_year)
 
     def dayUp(self):
         print('dayUp()')
@@ -164,7 +164,7 @@ class SmartHomeHolidayMode(BoxLayout):
         print('monthUp()')
 
         lt = time.localtime( self.timestamp )
-        print 'lt.tm_mon %i' % lt.tm_mon
+        print( 'lt.tm_mon %i' % lt.tm_mon)
         l = list(lt) # convert to a sequence
         if lt.tm_mon == 12:
             self.yearUp()
@@ -180,7 +180,7 @@ class SmartHomeHolidayMode(BoxLayout):
         print('monthDown()')
 
         lt = time.localtime( self.timestamp )
-        print 'lt.tm_mon %i' % lt.tm_mon
+        print( 'lt.tm_mon %i' % lt.tm_mon)
         l = list(lt) # convert to a sequence
         if lt.tm_mon == 1:
             self.yearDown()
@@ -226,19 +226,19 @@ class SmartHomeHolidayMode(BoxLayout):
         print('holidayModeSet()')
 
         lts = datetime.datetime.fromtimestamp(self.timestamp)
-        print 'day : %i' % lts.day
-        print 'month : %i' % lts.month
-        print 'hour : %i' % lts.hour
-        print 'minute : %i' % lts.minute
+        print( 'day : %i' % lts.day)
+        print( 'month : %i' % lts.month)
+        print( 'hour : %i' % lts.hour)
+        print( 'minute : %i' % lts.minute)
 
         #set BadHeizung_Clima controlParty 19 31.01.15 9:30 31.01.15 16:00
         
         cmd = "set BadHeizung_Clima controlParty %i 31.01.15 9:30 %02i.%02i.%02i %02i:%02i" % ( self.temp, lts.day, lts.month, (lts.year-2000), lts.hour, lts.minute )
-        print 'cmd: %s' % cmd
+        print( 'cmd: %s' % cmd)
         try:
             FhemConnect().fh.send_cmd( cmd )
         except Exception as e:
-            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
+            print( '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
     def holidayModeClear(self):
         print('holidayModeClear()')
@@ -246,7 +246,7 @@ class SmartHomeHolidayMode(BoxLayout):
         try:
             FhemConnect().fh.send_cmd( cmd )
         except Exception as e:
-            print '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e
+            print( '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
 class SmartHomeWohnzimmer(BoxLayout):
     led_r = NumericProperty()
@@ -259,7 +259,7 @@ class SmartHomeWohnzimmer(BoxLayout):
     rolladen = StringProperty()
 
     def on_get_focus(self):
-        print 'SmartHomeWohnzimmer.on_get_focus()'
+        print( 'SmartHomeWohnzimmer.on_get_focus()')
 
     def toggle_WzDeckenlampe(self):
         print('toggle_WzDeckenlampe')
@@ -360,7 +360,7 @@ class SmartHomeWohnzimmer(BoxLayout):
 class Smarthome:
     def __init__(self, server, ctrl):
 
-        #print '\n\n\n\n SMARTHOME \n\n\n'
+        #print( '\n\n\n\n SMARTHOME \n\n\n')
         #self.fc = server
         self.smarthomewidget = ctrl
 #        self.fh = fhem.Fhem(self.fhem_server)
@@ -374,7 +374,7 @@ class Smarthome:
 
 
     def init(self):
-        #print '\n\n\n\n SMARTHOME.init() \n\n\n'
+        #print( '\n\n\n\n SMARTHOME.init() \n\n\n')
         try:
             self.smarthomewidget.badItem.subwidget.temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
             self.smarthomewidget.badItem.subwidget.desired_temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
@@ -383,13 +383,13 @@ class Smarthome:
             self.smarthomewidget.badItem.subwidget.actuator = FhemConnect().fh.get_dev_reading("BadHeizung", "actuator")+u"%"
             self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( FhemConnect().fh.get_dev_reading("LED", "RGB") )
         except Exception as e:
-            print 'EXCEPTION in Smarthome.init(): %s' % e
+            print( 'EXCEPTION in Smarthome.init(): %s' % e)
 
     def updateSettings(self):
         self.setOfflineMode( Settings().offlinemode == True )
 
     def setOfflineMode(self, offlineMode ):
-        print 'Smarthome.setOfflineMode(%i)' % offlineMode
+        print( 'Smarthome.setOfflineMode(%i)' % offlineMode)
         if ( offlineMode == True ):
             self.smarthomewidget.badItem.subwidget.temp = u"21.5 °C"
             self.smarthomewidget.badItem.subwidget.desired_temp = u"23.0 °C"

@@ -37,31 +37,31 @@ class DashListener(threading.Thread):
 
 
     def run(self):
-        print 'DashListener.run()'
+        print( 'DashListener.run()')
         while (self.running):
-            #print 'Sniffing'
+            #print( 'Sniffing')
             if ( self.method == 'udp' ):
                 sniff(prn=partial(udp_filter, self), store=0, filter="udp",timeout=5, lfilter=lambda d: d.src in self.mac_id_list)
             elif ( self.method == 'arp' ):
                 sniff(prn=partial(arp_received, self), iface=self.iface, filter="arp", store=0, count=0,timeout=5)
             else:
-                print 'ERROR: unsupported sniffing method %s' % self.method
-        print 'DashListener.run() finished'
+                print( 'ERROR: unsupported sniffing method %s' % self.method)
+        print( 'DashListener.run() finished')
 
     def udp_filter(self, pkt):
-        print 'DashListener.udp_filter()'
+        print( 'DashListener.udp_filter()')
         self.mac_to_action[pkt.src]()
 
     def arp_received(self):
-        print 'DashListener.arp_received()'
+        print( 'DashListener.arp_received()')
         self.cb()
 
     def stop(self,a,b):
-        print 'DashListener.stop()'
+        print( 'DashListener.stop()')
         self.running = False
 
 def macToString(mac):
-    #print 'macToString %s' % mac
+    #print( 'macToString %s' % mac)
     if   '18:74:2e:35:30:8a' == mac: return 'AfriColaDASH'
     elif 'b8:27:eb:f6:2b:f3' == mac: return 'Pi.fritz.box'
     elif 'b8:27:eb:2a:c3:a7' == mac: return 'Pi2.fritz.box'
@@ -75,7 +75,7 @@ def macToString(mac):
         return mac
 
 def udp_filter(dash_listener, pkt):
-    print 'udp_filter'
+    print( 'udp_filter')
     options = pkt[DHCP].options
     for option in options:
         if isinstance(option, tuple):
@@ -86,11 +86,11 @@ def udp_filter(dash_listener, pkt):
                 break
 
 def arp_received(dash_listener, packet):
-    #print 'arp_received from %s to %s - dash_mac = %s ' % (macToString( packet[ARP].hwsrc), macToString(packet[ARP].hwdst), dash_listener.dash_mac)
-    print 'arp_received from %s to %s - dash_mac = %s ' % (( packet[ARP].hwsrc), (packet[ARP].hwdst), dash_listener.dash_mac)
+    #print( 'arp_received from %s to %s - dash_mac = %s ' % (macToString( packet[ARP].hwsrc), macToString(packet[ARP].hwdst), dash_listener.dash_mac))
+    print( 'arp_received from %s to %s - dash_mac = %s ' % (( packet[ARP].hwsrc), (packet[ARP].hwdst), dash_listener.dash_mac))
     #if packet[ARP].op == 1 and packet[ARP].hwdst == '00:00:00:00:00:00':
     if packet[ARP].hwsrc == dash_listener.dash_mac:  # This is the MAC of the first dash button
-        print 'DASH'
+        print( 'DASH')
         global last_press
         now = datetime.now()
         if last_press + timedelta(seconds=5) <= now:
@@ -102,7 +102,7 @@ def arp_received(dash_listener, packet):
         print("Unknown Device connecting: " + packet[ARP].hwsrc)
 
 def dash_button_pressed():
-    print 'dash_button_pressed'
+    print( 'dash_button_pressed')
 
 if __name__ == "__main__":
     print("Listening for ARP packets...")
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     
     signal.signal(signal.SIGINT, p1.stop)
     signal.pause()
-    print 'WAITING'
+    print( 'WAITING')
 
     p1.join()

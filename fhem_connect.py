@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from kivy.clock import Clock
-from thread import start_new_thread
+from _thread import start_new_thread
 import threading
 from threading import Timer
 import sched
@@ -26,7 +26,8 @@ class FhemConnect(object):
     def __init__(self, **kwargs):
 
         self.callbacks_update = CallbackList()
-        server = 'pi'
+        #server = 'pi'
+        server = 'apollo'
         self.fhem_server = server
         self.fh = fhem.Fhem(self.fhem_server, loglevel=0)
         global fh
@@ -75,4 +76,4 @@ class FhemConnect(object):
             try:
                 self.que.task_done()
             except Exception as e:
-                print '\n\nfhem_connect.queue_thread(): %s' % e
+                print( '\n\nfhem_connect.queue_thread(): %s' % e)

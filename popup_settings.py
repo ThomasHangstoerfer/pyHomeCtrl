@@ -58,17 +58,17 @@ class SettingsPopup(Popup):
         Settings().setOfflineMode(checked)
 
     def update(self):
-        #print 'Settings.update()'
+        #print( 'Settings.update()')
         pass
 
     def shutdown(self, a):
-        print 'SHUTDOWN running_on_pi() = %s' % running_on_pi()
+        print( 'SHUTDOWN running_on_pi() = %s' % running_on_pi())
         if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/poweroff -f')
 
     def reboot(self, a):
-        print 'REBOOT running_on_pi() = %s' % running_on_pi()
+        print( 'REBOOT running_on_pi() = %s' % running_on_pi())
         if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/reboot -f now')

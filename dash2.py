@@ -21,7 +21,7 @@ def button_pressed_dash1():
     if timespan.total_seconds() > timespan_threshhold:
         current_time = datetime.strftime(thistime, '%Y-%m-%d %H:%M:%S')
         print 'Dash button pressed at ' + current_time
-        #urllib2.urlopen('http://pi:8083/fhem?cmd.LED=set%20LED%20toggle&room=Haussteuerung')
+        #urllib2.urlopen('http://apollo:8083/fhem?cmd.LED=set%20LED%20toggle&room=Haussteuerung')
 
     lastpress = thistime
 
