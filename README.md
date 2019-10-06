@@ -20,7 +20,7 @@ Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](h
 
 ```
 pip3 -m venv venv
-. /venv/bin/activate
+. ./venv/bin/activate
 pip3 install -r requirements.txt
 
 # if you'd like to be able to use the x11 window backend do:
@@ -32,6 +32,7 @@ pip3 install git+https://github.com/kivy/kivy.git@master
 ### Backup
 
 Kivy Build Dependencies:
+```
 sudo apt-get install -y \
     python3-pip \
     build-essential \
@@ -53,6 +54,7 @@ sudo apt-get install -y \
     libgstreamer1.0 \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good
+```
 
 ```
 # make sure pip, virtualenv and setuptools are updated
