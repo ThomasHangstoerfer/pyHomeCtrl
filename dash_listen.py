@@ -39,13 +39,17 @@ class DashListener(threading.Thread):
     def run(self):
         print( 'DashListener.run()')
         while (self.running):
-            #print( 'Sniffing')
-            if ( self.method == 'udp' ):
-                sniff(prn=partial(udp_filter, self), store=0, filter="udp",timeout=5, lfilter=lambda d: d.src in self.mac_id_list)
-            elif ( self.method == 'arp' ):
-                sniff(prn=partial(arp_received, self), iface=self.iface, filter="arp", store=0, count=0,timeout=5)
-            else:
-                print( 'ERROR: unsupported sniffing method %s' % self.method)
+            try:
+                #print( 'Sniffing')
+                if ( self.method == 'udp' ):
+                    sniff(prn=partial(udp_filter, self), store=0, filter="udp",timeout=5, lfilter=lambda d: d.src in self.mac_id_list)
+                elif ( self.method == 'arp' ):
+                    sniff(prn=partial(arp_received, self), iface=self.iface, filter="arp", store=0, count=0,timeout=5)
+                else:
+                    print( 'ERROR: unsupported sniffing method %s' % self.method)
+            except:
+                print('DashListener.run() exception in sniff()')
+                time.sleep(5)
         print( 'DashListener.run() finished')
 
     def udp_filter(self, pkt):
