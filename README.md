@@ -3,7 +3,7 @@
 Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](https://www.amazon.de/gp/product/B01LZNCZ3A).
 
 
-# Screenshots
+## Screenshots
 <table>
     <tr>
         <td><img src="doc/pyHomeCtrl_SmartHome.png" style="width: 200px;">SmartHome</img></td>
@@ -16,6 +16,20 @@ Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](h
 </table>
 
 
+## Installation
+
+```
+pip3 -m venv venv
+. /venv/bin/activate
+pip3 install -r requirements.txt
+
+# if you'd like to be able to use the x11 window backend do:
+export USE_X11=1
+pip3 install git+https://github.com/kivy/kivy.git@master
+```
+
+
+### Backup
 
 Kivy Build Dependencies:
 sudo apt-get install -y \
@@ -40,7 +54,7 @@ sudo apt-get install -y \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good
 
-
+```
 # make sure pip, virtualenv and setuptools are updated
 python3 -m pip install --upgrade --user pip virtualenv setuptools
 
@@ -57,13 +71,13 @@ export USE_X11=1
 pip3 install Cython==0.29.10
 
 pip3 install git+https://github.com/kivy/kivy.git@master
-
-
-
+```
 
 Dependencies:
+```
 sudo pip3 install paho-mqtt
 sudo pip3 install httplib2
 sudo pip3 install --upgrade google-api-python-client
 sudo pip3 install --upgrade oauth2client 
 sudo pip3 install scapy
+```
