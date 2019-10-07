@@ -21,7 +21,7 @@ Building a SmartHome-Control-Center based on a [Raspberry Pi with touchscreen](h
 sudo apt install python3-venv python3-wheel
 
 ```
-pip3 -m venv venv
+python3 -m venv venv
 . ./venv/bin/activate
 pip3 install -r requirements.txt
 
