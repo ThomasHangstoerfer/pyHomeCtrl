@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 
@@ -260,10 +260,10 @@ class SmartHomeTabbedPanel(TabbedPanel):
         self.current_tab.on_get_focus()
 
     def on_release_focus(self):
-        print( 'SmartHomeTabbedPanel.on_release_focus()')
+        print('SmartHomeTabbedPanel.on_release_focus()')
 
     def on_current_tab(self, a, b):
-        print ('SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab) )
+        print('SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab) )
         self.current_tab.on_get_focus()
 
 class ExTabbedPanelItem(TabbedPanelItem):
@@ -296,7 +296,6 @@ class HomeCtrl(FloatLayout):
     pass
 
 
-#fhem_server = "pi"
 fhem_server = "apollo"
 #fc = fhem_connect.FhemConnect(fhem_server);
 fc = fhem_connect.FhemConnect();
@@ -308,11 +307,13 @@ sh = None
 settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
 netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
 
+
 class TestApp(App):
+
     def dash_pressed(self):
         print( 'dash_pressed')
-        #homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
-        #homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
+        # homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
+        # homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
         hc._screen_manager.current = 'doorcam'
         DisplayControl().displayOn()
 
@@ -321,17 +322,16 @@ class TestApp(App):
         print("Connected with result code "+str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
-        #client.subscribe("$SYS/#")
-        print("Subscribing to topic","cam/newImage")
+        # client.subscribe("$SYS/#")
+        print("Subscribing to topic", "cam/newImage")
         client.subscribe("cam/newImage")
-
 
     @mainthread
     def on_message(self, client, userdata, message):
         print('mqtt-message for topic ' + message.topic + ' received ' + str(message.payload.decode("utf-8")))
-        #print("message topic=",message.topic)
-        #print("message qos=",message.qos)
-        #print("message retain flag=",message.retain)
+        # print("message topic=",message.topic)
+        # print("message qos=",message.qos)
+        # print("message retain flag=",message.retain)
         if message.topic == 'cam/newImage':
             print("new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
             try:
@@ -356,7 +356,7 @@ class TestApp(App):
         print( 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off)
         global hc
         hc = HomeCtrl()
-#        hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
+        # hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
         hc.settings_button.on_press = settingspopup.open
         hc.wifistate.on_press = netinfopopup.open
         FhemConnect().connect()
@@ -368,14 +368,14 @@ class TestApp(App):
 
         global dl
         dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
-        #dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
+        # dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
         dl.start()
 
         client = mqtt.Client('homectrl')
-        client.on_message=self.on_message
+        client.on_message = self.on_message
         client.on_connect = self.on_connect
         print("connecting to broker")
-        #client.connect('pi')
+        # client.connect('pi')
         try:
             client.connect('apollo')
             client.loop_start() # start threaded loop
@@ -383,8 +383,11 @@ class TestApp(App):
             print('Exception: %s' % e)
             pass
 
-
         return hc
 
+
 if __name__ == '__main__':
-    TestApp().run()
+    try:
+        TestApp().run()
+    except KeyboardInterrupt:
+        print("\n\n\nKeyboardInterrupt\nTODO stop all threads\n\n\n")

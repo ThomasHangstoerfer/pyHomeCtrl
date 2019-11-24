@@ -23,6 +23,7 @@ def singleton(cls):
         pass
     return cls
 
+
 def setBacklight(on):
     if on:
         os.system('echo 1 > ' + bl_power_file)
@@ -30,10 +31,17 @@ def setBacklight(on):
         os.system('echo 0 > ' + bl_power_file)
 
 
+def set_backlight_brightness(b):
+    cmd = 'echo ' + str(b) + ' > /sys/class/backlight/rpi_backlight/brightness'
+    print('set_backlight_brightness(%i): ' + cmd)
+    # os.system('echo 0 > ' + bl_power_file)
+
+
 def get_ip_address():
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]
+
 
 def get_network_info(wlan_device):
     bitrate = ''

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from kivy.clock import Clock
-from _thread import start_new_thread
-import threading
+#from threading import start_new_thread
+#import threading
+import _thread as thread
 from threading import Timer
 import sched
 import os
@@ -49,7 +50,7 @@ class FhemConnect(object):
             #    print('TEMP: ' + self.fh.get_dev_reading("BadThermostat_Climate", "measured-temp"))
             #except Exception as e:
             #    print('FhemConnect.connect(): ', e)
-            start_new_thread(self.queue_thread,(0,))
+            thread.start_new_thread(self.queue_thread, (0,))
 
     def addListener(self, listener):
         self.callbacks_update.append(listener)

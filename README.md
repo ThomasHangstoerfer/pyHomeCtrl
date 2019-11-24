@@ -74,6 +74,8 @@ export USE_X11=1
 # install the correct Cython version
 pip3 install Cython==0.29.10
 
+https://kivy.org/doc/stable/installation/installation-rpi.html
+
 pip3 install git+https://github.com/kivy/kivy.git@master
 ```
 

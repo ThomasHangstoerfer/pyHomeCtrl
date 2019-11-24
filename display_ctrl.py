@@ -35,14 +35,14 @@ class DisplayOffPopup(Popup):
 @singleton
 class DisplayControl(object):
     __instance = None
-    #display_off_active = True
-    display_off_locked = False
+    display_off_active = True
+    # display_off_locked = False
     display_is_off = False
 
     callbacks_DisplaySwitchedOn = CallbackList()
 
-    def __init__(self,**kwargs):
-        #print( '\n\n\n DisplayControl \n\n\n')
+    def __init__(self, **kwargs):
+        # print( '\n\n\n DisplayControl \n\n\n')
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "") # it auto-starts, no need of rt.start()
 
@@ -81,14 +81,13 @@ class DisplayControl(object):
 
     def displayOff(self, arg):
         print( 'DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (DisplayControl.display_off_locked, Settings().display_off_active ))
-        #p.export_to_png("/tmp/kivy.png")
-        if ( Settings().display_off_active and not DisplayControl.display_off_locked ):
-            if ( running_on_pi() ):
+        # p.export_to_png("/tmp/kivy.png")
+        if Settings().display_off_active and not DisplayControl.display_off_locked:
+            if running_on_pi():
                 setBacklight(True)
             self.popup.open()
             self.display_is_off = True
             print( 'DisplayControl.display_is_off %i' % self.display_is_off)
-
 
     def displayOn(self):
         print('DisplayControl.displayOn()')

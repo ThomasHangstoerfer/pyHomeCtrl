@@ -16,6 +16,8 @@
     ww_temp_min_max: ww_temp_min_max
     ww_wind_speed: ww_wind_speed
     forecast: forecast
+    clock_time: clock_time
+    clock_date: clock_date
     ImageButton:
         img: 'gfx/reload1.png'
         size_hint: (0.1, 0.1)
@@ -49,9 +51,23 @@
                 id: ww_wind_speed
                 text: ''
                 font_size: 15
-        WeatherForecastWidget:
-            id: forecast
-            size_hint: (0.75, 1)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: root.size_hint
+            WeatherForecastWidget:
+                id: forecast
+                size_hint: (0.75, 1)
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: root.size_hint
+                Label:
+                    id: clock_time
+                    text: ''
+                    font_size: 85
+                Label:
+                    id: clock_date
+                    text: ''
+                    font_size: 25
 
 <WeatherForecastItemWidget>:
     orientation: 'vertical'

@@ -11,7 +11,8 @@ class Settings(object):
 
     callbacks_update = CallbackList()
 
-    display_off_active = True
+    # display_off_active = True
+    display_off_active = False
     display_off_timeout = 20.0
     offlinemode = False
 
