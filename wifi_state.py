@@ -17,8 +17,10 @@ class WifiState(ButtonBehavior, Image):
     def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
         super(WifiState,self).__init__(**kwargs)
         self.update()
- 
+
+
     def on_release(self):
+        print('WifiState.on_release()')
         pass
 
     def update(self, *args):

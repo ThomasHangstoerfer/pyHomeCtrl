@@ -43,6 +43,39 @@ def get_ip_address():
     return s.getsockname()[0]
 
 
+
+def get_network_info(wlan_device):
+
+    try:
+        output = subprocess.run(['iwconfig', 'wlan0'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        # print('output = ' + output)
+    except Exception as e:
+        print('Exception: ', e)
+
+    essid = ''
+    essid_search = re.search('ESSID.(.*).', output)
+    if essid_search:
+        essid = essid_search.group(1)
+        essid = essid.replace('"', '')
+    # print("essid " + essid)
+
+    quality = 0
+    quality_search = re.search('Link Quality=([0-9]*)/([0-9]*)', output)
+    if quality_search:
+        quality = int((int(quality_search.group(1)) * 100) / int(quality_search.group(2)))
+    # print("quality ", quality)
+
+    bitrate = 0
+    bitrate_unit = ""
+    bitrate_search = re.search('Bit Rate=([0-9]*) (.*)\s*Tx', output)
+    if bitrate_search:
+        bitrate = bitrate_search.group(1)
+        bitrate_unit = bitrate_search.group(2)
+    # print("bitrate: %s" % bitrate)
+    # print("bitrate_unit: %s" % bitrate_unit)
+
+    return bitrate, quality
+"""
 def get_network_info(wlan_device):
     bitrate = ''
     quality = 0
@@ -73,7 +106,7 @@ def get_network_info(wlan_device):
 
     #return bitrate, bitrate_unit, quality, essid
     return bitrate, quality
-
+"""
 
 
 def get_network_info_old(wlan_device):

@@ -310,8 +310,10 @@ netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_h
 
 class TestApp(App):
 
+    last_mqtt_image_name = ''
+
     def dash_pressed(self):
-        print( 'dash_pressed')
+        print('dash_pressed')
         # homectrlTabbedPanel.switch( homectrlTabbedPanel.doorCamItem )
         # homectrlTabbedPanel.doorCamItem.subwidget.on_get_focus()
         hc._screen_manager.current = 'doorcam'
@@ -319,41 +321,46 @@ class TestApp(App):
 
     @mainthread
     def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
+        print("MQTT: Connected with result code "+str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         # client.subscribe("$SYS/#")
-        print("Subscribing to topic", "cam/newImage")
+        print("MQTT: Subscribing to topic", "cam/newImage")
         client.subscribe("cam/newImage")
 
     @mainthread
     def on_message(self, client, userdata, message):
-        print('mqtt-message for topic ' + message.topic + ' received ' + str(message.payload.decode("utf-8")))
-        # print("message topic=",message.topic)
-        # print("message qos=",message.qos)
-        # print("message retain flag=",message.retain)
+        payload = str(message.payload.decode("utf-8"))
+        print('MQTT: on_message() mqtt-message for topic ' + message.topic + ' received ' + payload)
+        # print("MQTT: message topic=",message.topic)
+        # print("MQTT: message qos=",message.qos)
+        # print("MQTT: message retain flag=",message.retain)
         if message.topic == 'cam/newImage':
-            print("new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
-            try:
-                hc._screen_manager.current = 'doorcam'
-            except Exception as e:
-                print( 'Exception: %s' % e)
-                pass
-        DisplayControl().displayOn()
+            if payload != self.last_mqtt_image_name:
+                print("MQTT: new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
+                try:
+                    hc._screen_manager.current = 'doorcam'
+                    self.last_mqtt_image_name = payload
+                except Exception as e:
+                    print('MQTT: Exception: %s' % e)
+                    pass
+                DisplayControl().displayOn()
+            else:
+                print('last_mqtt_image_name not changed')
 
     def on_display_switched_on(self):
-        print( 'on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)
+        print('on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)
         try:
             cur_screen = hc._screen_manager.get_screen(hc._screen_manager.current)
             cur_screen.subwidget.on_get_focus()
         except Exception as e:
-            print( 'Exception: %s' % e)
+            print('Exception: %s' % e)
             pass
 
     def build(self):
         DisplayControl().displayOn()
         DisplayControl().on_DisplaySwitchedOn(self.on_display_switched_on)
-        print( 'DisplayControl.display_is_off %s' % DisplayControl.display_is_off)
+        print('DisplayControl.display_is_off %s' % DisplayControl.display_is_off)
         global hc
         hc = HomeCtrl()
         # hc._screen_manager.screen_calllist.calllist.setCtrl(fc)
@@ -374,20 +381,27 @@ class TestApp(App):
         client = mqtt.Client('homectrl')
         client.on_message = self.on_message
         client.on_connect = self.on_connect
-        print("connecting to broker")
-        # client.connect('pi')
+        print("MQTT: connecting to broker")
         try:
             client.connect('apollo')
             client.loop_start() # start threaded loop
         except Exception as e:
-            print('Exception: %s' % e)
+            print('MQTT: Exception: %s' % e)
             pass
 
         return hc
 
+    def stop(self):
+        global dl
+        dl.running = False
+        dl.stop()
+        DisplayControl().stop()
+
 
 if __name__ == '__main__':
+    app = TestApp()
     try:
-        TestApp().run()
+        app.run()
     except KeyboardInterrupt:
         print("\n\n\nKeyboardInterrupt\nTODO stop all threads\n\n\n")
+        app.stop()

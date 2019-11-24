@@ -87,32 +87,31 @@ class DoorCam(BoxLayout):
         self.has_focus = False
         self.index = 0
 
-
     def on_touch_down( self, touch ):
         self.index = self.index + 1
-        print( 'on_touch_down index=%i' % self.index)
+        print('on_touch_down index=%i' % self.index)
         self.update('')
 
     def update(self, e):
-        print( 'DoorCam.update() self %s index %i' % (self, self.index))
+        print('DoorCam.update() index %i' % (self.index))
         #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
         #filepath = getLatestFile(cam_path)
         #self.camimage.source = filepath
         #if ( displayCtrl.display_is_off == True ):
-        #    print( 'Display Off')
+        #    print('Display Off')
         #else:
-        #    print( 'Display On')
+        #    print('Display On')
 
-        if ( Settings().offlinemode == True ):
+        if Settings().offlinemode:
             self.camimage.source = 'images/cam-20170921-222342.jpg'
         else:
             try:
-                print( 'DisplayControl().display_is_off = %s  self.has_focus = %s' % (DisplayControl().display_is_off, self.has_focus))
-                #print( 'self.parent.parent.current_tab %s' % self.parent.parent.current_tab)
-                #print( 'self.parent.parent.doorCamItem %s' % self.parent.parent.doorCamItem)
+                print('DisplayControl().display_is_off = %s  self.has_focus = %s' % (DisplayControl().display_is_off, self.has_focus))
+                #print('self.parent.parent.current_tab %s' % self.parent.parent.current_tab)
+                #print('self.parent.parent.doorCamItem %s' % self.parent.parent.doorCamItem)
 #                if ( self.parent.parent.doorCamItem == self.parent.parent.current_tab and DisplayControl().display_is_off == False ):
-                if ( DisplayControl().display_is_off == False and self.has_focus == True ):
-                    print( 'update doorCam')
+                if DisplayControl().display_is_off is False and self.has_focus:
+                    print('update doorCam')
                     #if ( self.camimage.source == '' ):
                     # nodejs webserver auf pi1:
                     # sudo /etc/init.d/cam-image-server start
@@ -120,7 +119,7 @@ class DoorCam(BoxLayout):
                         self.camimage.source = 'http://apollo:9615/latest-%i.jpg' % self.index
                     else:
                         self.camimage.source = 'http://apollo:9615/latest.jpg'
-                    print( 'self.camimage.source = %s' % self.camimage.source)
+                    print('self.camimage.source = %s' % self.camimage.source)
                     self.camimage.reload()
                     #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -128,15 +127,14 @@ class DoorCam(BoxLayout):
                     if self.update_event is not None:
                         self.update_event.cancel()
 
-
-                    if ( self.has_focus is True ):
+                    if self.has_focus is True:
                         self.update_event = Clock.schedule_once(self.update, 2)
             except Exception as e:
-                print( 'Exception: %s' % e)
+                print('Exception: %s' % e)
                 pass
 
     def on_get_focus(self):
-        print( 'DoorCam.on_get_focus() self %s' % self)
+        print('DoorCam.on_get_focus() self %s' % self)
         self.index = 0
         self.has_focus = True
         self.update('')
@@ -146,11 +144,12 @@ class DoorCam(BoxLayout):
         self.update_event = Clock.schedule_once(self.update, 2)
 
     def on_release_focus(self):
-        print( 'DoorCam.on_release_focus() self %s' % self)
+        print('DoorCam.on_release_focus() self %s' % self)
         self.has_focus = False
         if self.update_event is not None:
-            print( 'self.update_event.cancel()')
+            print('self.update_event.cancel()')
             self.update_event.cancel()
+
 
 class DoorCamApp(App):
     def build(self):

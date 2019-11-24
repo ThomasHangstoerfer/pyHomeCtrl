@@ -36,7 +36,7 @@ class DisplayOffPopup(Popup):
 class DisplayControl(object):
     __instance = None
     display_off_active = True
-    # display_off_locked = False
+    display_off_locked = False
     display_is_off = False
 
     callbacks_DisplaySwitchedOn = CallbackList()
@@ -80,7 +80,7 @@ class DisplayControl(object):
         DisplayControl.display_off_locked = False
 
     def displayOff(self, arg):
-        print( 'DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (DisplayControl.display_off_locked, Settings().display_off_active ))
+        print('DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (DisplayControl.display_off_locked, Settings().display_off_active ))
         # p.export_to_png("/tmp/kivy.png")
         if Settings().display_off_active and not DisplayControl.display_off_locked:
             if running_on_pi():
