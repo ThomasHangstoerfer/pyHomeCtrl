@@ -73,6 +73,7 @@ class WeatherWidget(FloatLayout):
     def on_release_focus(self):
         print('WeatherWidget.on_release_focus()')
         self.clock_update_timer.stop()
+        self.clock_update_timer = None
         
     def setOfflineMode(self, offlineMode):
         print('WeatherWidget.setOfflineMode(%i)' % offlineMode)

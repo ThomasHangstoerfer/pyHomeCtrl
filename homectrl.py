@@ -255,26 +255,28 @@ class SmartHomeTabbedPanel(TabbedPanel):
     badItem = ObjectProperty()
 
     def on_get_focus(self):
-        print ('SmartHomeTabbedPanel.on_get_focus()')
-        self.bind(current_tab = self.on_current_tab)
+        print('SmartHomeTabbedPanel.on_get_focus()')
+        self.bind(current_tab=self.on_current_tab)
         self.current_tab.on_get_focus()
 
     def on_release_focus(self):
         print('SmartHomeTabbedPanel.on_release_focus()')
 
     def on_current_tab(self, a, b):
-        print('SmartHomeTabbedPanel.on_current_tab() %s' % ( self.current_tab) )
+        print('SmartHomeTabbedPanel.on_current_tab() %s' % self.current_tab)
         self.current_tab.on_get_focus()
+
 
 class ExTabbedPanelItem(TabbedPanelItem):
     subwidget = ObjectProperty()
 
     def on_get_focus(self):
-        print ('ExTabbedPanelItem.on_get_focus()')
+        print('ExTabbedPanelItem.on_get_focus()')
         if self.subwidget is not None:
             self.subwidget.on_get_focus()
         else:
-            print( 'subwidget not valid!')
+            print('subwidget not valid!')
+
 
 class SimpleClock(Label):
 
@@ -282,23 +284,24 @@ class SimpleClock(Label):
         self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
 
     def on_touch_down( self, touch ):
-        #print( 'touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1]))
-        if ( touch.pos[0] > self.pos[0] + self.size[0] ) or ( touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]) :
-            #print( 'OUTSIDE SimpleClock')
+        # print('touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1]))
+        if (touch.pos[0] > self.pos[0] + self.size[0]) or (touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]):
+            # print('OUTSIDE SimpleClock')
             pass
         else:
-            #print( 'INSIDE SimpleClock')
-            #Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.clockItem), 0)
+            # print('INSIDE SimpleClock')
+            # Clock.schedule_once(partial(homectrlTabbedPanel.switch, homectrlTabbedPanel.clockItem), 0)
             hc._screen_manager.current = 'verboseclock'
             pass
+
 
 class HomeCtrl(FloatLayout):
     pass
 
 
 fhem_server = "apollo"
-#fc = fhem_connect.FhemConnect(fhem_server);
-fc = fhem_connect.FhemConnect();
+# fc = fhem_connect.FhemConnect(fhem_server);
+fc = fhem_connect.FhemConnect()
 
 dl = None
 hc = None
@@ -308,7 +311,7 @@ settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.
 netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
 
 
-class TestApp(App):
+class HomeCtrlApp(App):
 
     last_mqtt_image_name = ''
 
@@ -368,6 +371,8 @@ class TestApp(App):
         hc.wifistate.on_press = netinfopopup.open
         FhemConnect().connect()
 
+        # hc._screen_manager.current = 'weather'
+
         global sh
         sh = smarthome.Smarthome(fc, hc._screen_manager.screen_smarthome.smarthome_tabbed_panel)
 
@@ -396,10 +401,12 @@ class TestApp(App):
         dl.running = False
         dl.stop()
         DisplayControl().stop()
+        cur_screen = hc._screen_manager.get_screen(hc._screen_manager.current)
+        cur_screen.subwidget.on_release_focus()
 
 
 if __name__ == '__main__':
-    app = TestApp()
+    app = HomeCtrlApp()
     try:
         app.run()
     except KeyboardInterrupt:

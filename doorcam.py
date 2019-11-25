@@ -107,9 +107,9 @@ class DoorCam(BoxLayout):
         else:
             try:
                 print('DisplayControl().display_is_off = %s  self.has_focus = %s' % (DisplayControl().display_is_off, self.has_focus))
-                #print('self.parent.parent.current_tab %s' % self.parent.parent.current_tab)
-                #print('self.parent.parent.doorCamItem %s' % self.parent.parent.doorCamItem)
-#                if ( self.parent.parent.doorCamItem == self.parent.parent.current_tab and DisplayControl().display_is_off == False ):
+                # print('self.parent.parent.current_tab %s' % self.parent.parent.current_tab)
+                # print('self.parent.parent.doorCamItem %s' % self.parent.parent.doorCamItem)
+                # if ( self.parent.parent.doorCamItem == self.parent.parent.current_tab and DisplayControl().display_is_off == False ):
                 if DisplayControl().display_is_off is False and self.has_focus:
                     print('update doorCam')
                     #if ( self.camimage.source == '' ):

@@ -56,7 +56,7 @@ class SmartHomeBad(BoxLayout):
     actuator = StringProperty()
 
     def on_get_focus(self):
-        print( 'SmartHomeBad.on_get_focus()')
+        print('SmartHomeBad.on_get_focus()')
 
     # set BadThermostat_Climate desired-temp 18
     def tempDown(self):
@@ -66,7 +66,7 @@ class SmartHomeBad(BoxLayout):
             newt = t - 0.5
             FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print( '\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e)
+            print('\n\nEXCEPTION in SmartHomeBad.tempDown(): %s' % e)
 
     def tempUp(self):
         print('tempUp()')
@@ -75,7 +75,7 @@ class SmartHomeBad(BoxLayout):
             newt = t + 0.5
             FhemConnect().fh.send_cmd("set BadThermostat_Climate desired-temp " + str(newt))
         except Exception as e:
-            print( '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
+            print('\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
 
 class SmartHomeHolidayMode(BoxLayout):
@@ -105,20 +105,20 @@ class SmartHomeHolidayMode(BoxLayout):
     def on_get_focus(self):
 
         self.timestamp = time.time()
-        print( 'SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp)
+        print('SmartHomeHolidayMode.on_get_focus() self.timestamp = %i' % self.timestamp)
 
         self.minuteUp()
         # self.update()
 
     def update(self):
-        print( 'SmartHomeHolidayMode.update()')
+        print('SmartHomeHolidayMode.update()')
 
-        print( 'timestamp : %s' % datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+        print('timestamp : %s' % datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         lts = datetime.datetime.fromtimestamp(self.timestamp)
-        print( 'day : %i' % lts.day)
-        print( 'month : %i' % lts.month)
-        print( 'hour : %i' % lts.hour)
-        print( 'minute : %i' % lts.minute)
+        print('day : %i' % lts.day)
+        print('month : %i' % lts.month)
+        print('hour : %i' % lts.hour)
+        print('minute : %i' % lts.minute)
 
         self.day_str = str(lts.day)
         self.month_str = str(lts.month)
@@ -138,7 +138,7 @@ class SmartHomeHolidayMode(BoxLayout):
     def yearUp(self):
         print('yearUp()')
         lt = time.localtime( self.timestamp )
-        print( 'lt.tm_year %i' % lt.tm_year)
+        print('lt.tm_year %i' % lt.tm_year)
         l = list(lt) # convert to a sequence
         l[0] += 1 # increment year
         lt = time.struct_time(l) # convert to a struct_time
@@ -147,13 +147,13 @@ class SmartHomeHolidayMode(BoxLayout):
     def yearDown(self):
         print('yearDown()')
         lt = time.localtime( self.timestamp )
-        print( 'lt.tm_year %i' % lt.tm_year)
+        print('lt.tm_year %i' % lt.tm_year)
         l = list(lt) # convert to a sequence
         l[0] -= 1 # decrement year
         lt = time.struct_time(l) # convert to a struct_time
         self.timestamp = time.mktime(lt)
         lt = time.localtime( self.timestamp )
-        print( 'lt.tm_year %i' % lt.tm_year)
+        print('lt.tm_year %i' % lt.tm_year)
 
     def dayUp(self):
         print('dayUp()')
@@ -169,7 +169,7 @@ class SmartHomeHolidayMode(BoxLayout):
         print('monthUp()')
 
         lt = time.localtime( self.timestamp )
-        print( 'lt.tm_mon %i' % lt.tm_mon)
+        print('lt.tm_mon %i' % lt.tm_mon)
         l = list(lt) # convert to a sequence
         if lt.tm_mon == 12:
             self.yearUp()
@@ -184,7 +184,7 @@ class SmartHomeHolidayMode(BoxLayout):
         print('monthDown()')
 
         lt = time.localtime( self.timestamp )
-        print( 'lt.tm_mon %i' % lt.tm_mon)
+        print('lt.tm_mon %i' % lt.tm_mon)
         l = list(lt) # convert to a sequence
         if lt.tm_mon == 1:
             self.yearDown()
@@ -230,10 +230,10 @@ class SmartHomeHolidayMode(BoxLayout):
         print('holidayModeSet()')
 
         lts = datetime.datetime.fromtimestamp(self.timestamp)
-        print( 'day : %i' % lts.day)
-        print( 'month : %i' % lts.month)
-        print( 'hour : %i' % lts.hour)
-        print( 'minute : %i' % lts.minute)
+        print('day : %i' % lts.day)
+        print('month : %i' % lts.month)
+        print('hour : %i' % lts.hour)
+        print('minute : %i' % lts.minute)
 
         # set BadHeizung_Clima controlParty 19 31.01.15 9:30 31.01.15 16:00
         
@@ -250,7 +250,7 @@ class SmartHomeHolidayMode(BoxLayout):
         try:
             FhemConnect().fh.send_cmd( cmd )
         except Exception as e:
-            print( '\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
+            print('\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
 
 class SmartHomeWohnzimmer(BoxLayout):
@@ -264,7 +264,7 @@ class SmartHomeWohnzimmer(BoxLayout):
     rolladen = StringProperty()
 
     def on_get_focus(self):
-        print( 'SmartHomeWohnzimmer.on_get_focus()')
+        print('SmartHomeWohnzimmer.on_get_focus()')
 
     def toggle_WzDeckenlampe(self):
         print('toggle_WzDeckenlampe')
@@ -289,67 +289,31 @@ class SmartHomeWohnzimmer(BoxLayout):
         # print('setRGB(' + rgb + ') rgb[2:4] = ' + rgb[2:4] )
         # print('setRGB(' + rgb + ') rgb[4:6] = ' + rgb[4:6] )
 
-        self.led_r = int(rgb[0:2], 16)/255.0
-        self.led_g = int(rgb[2:4], 16)/255.0
-        self.led_b = int(rgb[4:6], 16)/255.0
+        self.led_r = int(rgb[0:2], 16)
+        self.led_g = int(rgb[2:4], 16)
+        self.led_b = int(rgb[4:6], 16)
         print('setRGB led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
 
     def update_LEDswitch(self):
         print('update_LEDswitch led_r = ' + str(self.led_r) + ' led_g = ' + str(self.led_g) + ' led_b = ' + str(self.led_b) )
-        redHex = "%0.2X" % (self.led_r * 255)
-        greenHex = "%0.2X" % (self.led_g * 255)
-        blueHex = "%0.2X" % (self.led_b * 255)
-        print('redHex ' + redHex )
-        print('greenHex ' + greenHex )
-        print('blueHex ' + blueHex )
+        redHex = "%0.2X" % (int(self.led_r))
+        greenHex = "%0.2X" % (int(self.led_g))
+        blueHex = "%0.2X" % (int(self.led_b))
+        print('redHex ' + redHex)
+        print('greenHex ' + greenHex)
+        print('blueHex ' + blueHex)
         FhemConnect().fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
 
-    def redDown(self):
-        print('redDown() self.led_r ', self.led_r)
-        if self.led_r > .1:
-            self.led_r -= .1
-        else:
-            self.led_r = 0
+    def set_red_value(self, value):
+        print("set_red_value(%i)" % value)
         self.update_LEDswitch()
 
-    def redUp(self):
-        print('redUp() self.led_r ', self.led_r)
-        if self.led_r < 0.9:
-            self.led_r += .1
-        else:
-            self.led_r = 1.0
+    def set_green_value(self, value):
+        print("set_green_value(%i)" % value)
         self.update_LEDswitch()
 
-    def greenDown(self):
-        print('greenDown() self.led_g ', self.led_g)
-        if self.led_g > .1:
-            self.led_g -= .1
-        else:
-            self.led_g = 0
-        self.update_LEDswitch()
-
-    def greenUp(self):
-        print('greenUp() self.led_g ', self.led_g)
-        if self.led_g < 0.9:
-            self.led_g += .1
-        else:
-            self.led_g = 1.0
-        self.update_LEDswitch()
-
-    def blueDown(self):
-        print('blueDown() self.led_b ', self.led_b)
-        if self.led_b > .1:
-            self.led_b -= .1
-        else:
-            self.led_b = 0
-        self.update_LEDswitch()
-
-    def blueUp(self):
-        print('blueUp() self.led_b ', self.led_b)
-        if self.led_b < 0.9:
-            self.led_b += .1
-        else:
-            self.led_b = 1.0
+    def set_blue_value(self, value):
+        print("set_blue_value(%i)" % value)
         self.update_LEDswitch()
 
     def rolladen_hoch(self):
@@ -364,7 +328,7 @@ class SmartHomeWohnzimmer(BoxLayout):
 class Smarthome:
 
     def __init__(self, server, ctrl):
-        # print( '\n\n\n\n SMARTHOME \n\n\n')
+        # print('\n\n\n\n SMARTHOME \n\n\n')
         # self.fc = server
         self.smarthomewidget = ctrl
 #        self.fh = fhem.Fhem(self.fhem_server)

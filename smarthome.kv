@@ -43,7 +43,7 @@
             Label:
                 canvas:
                     Color:
-                        rgba: root.led_r, root.led_g, root.led_b, 1
+                        rgba: root.led_r/255, root.led_g/255, root.led_b/255, 1
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -55,32 +55,41 @@
             BoxLayout:
                 orientation: 'vertical'
                 BoxLayout:
-                    Button:
-                        text: '-'
-                        on_release: root.redDown()
-                    Label:
-                        text: 'RED'
-                    Button:
-                        text: '+'
-                        on_release: root.redUp()
-                BoxLayout:
-                    Button:
-                        text: '-'
-                        on_release: root.greenDown()
-                    Label:
-                        text: 'GREEN'
-                    Button:
-                        text: '+'
-                        on_release: root.greenUp()
-                BoxLayout:
-                    Button:
-                        text: '-'
-                        on_release: root.blueDown()
-                    Label:
-                        text: 'BLUE'
-                    Button:
-                        text: '+'
-                        on_release: root.blueUp()
+                    Slider:
+                        id: slider_red
+                        #size_hint_x: None
+                        #width: '48dp'
+                        orientation: 'vertical'
+                        min: 0
+                        max: 255
+                        value: root.led_r
+                        value_track: True
+                        value_track_color: [1, 0, 0, 1]
+                        on_value: root.led_r = self.value ; root.set_red_value(self.value)
+
+                    Slider:
+                        id: slider_green
+                        #size_hint_x: None
+                        #width: '48dp'
+                        orientation: 'vertical'
+                        min: 0
+                        max: 255
+                        value: root.led_g
+                        value_track: True
+                        value_track_color: [0, 1, 0, 1]
+                        on_value: root.led_g = self.value ; root.set_green_value(self.value)
+
+                    Slider:
+                        id: slider_blue
+                        #size_hint_x: None
+                        #width: '48dp'
+                        orientation: 'vertical'
+                        min: 0
+                        max: 255
+                        value: root.led_b
+                        value_track: True
+                        value_track_color: [0, 0, 1, 1]
+                        on_value: root.led_b = self.value ; root.set_blue_value(self.value)
 
 <SmartHomeBad>:
     orientation: 'vertical'
