@@ -33,8 +33,8 @@ def setBacklight(on):
 
 def set_backlight_brightness(b):
     cmd = 'echo ' + str(b) + ' > /sys/class/backlight/rpi_backlight/brightness'
-    print('set_backlight_brightness(%i): ' + cmd)
-    # os.system('echo 0 > ' + bl_power_file)
+    print('set_backlight_brightness(%i): %s', (b, cmd))
+    os.system(cmd)
 
 
 def get_ip_address():

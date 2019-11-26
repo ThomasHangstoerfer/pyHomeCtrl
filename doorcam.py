@@ -41,28 +41,17 @@ Builder.load_string("""
             size: self.size
         Line:
             rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-    AsyncImage:
-#        canvas.before:
-#            Color:
-#                rgba: 0,1,0,1
-#            Rectangle:
-#                pos: self.pos
-#                size: self.size
-#        canvas:
-#            Color:
-#                rgba: 1,0,0,.5
-#            Line:
-#                rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-        id: camimage
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        #size_hint: root.size_hint
-        #size: root.size
-        background_normal: ''
-        nocache: True
-        #source: '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
-#    Image:
+#    AsyncImage:
 #        id: camimage
-#        source: '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+#        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+#        #size_hint: root.size_hint
+#        #size: root.size
+#        background_normal: ''
+#        nocache: True
+#        #source: '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+    Image:
+        id: camimage
+        source: ''
     Label:
         id: image_timestamp
         text: ''
@@ -85,6 +74,7 @@ class DoorCam(BoxLayout):
         self.update_event = None
         #self.camimage = ObjectProperty(AsyncImage)
         self.has_focus = False
+        self.file_name = ''
         self.index = 0
 
     def on_touch_down( self, touch ):
@@ -92,8 +82,12 @@ class DoorCam(BoxLayout):
         print('on_touch_down index=%i' % self.index)
         self.update('')
 
+    def set_filename(self, filename):
+        self.file_name = filename
+
     def update(self, e):
-        print('DoorCam.update() index %i' % (self.index))
+        print('DoorCam.update() index %i file_name %s' % (self.index, self.file_name))
+        self.image_timestamp.text = self.file_name
         #self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
         #filepath = getLatestFile(cam_path)
         #self.camimage.source = filepath
@@ -115,10 +109,12 @@ class DoorCam(BoxLayout):
                     #if ( self.camimage.source == '' ):
                     # nodejs webserver auf pi1:
                     # sudo /etc/init.d/cam-image-server start
-                    if self.index > 0:
-                        self.camimage.source = 'http://apollo:9615/latest-%i.jpg' % self.index
-                    else:
-                        self.camimage.source = 'http://apollo:9615/latest.jpg'
+                    #if self.index > 0:
+                    #    self.camimage.source = 'http://apollo:9615/latest-%i.jpg' % self.index
+                    #else:
+                    #    self.camimage.source = 'http://apollo:9615/latest.jpg'
+                    self.camimage.source = "/qnap/Download/today/" + self.file_name
+
                     print('self.camimage.source = %s' % self.camimage.source)
                     self.camimage.reload()
                     #self.image_timestamp.text = datetime.datetime.fromtimestamp( os.stat(filepath).st_mtime ).strftime('%Y-%m-%d %H:%M:%S')

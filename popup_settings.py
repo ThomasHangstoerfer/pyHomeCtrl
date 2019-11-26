@@ -16,8 +16,8 @@ from display_ctrl import DisplayControl
 
 class SettingsPopup(Popup):
 
-    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
-        super(SettingsPopup,self).__init__(**kwargs)
+    def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
+        super(SettingsPopup, self).__init__(**kwargs)
 
         self.shutdown_button = Button(text='SHUTDOWN', size_hint=(0.5, 0.5))
         self.shutdown_button.bind(on_press=self.shutdown)
@@ -30,7 +30,6 @@ class SettingsPopup(Popup):
         self.offlinemode_label = Label(text='Offline mode', size_hint=(0.5, 0.5))
         self.offlinemode_checkbox = CheckBox(size_hint=(0.5, 0.5), active=Settings().offlinemode)
         self.offlinemode_checkbox.bind(active=self.on_checkbox_offlinemode)
-
 
         self.content = BoxLayout(orientation="vertical")
         self.displayoff_layout = BoxLayout(orientation="horizontal")
@@ -62,13 +61,13 @@ class SettingsPopup(Popup):
         pass
 
     def shutdown(self, a):
-        print( 'SHUTDOWN running_on_pi() = %s' % running_on_pi())
+        print('SHUTDOWN running_on_pi() = %s' % running_on_pi())
         if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/poweroff -f')
 
     def reboot(self, a):
-        print( 'REBOOT running_on_pi() = %s' % running_on_pi())
+        print('REBOOT running_on_pi() = %s' % running_on_pi())
         if ( running_on_pi() ):
             DisplayControl().displayOff(0)
             os.system('sync; sleep 1; /sbin/reboot -f now')

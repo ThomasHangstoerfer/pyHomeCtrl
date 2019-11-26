@@ -13,6 +13,7 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.clock import Clock, mainthread
+from kivy.core.window import Window
 
 import datetime
 from threading import Timer
@@ -160,6 +161,7 @@ Builder.load_string("""
 #        screen_calllist: screen_calllist
         screen_smarthome: screen_smarthome
         screen_weather: screen_weather
+        screen_doorcam: doorcam
 #        screen_calendar: screen_calendar
         size_hint: .9, 1
         pos_hint: {'right': 1}
@@ -313,7 +315,7 @@ netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_h
 
 class HomeCtrlApp(App):
 
-    last_mqtt_image_name = ''
+    last_mqtt_image_name = 'dont skip first image'
 
     def dash_pressed(self):
         print('dash_pressed')
@@ -342,7 +344,9 @@ class HomeCtrlApp(App):
             if payload != self.last_mqtt_image_name:
                 print("MQTT: new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
                 try:
-                    hc._screen_manager.current = 'doorcam'
+                    hc._screen_manager.screen_doorcam.set_filename(payload)
+                    if self.last_mqtt_image_name != '':  # skip the first image
+                        hc._screen_manager.current = 'doorcam'
                     self.last_mqtt_image_name = payload
                 except Exception as e:
                     print('MQTT: Exception: %s' % e)
@@ -406,6 +410,7 @@ class HomeCtrlApp(App):
 
 
 if __name__ == '__main__':
+    Window.show_cursor = False
     app = HomeCtrlApp()
     try:
         app.run()

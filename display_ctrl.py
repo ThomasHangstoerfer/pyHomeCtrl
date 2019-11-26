@@ -14,14 +14,14 @@ import os
 from threading import Timer
 
 from settings import Settings
-from utils import singleton, RepeatedTimer, running_on_pi, setBacklight
+from utils import singleton, RepeatedTimer, running_on_pi, setBacklight, set_backlight_brightness
 from callback_list import CallbackList
 
 
 class DisplayOffPopup(Popup):
 
-    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
-        super(DisplayOffPopup,self).__init__(**kwargs)
+    def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
+        super(DisplayOffPopup, self).__init__(**kwargs)
         self.content = Button(text='', size_hint=(1.0, 1.0))
         self.content.bind(on_release=self.dismiss)
 
@@ -46,6 +46,7 @@ class DisplayControl(object):
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "") # it auto-starts, no need of rt.start()
 
+        set_backlight_brightness(Settings.display_brightness)
         Window.bind(on_motion=self.on_motion)
 
         global dc
