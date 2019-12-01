@@ -6,6 +6,7 @@ from threading import Timer
 import os
 import sys
 import subprocess
+import re
 
 bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
 
@@ -31,10 +32,32 @@ def setBacklight(on):
         os.system('echo 0 > ' + bl_power_file)
 
 
+last_brightness = 0
+
+
 def set_backlight_brightness(b):
-    cmd = 'echo ' + str(b) + ' > /sys/class/backlight/rpi_backlight/brightness'
-    print('set_backlight_brightness(%i): %s', (b, cmd))
-    os.system(cmd)
+    global last_brightness
+    if last_brightness == b:
+        return
+    try:
+        cmd = 'echo ' + str(b) + ' > /sys/class/backlight/rpi_backlight/brightness'
+        # print('utils.set_backlight_brightness(%i): %s' % (b, cmd))
+        os.system(cmd)
+        last_brightness = b
+    except Exception:
+        print('utils.set_backlight_brightness() failed)')
+
+
+def get_backlight_brightness():
+    data = '0'
+    try:
+        with open('/sys/class/backlight/rpi_backlight/brightness', 'r') as file:
+            data = file.read().replace('\n', '')
+    except Exception:
+        print('utils.get_backlight_brightness() failed)')
+
+    # print('get_backlight_brightness(%i): ' + data)
+    return data
 
 
 def get_ip_address():
@@ -43,9 +66,7 @@ def get_ip_address():
     return s.getsockname()[0]
 
 
-
 def get_network_info(wlan_device):
-
     try:
         output = subprocess.run(['iwconfig', 'wlan0'], stdout=subprocess.PIPE).stdout.decode('utf-8')
         # print('output = ' + output)
@@ -75,6 +96,8 @@ def get_network_info(wlan_device):
     # print("bitrate_unit: %s" % bitrate_unit)
 
     return bitrate, quality
+
+
 """
 def get_network_info(wlan_device):
     bitrate = ''
@@ -110,42 +133,46 @@ def get_network_info(wlan_device):
 
 
 def get_network_info_old(wlan_device):
-    output = subprocess.check_output("iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8", shell=True, stderr=subprocess.STDOUT )
-    #output = subprocess.check_output("ifconfig lo |grep 'RX packets'|tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 4", shell=True )
-    #print('output = ' + output)
+    output = subprocess.check_output(
+        "iwconfig " + wlan_device + "|grep -e \"Bit Rate\" -e \"Quality\" |tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 2,3,8",
+        shell=True, stderr=subprocess.STDOUT)
+    # output = subprocess.check_output("ifconfig lo |grep 'RX packets'|tr '\n' ' '|sed 's/ \\+/ /g'|cut -d' ' -f 4", shell=True )
+    # print('output = ' + output)
     bitrate = output[9:12]
 
     tokens = output.split()
     raw = tokens[2][-5:]
     q = raw.split("/")[0]
     t = raw.split("/")[1]
-    quality = ( int(q) * 100 ) / int(t)
+    quality = (int(q) * 100) / int(t)
     return bitrate, quality
+
 
 def running_on_pi():
     return os.path.isfile(bl_power_file)
 
+
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
-        self._timer     = None
-        self.function   = function
-        self.interval   = interval
-        self.args       = args
-        self.kwargs     = kwargs
+        self._timer = None
+        self.function = function
+        self.interval = interval
+        self.args = args
+        self.kwargs = kwargs
         self.is_running = False
-        #self.ignore_next = True
+        # self.ignore_next = True
         self.ignore_next = False
         self.to_be_stopped = False
         self.start()
 
     def _run(self):
         self.is_running = False
-        #print 'self.to_be_stopped = %s' % self.to_be_stopped
-        if ( self.to_be_stopped == False ):
+        # print 'self.to_be_stopped = %s' % self.to_be_stopped
+        if (self.to_be_stopped == False):
             self.start()
-        #print('RepeatedTimer._run() ignore_next = ', self.ignore_next)
-        if ( self.ignore_next ):
-            #print('ignore first display_off')
+        # print('RepeatedTimer._run() ignore_next = ', self.ignore_next)
+        if (self.ignore_next):
+            # print('ignore first display_off')
             self.ignore_next = False
         else:
             self.function(*self.args, **self.kwargs)
@@ -157,17 +184,16 @@ class RepeatedTimer(object):
             self.is_running = True
 
     def stop(self):
-        #print 'RepeatedTimer.stop()'
+        # print 'RepeatedTimer.stop()'
         self._timer.cancel()
         self.is_running = False
 
     def restart(self):
-        #print 'RepeatedTimer.restart()'
+        # print 'RepeatedTimer.restart()'
         self.stop()
         self.start()
 
     def finish(self):
-        #print 'RepeatedTimer.finish()'
+        # print 'RepeatedTimer.finish()'
         self.to_be_stopped = True
         self.stop()
-

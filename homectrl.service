@@ -1,0 +1,12 @@
+[Unit]
+Description=pyHomeCtrl
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/python3 /home/pi/pyHomeCtrl_systemd/homectrl.py
+#ExecStop=/usr/local/bin/nzbget -Q
+#Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

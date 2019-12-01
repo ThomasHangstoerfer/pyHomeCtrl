@@ -19,7 +19,8 @@ import json
 import socket
 
 from settings import Settings
-from utils import RepeatedTimer, set_backlight_brightness
+from display_ctrl import DisplayControl
+from utils import RepeatedTimer, set_backlight_brightness, get_backlight_brightness
 
 
 weather_theme = "w"
@@ -37,15 +38,17 @@ class WeatherWidget(FloatLayout):
     forecast = ObjectProperty()
     clock_time = ObjectProperty()
     clock_date = ObjectProperty()
+    dbg_brightness = ObjectProperty()
+    dbg_lux = ObjectProperty()
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(WeatherWidget, self).__init__(**kwargs)
         Settings().addListener(self.update)
         self.clock_update_timer = None
+        self.weather_update_timer = None
 
     def update(self):
         print('WeatherWidget.update()')
-        set_backlight_brightness(50)
         self.clear_widget()
         if self.fake_data == 1:
             payload = '{"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":7.34,"pressure":1012,"humidity":81,"temp_min":7,"temp_max":8},"visibility":10000,"wind":{"speed":3.1,"deg":20},"clouds":{"all":75},"dt":1490206800,"sys":{"type":1,"id":4921,"message":0.0033,"country":"DE","sunrise":1490160155,"sunset":1490204573},"id":2808802,"name":"Wilferdingen","cod":200}'
@@ -59,9 +62,12 @@ class WeatherWidget(FloatLayout):
             forecast_request = UrlRequest(forecast_url, on_success=self.new_forecast_data, on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
 
     def update_clock(self, arg=None):
-        print('Weather.update_clock()')
+        # print('Weather.update_clock()')
         self.clock_time.text = time.strftime("%H:%M:%S", time.localtime())
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
+
+        self.dbg_brightness.text = get_backlight_brightness()
+        self.dbg_lux.text = str(int(DisplayControl().BH1750.readLight()))
         pass
 
     def on_get_focus(self):
@@ -69,11 +75,14 @@ class WeatherWidget(FloatLayout):
         self.update()
         self.update_clock()
         self.clock_update_timer = RepeatedTimer(1, self.update_clock, "")  # it auto-starts, no need of clock_update_timer.start()
+        self.weather_update_timer = RepeatedTimer(60*60, self.update, "")  # it auto-starts, no need of clock_update_timer.start()
 
     def on_release_focus(self):
         print('WeatherWidget.on_release_focus()')
         self.clock_update_timer.stop()
         self.clock_update_timer = None
+        self.weather_update_timer.stop()
+        self.weather_update_timer = None
         
     def setOfflineMode(self, offlineMode):
         print('WeatherWidget.setOfflineMode(%i)' % offlineMode)
@@ -140,7 +149,7 @@ class WeatherWidget(FloatLayout):
 
         #self.forecast.forecast_1.wf_temp.text = f
 
-    def new_weather_data(self,request,payload):
+    def new_weather_data(self, request, payload):
         #print(payload)
         w = json.loads(payload.decode()) if not isinstance(payload,dict) else payload
         #w = json.loads(payload)
