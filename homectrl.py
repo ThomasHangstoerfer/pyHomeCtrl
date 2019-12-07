@@ -24,10 +24,10 @@ import paho.mqtt.client as mqtt
 import verboseclock
 import smarthome
 import doorcam
-#import calllist
+# import calllist
 import weather
 import fhem_connect
-#import calendarlist
+# import calendarlist
 import image_button
 from popup_settings import SettingsPopup
 from popup_networkinfo import NetworkInfoPopup
@@ -35,10 +35,11 @@ from fhem_connect import FhemConnect
 from wifi_state import WifiState
 from display_ctrl import DisplayControl
 from settings import Settings
+from utils import RepeatedTimer
+from hdc1008 import HDC1008
+from bh1750 import BH1750
 
 from dash_listen import DashListener
-from kivy.config import Config
-from kivy.core.window import Window
 from utils import running_on_pi
 
 Builder.load_string("""
@@ -287,9 +288,10 @@ class SimpleClock(Label):
     def update(self, *args):
         self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
 
-    def on_touch_down( self, touch ):
+    def on_touch_down(self, touch):
         # print('touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1]))
-        if (touch.pos[0] > self.pos[0] + self.size[0]) or (touch.pos[0] < self.pos[0]) or (touch.pos[1] > self.pos[1] + self.size[1]):
+        if (touch.pos[0] > self.pos[0] + self.size[0]) or (touch.pos[0] < self.pos[0]) or (
+                touch.pos[1] > self.pos[1] + self.size[1]):
             # print('OUTSIDE SimpleClock')
             pass
         else:
@@ -316,8 +318,8 @@ netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_h
 
 
 class HomeCtrlApp(App):
-
     last_mqtt_image_name = 'dont skip first image'
+    mqtt_client = mqtt.Client('homectrl')
 
     def dash_pressed(self):
         print('dash_pressed')
@@ -328,7 +330,7 @@ class HomeCtrlApp(App):
 
     @mainthread
     def on_connect(self, client, userdata, flags, rc):
-        print("MQTT: Connected with result code "+str(rc))
+        print("MQTT: Connected with result code " + str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         # client.subscribe("$SYS/#")
@@ -366,6 +368,13 @@ class HomeCtrlApp(App):
             print('Exception: %s' % e)
             pass
 
+    def update_mqtt(self, *args):
+        temp, humid = HDC1008().read_values()
+        self.mqtt_client.publish('homectrl/temperature', temp)
+        self.mqtt_client.publish('homectrl/humidity', humid)
+        lum = BH1750().readLight()
+        self.mqtt_client.publish('homectrl/luminosity', int(lum))
+
     def build(self):
         DisplayControl().displayOn()
         DisplayControl().on_DisplaySwitchedOn(self.on_display_switched_on)
@@ -383,19 +392,19 @@ class HomeCtrlApp(App):
         sh = smarthome.Smarthome(fc, hc._screen_manager.screen_smarthome.smarthome_tabbed_panel)
 
         Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 1)
+        Clock.schedule_interval(self.update_mqtt, 10)
 
         global dl
         dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
         # dl = DashListener('enp0s3', '08:00:27:50:83:ae', self.dash_pressed, 'arp') # Trigger: arping -I enp0s3 -U 10.0.2.15
         dl.start()
 
-        client = mqtt.Client('homectrl')
-        client.on_message = self.on_message
-        client.on_connect = self.on_connect
+        self.mqtt_client.on_message = self.on_message
+        self.mqtt_client.on_connect = self.on_connect
         print("MQTT: connecting to broker")
         try:
-            client.connect('apollo')
-            client.loop_start() # start threaded loop
+            self.mqtt_client.connect('apollo')
+            self.mqtt_client.loop_start()  # start threaded loop
         except Exception as e:
             print('MQTT: Exception: %s' % e)
             pass

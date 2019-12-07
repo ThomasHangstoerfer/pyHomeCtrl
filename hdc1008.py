@@ -58,7 +58,8 @@ class HDC1008:
             humid = ((((buf[0] << 8) + (buf[1])) / 65536.0) * 100.0)
         except:
             print('HDC1008.read_values(): exception')
-
+        temp = (int(temp * 100))/100
+        humid = (int(humid * 100))/100
         return temp, humid
 
 

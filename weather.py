@@ -69,6 +69,7 @@ class WeatherWidget(FloatLayout):
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
         temp, humid = self.HDC1008.read_values()
         self.ww_inside_temp.text = str(int(temp)) + '°C'
+        self.ww_inside_hum.text = str(int(humid)) + '%'
 
         self.dbg_brightness.text = get_backlight_brightness()
         self.dbg_lux.text = str(int(DisplayControl().BH1750.readLight()))
