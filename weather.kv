@@ -14,6 +14,7 @@
     ww_cur_cond_icon: ww_cur_cond_icon
     ww_temp: ww_temp
     ww_temp_min_max: ww_temp_min_max
+    ww_inside_temp: ww_inside_temp
     ww_wind_speed: ww_wind_speed
     forecast: forecast
     clock_time: clock_time
@@ -45,14 +46,16 @@
                 id: ww_temp
                 text: ''
                 font_size: 40
-            Label:
-                id: ww_temp_min_max
-                text: ''
-                font_size: 15
-            Label:
-                id: ww_wind_speed
-                text: ''
-                font_size: 15
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    id: ww_temp_min_max
+                    text: ''
+                    font_size: 15
+                Label:
+                    id: ww_wind_speed
+                    text: ''
+                    font_size: 15
             BoxLayout:
                 orientation: 'horizontal'
                 Label:
@@ -72,8 +75,21 @@
             BoxLayout:
                 orientation: 'vertical'
                 size_hint: root.size_hint
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Label:
+                        id: ww_inside_temp
+                        halign: 'center'
+                        text: ''
+                        font_size: 40
+                    Label:
+                        id: ww_inside_hum
+                        halign: 'center'
+                        text: '44%'
+                        font_size: 40
                 Label:
                     id: clock_time
+                    size_hint: (0.75, 1)
                     text: ''
                     font_size: 85
                 Label:

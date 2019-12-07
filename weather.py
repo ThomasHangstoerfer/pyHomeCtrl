@@ -18,6 +18,7 @@ import time
 import json
 import socket
 
+from hdc1008 import HDC1008
 from settings import Settings
 from display_ctrl import DisplayControl
 from utils import RepeatedTimer, set_backlight_brightness, get_backlight_brightness
@@ -44,6 +45,7 @@ class WeatherWidget(FloatLayout):
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(WeatherWidget, self).__init__(**kwargs)
         Settings().addListener(self.update)
+        self.HDC1008 = HDC1008()
         self.clock_update_timer = None
         self.weather_update_timer = None
 
@@ -65,6 +67,8 @@ class WeatherWidget(FloatLayout):
         # print('Weather.update_clock()')
         self.clock_time.text = time.strftime("%H:%M:%S", time.localtime())
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
+        temp, humid = self.HDC1008.read_values()
+        self.ww_inside_temp.text = str(int(temp)) + '°C'
 
         self.dbg_brightness.text = get_backlight_brightness()
         self.dbg_lux.text = str(int(DisplayControl().BH1750.readLight()))

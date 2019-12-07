@@ -1,4 +1,3 @@
-
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -9,19 +8,19 @@ from kivy.uix.popup import Popup
 from display_ctrl import DisplayControl
 
 
-#<div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+# <div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 class PhoneCallPopup(Popup):
-    caller = Label(text='',id='caller', font_size='60sp', size_hint=(1.0, 0.5))
-    pnumber = Label(text='',id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
+    caller = Label(text='', id='caller', font_size='60sp', size_hint=(1.0, 0.5))
+    pnumber = Label(text='', id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
     old_display_status = False
 
-    def __init__(self,**kwargs):  # my_widget is now the object where popup was called from.
-        super(PhoneCallPopup,self).__init__(**kwargs)
+    def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
+        super(PhoneCallPopup, self).__init__(**kwargs)
         print('PhoneCallPopup()__init__')
         self.content = BoxLayout(orientation="vertical")
         self.content.add_widget(self.caller)
-        #self.content.add_widget(Label(text='PhoneCall',id='number'))
+        # self.content.add_widget(Label(text='PhoneCall',id='number'))
         self.content.add_widget(self.pnumber)
         self.button = Button(text='Ok', size_hint=(1.0, 0.2))
         self.button.bind(on_press=self.dismiss)
@@ -39,43 +38,43 @@ class PhoneCallPopup(Popup):
         pass
 
     def setExternalName(self, name):
-        if ( self.caller.text != "" and ( name == "unknown" or name == "" ) ):
-            self.pnumber.text = self.caller.text # transfer number from name-label to number-label
+        if self.caller.text != "" and (name == "unknown" or name == ""):
+            self.pnumber.text = self.caller.text  # transfer number from name-label to number-label
             self.caller.text = name
         else:
             self.caller.text = name
 
     def setExternalNumber(self, num):
-        if ( self.caller.text == "unknown" or self.caller.text == "" ):
-            self.caller.text = num # caller is unknown, show number in name-label
+        if self.caller.text == "unknown" or self.caller.text == "":
+            self.caller.text = num  # caller is unknown, show number in name-label
             self.pnumber.text = ""
         else:
             self.pnumber.text = num
 
     def handleCallmonitor(self, reading, value):
-        #print('reading: ' + reading + ' value: ' + value)
+        # print('reading: ' + reading + ' value: ' + value)
 
-        if ( reading == "external_name" ):
+        if reading == "external_name":
             print("external_name: " + value)
             self.setExternalName(value)
 
-        elif ( reading == "external_number" ):
+        elif reading == "external_number":
             print("external_number: " + value)
             self.setExternalNumber(value)
 
-        elif ( reading == "event" ):
+        elif reading == "event":
             print("event: " + value)
-            if ( value == "call" or value == "ring" ):
+            if value == "call" or value == "ring":
                 DisplayControl().displayOn()
                 self.open()
-            elif ( value == "disconnect" ):
+            elif value == "disconnect":
                 self.dismiss()
                 self.caller.text = ""
                 self.pnumber.text = ""
 
-        elif ( reading == "direction" ):
+        elif reading == "direction":
             print("direction: " + value)
-            if ( value == "outgoing" ):
+            if value == "outgoing":
                 self.title = "Ausgehender Anruf"
-            elif ( value == "incomming" ):
+            elif value == "incomming":
                 self.title = "Eingehender Anruf"

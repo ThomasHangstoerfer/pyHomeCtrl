@@ -37,7 +37,9 @@ from display_ctrl import DisplayControl
 from settings import Settings
 
 from dash_listen import DashListener
-
+from kivy.config import Config
+from kivy.core.window import Window
+from utils import running_on_pi
 
 Builder.load_string("""
 
@@ -410,7 +412,13 @@ class HomeCtrlApp(App):
 
 
 if __name__ == '__main__':
-    Window.show_cursor = False
+
+    if running_on_pi():
+        Window.show_cursor = False  # hide mouse cursor on pi
+
+    if not running_on_pi():
+        Window.size = (800, 480)
+
     app = HomeCtrlApp()
     try:
         app.run()
