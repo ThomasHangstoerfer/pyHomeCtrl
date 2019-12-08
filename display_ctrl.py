@@ -78,16 +78,18 @@ class DisplayControl(object):
         if not Settings().autobrightness:
             return
         light = self.BH1750.readLight()
+        if light > 30:
+            light = 255  # set to max starting at 100 lx
         new_brightness = int(min(light, 255))  # limit value to 255
-        new_brightness = int(max(new_brightness, 15))  # not less than 10
+        new_brightness = int(max(new_brightness, 10))  # not less than 10
         # print('DisplayControl() Light: %i new_brightness %i' % (light, new_brightness))
 
         t = time.localtime()
         # print('%i:%i is_earlier = %i is_later = %i' % (
         #    t.tm_hour, t.tm_min, self.is_earlier(5, 35), self.is_later(11, 39)))
 
-        # if self.is_earlier(5, 30) or self.is_later(23, 30):
-        if self.is_earlier(11, 35) or self.is_later(11, 39):
+        #  if self.is_earlier(11, 35) or self.is_later(11, 39):
+        if self.is_earlier(5, 30) or self.is_later(23, 30):
             pass
         else:
             print('turn off')
