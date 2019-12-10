@@ -31,6 +31,7 @@ import fhem_connect
 import image_button
 from popup_settings import SettingsPopup
 from popup_networkinfo import NetworkInfoPopup
+from popup_doorcam import DoorCamPopup
 from fhem_connect import FhemConnect
 from wifi_state import WifiState
 from display_ctrl import DisplayControl
@@ -315,10 +316,12 @@ sh = None
 
 settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.5, 0.5))
 netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
+doorcampopup = DoorCamPopup(auto_dismiss=True, title='', separator_height=0, size_hint=(1.0, 1.0))
 
 
 class HomeCtrlApp(App):
-    last_mqtt_image_name = 'dont skip first image'
+    # last_mqtt_image_name = 'dont skip first image'
+    last_mqtt_image_name = ''
     mqtt_client = mqtt.Client('homectrl')
 
     def dash_pressed(self):
@@ -346,11 +349,17 @@ class HomeCtrlApp(App):
         # print("MQTT: message retain flag=",message.retain)
         if message.topic == 'cam/newImage':
             if payload != self.last_mqtt_image_name:
+                filename = "/qnap/Download/today/" + payload
                 print("MQTT: new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
                 try:
-                    hc._screen_manager.screen_doorcam.set_filename(payload)
-                    if self.last_mqtt_image_name != '':  # skip the first image
-                        hc._screen_manager.current = 'doorcam'
+                    hc._screen_manager.screen_doorcam.set_filename(payload, filename)
+                    if self.last_mqtt_image_name != '':  # skip the first image (dont show popup)
+                        # hc._screen_manager.current = 'doorcam'
+                        doorcampopup.set_image_filename(filename)
+                        doorcampopup.open()
+                    else:
+                        print('MQTT: ignore first image')
+
                     self.last_mqtt_image_name = payload
                 except Exception as e:
                     print('MQTT: Exception: %s' % e)
@@ -375,6 +384,10 @@ class HomeCtrlApp(App):
         lum = BH1750().readLight()
         self.mqtt_client.publish('homectrl/luminosity', int(lum))
 
+    def switch_to_default_screen(self, arg):
+        print('switch_to_default_screen')
+        hc._screen_manager.current = 'weather'
+
     def build(self):
         DisplayControl().displayOn()
         DisplayControl().on_DisplaySwitchedOn(self.on_display_switched_on)
@@ -393,6 +406,7 @@ class HomeCtrlApp(App):
 
         Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 1)
         Clock.schedule_interval(self.update_mqtt, 10)
+        Clock.schedule_once(self.switch_to_default_screen, 5)
 
         global dl
         dl = DashListener('wlan0', '18:74:2e:35:30:8a', self.dash_pressed, 'udp')
