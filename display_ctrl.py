@@ -52,7 +52,7 @@ class DisplayControl(object):
 
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "")
-        self.brightness_update_timer = RepeatedTimer(0.5, self.update_brightness)
+        self.brightness_update_timer = RepeatedTimer(2.0, self.update_brightness)
 
         Settings().addListener(self.update_settings)
 
@@ -81,7 +81,7 @@ class DisplayControl(object):
         if light > 30:
             light = 255  # set to max starting at 100 lx
         new_brightness = int(min(light, 255))  # limit value to 255
-        new_brightness = int(max(new_brightness, 10))  # not less than 10
+        new_brightness = int(max(new_brightness, 12))  # not less than 12
         # print('DisplayControl() Light: %i new_brightness %i' % (light, new_brightness))
 
         t = time.localtime()

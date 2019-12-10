@@ -1,9 +1,9 @@
-from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
+from kivy.uix.widget import Widget
 
 from display_ctrl import DisplayControl
 
@@ -20,7 +20,7 @@ class PhoneCallPopup(Popup):
         print('PhoneCallPopup()__init__')
         self.content = BoxLayout(orientation="vertical")
         self.content.add_widget(self.caller)
-        # self.content.add_widget(Label(text='PhoneCall',id='number'))
+        # self.content.add_widget(Label(text='PhoneCall', id='number'))
         self.content.add_widget(self.pnumber)
         self.button = Button(text='Ok', size_hint=(1.0, 0.2))
         self.button.bind(on_press=self.dismiss)
