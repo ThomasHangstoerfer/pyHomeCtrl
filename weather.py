@@ -1,36 +1,34 @@
 # -*- coding: utf-8 -*-
 
+import json
+import socket
+import time
 from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.clock import Clock
+from kivy.graphics import Line
+from kivy.lang import Builder
+from kivy.network.urlrequest import UrlRequest
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.lang import Builder
-from kivy.properties import NumericProperty, ObjectProperty, StringProperty
-from kivy.clock import Clock
-from kivy.graphics import Line
-from kivy.network.urlrequest import UrlRequest
+from kivy.uix.widget import Widget
 
-import time
-import json
-import socket
-
+from display_ctrl import DisplayControl
 from hdc1008 import HDC1008
 from settings import Settings
-from display_ctrl import DisplayControl
 from utils import RepeatedTimer, set_backlight_brightness, get_backlight_brightness
-
 
 weather_theme = "w"
 
+
 # {"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":7.34,"pressure":1012,"humidity":81,"temp_min":7,"temp_max":8},"visibility":10000,"wind":{"speed":3.1,"deg":20},"clouds":{"all":75},"dt":1490206800,"sys":{"type":1,"id":4921,"message":0.0033,"country":"DE","sunrise":1490160155,"sunset":1490204573},"id":2808802,"name":"Wilferdingen","cod":200}
 class WeatherWidget(FloatLayout):
-    
     fake_data = 0
-    
+
     ww_city = ObjectProperty()
     ww_cur_cond_icon = ObjectProperty()
     ww_temp = ObjectProperty()
@@ -48,9 +46,16 @@ class WeatherWidget(FloatLayout):
         self.HDC1008 = HDC1008()
         self.clock_update_timer = None
         self.weather_update_timer = None
+        self.timestamp_last_update_weather = 0
+        self.timestamp_last_update_forecast = 0
 
     def update(self):
         print('WeatherWidget.update()')
+        if int(time.time()) - self.timestamp_last_update_weather < 60 * 30 and int(
+                time.time()) - self.timestamp_last_update_forecast < 60 * 30:  # 30 minutes
+            print('WeatherWidget.update() inhibit update')
+            return
+
         self.clear_widget()
         if self.fake_data == 1:
             payload = '{"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":7.34,"pressure":1012,"humidity":81,"temp_min":7,"temp_max":8},"visibility":10000,"wind":{"speed":3.1,"deg":20},"clouds":{"all":75},"dt":1490206800,"sys":{"type":1,"id":4921,"message":0.0033,"country":"DE","sunrise":1490160155,"sunset":1490204573},"id":2808802,"name":"Wilferdingen","cod":200}'
@@ -59,9 +64,11 @@ class WeatherWidget(FloatLayout):
             self.new_forecast_data(None, payload)
         else:
             weather_url = 'http://api.openweathermap.org/data/2.5/weather?id=2808802&APPID=83b6d799fe72c462f34c2e772188190d&units=metric'
-            request = UrlRequest(weather_url, on_success=self.new_weather_data, on_failure=self.weather_failure, on_redirect=self.weather_redirect)
+            request = UrlRequest(weather_url, on_success=self.new_weather_data, on_failure=self.weather_failure,
+                                 on_redirect=self.weather_redirect)
             forecast_url = 'http://api.openweathermap.org/data/2.5/forecast?id=2808802&appid=83b6d799fe72c462f34c2e772188190d&units=metric'
-            forecast_request = UrlRequest(forecast_url, on_success=self.new_forecast_data, on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
+            forecast_request = UrlRequest(forecast_url, on_success=self.new_forecast_data,
+                                          on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
 
     def update_clock(self, arg=None):
         # print('Weather.update_clock()')
@@ -79,8 +86,10 @@ class WeatherWidget(FloatLayout):
         print('WeatherWidget.on_get_focus()')
         self.update()
         self.update_clock()
-        self.clock_update_timer = RepeatedTimer(1, self.update_clock, "")  # it auto-starts, no need of clock_update_timer.start()
-        self.weather_update_timer = RepeatedTimer(60*60, self.update, "")  # it auto-starts, no need of clock_update_timer.start()
+        self.clock_update_timer = RepeatedTimer(1, self.update_clock,
+                                                "")  # it auto-starts, no need of clock_update_timer.start()
+        self.weather_update_timer = RepeatedTimer(60 * 60, self.update,
+                                                  "")  # it auto-starts, no need of clock_update_timer.start()
 
     def on_release_focus(self):
         print('WeatherWidget.on_release_focus()')
@@ -88,7 +97,7 @@ class WeatherWidget(FloatLayout):
         self.clock_update_timer = None
         self.weather_update_timer.stop()
         self.weather_update_timer = None
-        
+
     def setOfflineMode(self, offlineMode):
         print('WeatherWidget.setOfflineMode(%i)' % offlineMode)
         if offlineMode:
@@ -121,9 +130,11 @@ class WeatherWidget(FloatLayout):
         self.forecast.forecast_1.wf_temp.text = 'forecast_redirect'
         print('forecast_redirect')
 
-    def new_forecast_data(self,request,payload):
+    def new_forecast_data(self, request, payload):
         # print(payload)
-        f = json.loads(payload.decode()) if not isinstance(payload,dict) else payload
+        self.timestamp_last_update_forecast = int(time.time())
+
+        f = json.loads(payload.decode()) if not isinstance(payload, dict) else payload
         flist = f["list"]
         count = 0
         for index in range(len(flist)):
@@ -135,61 +146,74 @@ class WeatherWidget(FloatLayout):
                 if count == 0:
                     self.forecast.forecast_1.wf_day.text = day
                     self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                                                              flist[index]["weather"][0]["icon"] + '.png'
                 elif count == 1:
                     self.forecast.forecast_2.wf_day.text = day
                     self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                                                              flist[index]["weather"][0]["icon"] + '.png'
                 elif count == 2:
                     self.forecast.forecast_3.wf_day.text = day
                     self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                                                              flist[index]["weather"][0]["icon"] + '.png'
                 elif count == 3:
                     self.forecast.forecast_4.wf_day.text = day
                     self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + flist[index]["weather"][0]["icon"] + '.png'
+                    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                                                              flist[index]["weather"][0]["icon"] + '.png'
                 elif count == 4:
                     print('ende')
                 count += 1
 
-        #self.forecast.forecast_1.wf_temp.text = f
+        # self.forecast.forecast_1.wf_temp.text = f
 
     def new_weather_data(self, request, payload):
-        #print(payload)
-        w = json.loads(payload.decode()) if not isinstance(payload,dict) else payload
-        #w = json.loads(payload)
+        # print(payload)
+        self.timestamp_last_update_weather = int(time.time())
+
+        w = json.loads(payload.decode()) if not isinstance(payload, dict) else payload
+        # w = json.loads(payload)
         weather = w["weather"]
         print(weather[0]["main"])
         self.ww_city.text = w["name"]
         self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
-        #if ( self.fake_data == 1 ):
+        # if ( self.fake_data == 1 ):
         #    self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
-        #else:
+        # else:
         #    self.ww_cur_cond_icon.source = 'http://openweathermap.org/img/w/' + weather[0]["icon"] + '.png'
-        #print(self.ww_cur_cond_icon.source)
+        # print(self.ww_cur_cond_icon.source)
         self.ww_temp.text = '{}°C'.format(int(w["main"]["temp"]))
-        self.ww_temp_min_max.text = '{}°C / {}°C'.format(int(w["main"]["temp_min"]), int(w["main"]["temp_max"]) )
+        self.ww_temp_min_max.text = '{}°C / {}°C'.format(int(w["main"]["temp_min"]), int(w["main"]["temp_max"]))
         self.ww_wind_speed.text = 'Wind: {} km/h'.format(int(w["wind"]["speed"]))
+
     pass
+
 
 class WeatherForecastItemWidget(BoxLayout):
     wf_icon = ObjectProperty()
     wf_temp = ObjectProperty()
     wf_day = ObjectProperty()
+
     def clear_widget(self):
         self.wf_icon.source = ''
         self.wf_temp.text = ''
         self.wf_day.text = ''
+
     pass
+
 
 class WeatherForecastWidget(BoxLayout):
     forecast_1 = ObjectProperty()
     forecast_2 = ObjectProperty()
     forecast_3 = ObjectProperty()
     forecast_4 = ObjectProperty()
+
     def clear_widget(self):
         self.forecast_1.clear_widget()
         self.forecast_2.clear_widget()
         self.forecast_3.clear_widget()
         self.forecast_4.clear_widget()
+
     pass
