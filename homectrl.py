@@ -443,8 +443,13 @@ if __name__ == '__main__':
         Window.size = (800, 480)
 
     app = HomeCtrlApp()
-    try:
-        app.run()
-    except KeyboardInterrupt:
-        print("\n\n\nKeyboardInterrupt\nTODO stop all threads\n\n\n")
-        app.stop()
+    should_run = True
+    while should_run:
+        try:
+            app.run()
+        except KeyboardInterrupt:
+            print("\n\n\nKeyboardInterrupt\nTODO stop all threads\n\n\n")
+            should_run = False
+            app.stop()
+        except Exception as e:
+            print("\n\n\nException in main\n\n\n", e)
