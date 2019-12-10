@@ -3,10 +3,20 @@
 # Based on:
 # http://www.netzmafia.de/skripten/hardware/RasPi/Projekt-HCD1008/index.html
 
-import struct, array, time, io, fcntl
+import array
+import fcntl
+import io
+import struct
+import time
+from threading import Lock
+
+from utils import singleton
+
+hdc_lock = Lock()
 
 
-class HDC1008:
+@singleton
+class HDC1008(object):
     I2C_SLAVE = 0x0703
 
     # select address according to jumper setting
@@ -14,6 +24,9 @@ class HDC1008:
     # sudo i2cdetect -y 1
     # HDC1008_ADDR = 0x43
     HDC1008_ADDR = 0x40
+    timestamp_last_read = 0
+    last_temp = 0
+    last_humid = 0
 
     bus = 1
 
@@ -21,6 +34,12 @@ class HDC1008:
         pass
 
     def read_values(self):
+        # within 2 seconds, return the last read values
+        if int(time.time()) - self.timestamp_last_read < 2:
+            return self.last_temp, self.last_humid
+
+        hdc_lock.acquire()
+
         humid = 0
         temp = 0
         try:
@@ -56,10 +75,20 @@ class HDC1008:
             data = fr.read(2)  # read 2 byte temperature data
             buf = array.array('B', data)
             humid = ((((buf[0] << 8) + (buf[1])) / 65536.0) * 100.0)
+            # print('temp = %i humid = %i' % (temp, humid))
+
+            temp = (int(temp * 100)) / 100
+            humid = (int(humid * 100)) / 100
+
+            self.last_temp = temp
+            self.last_humid = humid
+
+            self.timestamp_last_read = int(time.time())
+
         except:
             print('HDC1008.read_values(): exception')
-        temp = (int(temp * 100))/100
-        humid = (int(humid * 100))/100
+
+        hdc_lock.release()
         return temp, humid
 
 
@@ -67,8 +96,8 @@ def main():
     hdc = HDC1008()
     while True:
         temp, humid = hdc.read_values()
-        print ("Luftfeuchte: %7.2f%%" % humid)
-        print ("Temperatur:  %7.2f" % temp)
+        print("Luftfeuchte: %7.2f%%" % humid)
+        print("Temperatur:  %7.2f" % temp)
         time.sleep(2.0)
 
 

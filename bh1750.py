@@ -22,6 +22,10 @@ except:
     smbus = None
 import time
 
+from threading import Lock
+
+bh_lock = Lock()
+
 
 class BH1750:
     DEVICE = 0x23  # Default device I2C address
@@ -67,10 +71,12 @@ class BH1750:
 
     def readLight(self, addr=DEVICE):
         # Read data from I2C interface
+        bh_lock.acquire()
         if self.bus:
             data = self.bus.read_i2c_block_data(addr, BH1750.ONE_TIME_HIGH_RES_MODE_1)
         else:
             data = None
+        bh_lock.release()
         return self.convertToNumber(data)
 
 
