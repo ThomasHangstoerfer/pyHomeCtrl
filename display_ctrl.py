@@ -52,7 +52,7 @@ class DisplayControl(object):
 
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "")
-        self.brightness_update_timer = RepeatedTimer(2.0, self.update_brightness)
+        self.brightness_update_timer = RepeatedTimer(2.0, self.update_brightness, "")
 
         Settings().addListener(self.update_settings)
 
@@ -74,14 +74,55 @@ class DisplayControl(object):
         t = time.localtime()
         return (t.tm_hour == h and t.tm_min < m) or t.tm_hour < h
 
-    def update_brightness(self):
+    def update_brightness(self, arg):
         if not Settings().autobrightness:
             return
         light = self.BH1750.readLight()
         if light > 30:
             light = 255  # set to max starting at 100 lx
+        elif light > 29:
+            light = 240
+        elif light > 28:
+            light = 225
+        elif light > 27:
+            light = 210
+        elif light > 26:
+            light = 195
+        elif light > 25:
+            light = 180
+        elif light > 24:
+            light = 165
+        elif light > 23:
+            light = 150
+        elif light > 22:
+            light = 135
+        elif light > 21:
+            light = 120
+        elif light > 20:
+            light = 105
+        elif light > 19:
+            light = 90
+        elif light > 18:
+            light = 75
+        elif light > 17:
+            light = 60
+        elif light > 16:
+            light = 45
+        elif light > 15:
+            light = 30
+        elif light > 14:
+            light = 25
+        elif light > 13:
+            light = 15
+        elif light > 12:
+            light = 15
+        elif light > 10:
+            light = 12
+        else:
+            light = 10
+            # bei 10 lux ist 12 zu dunkel
         new_brightness = int(min(light, 255))  # limit value to 255
-        new_brightness = int(max(new_brightness, 12))  # not less than 12
+        # new_brightness = int(max(new_brightness, 12))  # not less than 12
         # print('DisplayControl() Light: %i new_brightness %i' % (light, new_brightness))
 
         t = time.localtime()

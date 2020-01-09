@@ -48,4 +48,7 @@ class Settings(object):
     def notifyOnChange(self):
         print('Settings.notifyOnChange()')
         print('TODO let clients register for changes of Settings and trigger callbacks')
-        self.callbacks_update.fire()
+        try:
+            self.callbacks_update.fire()
+        except Exception as e:
+            print("\n\n\nException in Settings.notifyOnChange()\n\n\n")

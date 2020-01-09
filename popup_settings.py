@@ -61,7 +61,7 @@ class SettingsPopup(Popup):
 
         self.BH1750 = BH1750()
         # print('Light: %i' % self.BH1750.readLight())
-        self.brightness_update_timer = RepeatedTimer(2, self.update_brightness)
+        self.brightness_update_timer = RepeatedTimer(2, self.update_brightness, "")
 
         self.bind(on_dismiss=self.dismiss_popup)
         Settings().addListener(self.update)
@@ -83,7 +83,7 @@ class SettingsPopup(Popup):
         print('on_brightness_slider(%i)' % int(val))
         Settings().setDisplayBrightness(int(val))
 
-    def update_brightness(self):
+    def update_brightness(self, arg):
         b = self.BH1750.readLight()
         # print('SettingsPopup() Light: %i' % b)
         self.brightness_label.text = 'Brightness [' + str(int(b)) + ' lx]'

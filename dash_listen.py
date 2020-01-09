@@ -47,7 +47,7 @@ class DashListener(threading.Thread):
                 else:
                     print('ERROR: unsupported sniffing method %s' % self.method)
             except:
-                print('DashListener.run() exception in sniff()')
+                #print('DashListener.run() exception in sniff()')
                 time.sleep(5)
         print('DashListener.run() finished')
 

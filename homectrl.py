@@ -18,6 +18,7 @@ from kivy.core.window import Window
 import datetime
 from threading import Timer
 import time
+import traceback
 
 import paho.mqtt.client as mqtt
 
@@ -453,3 +454,4 @@ if __name__ == '__main__':
             app.stop()
         except Exception as e:
             print("\n\n\nException in main\n\n\n", e)
+            traceback.print_exc()

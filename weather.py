@@ -49,7 +49,7 @@ class WeatherWidget(FloatLayout):
         self.timestamp_last_update_weather = 0
         self.timestamp_last_update_forecast = 0
 
-    def update(self):
+    def update(self, arg):
         print('WeatherWidget.update()')
         if int(time.time()) - self.timestamp_last_update_weather < 60 * 30 and int(
                 time.time()) - self.timestamp_last_update_forecast < 60 * 30:  # 30 minutes
@@ -84,7 +84,7 @@ class WeatherWidget(FloatLayout):
 
     def on_get_focus(self):
         print('WeatherWidget.on_get_focus()')
-        self.update()
+        self.update("")
         self.update_clock()
         self.clock_update_timer = RepeatedTimer(1, self.update_clock,
                                                 "")  # it auto-starts, no need of clock_update_timer.start()
@@ -104,7 +104,7 @@ class WeatherWidget(FloatLayout):
             self.fake_data = 1
         else:
             self.fake_data = 0
-        self.update()
+        self.update("")
 
     def clear_widget(self):
         self.ww_city.text = 'Updating weather...'
