@@ -51,8 +51,8 @@ class DisplayControl(object):
         print('DisplayControl() Light: %i' % self.BH1750.readLight())
 
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
-        self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "")
-        self.brightness_update_timer = RepeatedTimer(2.0, self.update_brightness, "")
+        self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "DisplayControl.__init__() rt")
+        self.brightness_update_timer = RepeatedTimer(2.0, self.update_brightness, "DisplayControl.__init__() brightness_update_timer")
 
         Settings().addListener(self.update_settings)
 
@@ -202,6 +202,9 @@ class DisplayControl(object):
         self.popup.content.trigger_action()
         if (running_on_pi()):
             setBacklight(False)
+        if not self.display_is_off:
+            # if display is already on, dont notify subscribers
+            return
         self.display_is_off = False
         self.callbacks_DisplaySwitchedOn.fire()
         print('DisplayControl.display_is_off %s' % self.display_is_off)

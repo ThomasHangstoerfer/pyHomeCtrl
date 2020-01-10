@@ -41,14 +41,16 @@ class DoorCamPopup(Popup):
         DisplayControl().lock()
         if self.dismiss_timer is not None:
             self.dismiss_timer.finish()
+            del self.dismiss_timer
             self.dismiss_timer = None
-        self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "")
+        self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.on_open")
         pass
 
     def on_dismiss(self):
         print('on_dismiss')
         if self.dismiss_timer is not None:
             self.dismiss_timer.finish()
+            del self.dismiss_timer
         self.dismiss_timer = None
         DisplayControl().unlock()
         pass
@@ -56,7 +58,10 @@ class DoorCamPopup(Popup):
     def set_image_filename(self, filename):
         print('DoorCamPopup.set_image_filename(%s)', filename)
         if self.dismiss_timer is not None:
-            self.dismiss_timer.restart()
+            self.dismiss_timer.finish()
+            del self.dismiss_timer
+            #self.dismiss_timer.restart()
+        self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.set_image_filename")
         self.image.source = filename
 
     def dismiss_popup(self, arg):

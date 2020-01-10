@@ -154,6 +154,7 @@ def running_on_pi():
 
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
+        print('RepeatedTimer created', args)
         self._timer = None
         self.function = function
         self.interval = interval
@@ -179,6 +180,9 @@ class RepeatedTimer(object):
 
     def start(self):
         if not self.is_running:
+            if self._timer is not None:
+                #print('RepeatedTimer(): deleting _timer')
+                del self._timer
             self._timer = Timer(self.interval, self._run)
             self._timer.start()
             self.is_running = True

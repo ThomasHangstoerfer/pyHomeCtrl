@@ -87,15 +87,17 @@ class WeatherWidget(FloatLayout):
         self.update("")
         self.update_clock()
         self.clock_update_timer = RepeatedTimer(1, self.update_clock,
-                                                "")  # it auto-starts, no need of clock_update_timer.start()
+                                                "WeatherWidget.on_get_focus() clock_update_timer")  # it auto-starts, no need of clock_update_timer.start()
         self.weather_update_timer = RepeatedTimer(60 * 60, self.update,
-                                                  "")  # it auto-starts, no need of clock_update_timer.start()
+                                                  "WeatherWidget.on_get_focus() weather_update_timer")  # it auto-starts, no need of clock_update_timer.start()
 
     def on_release_focus(self):
         print('WeatherWidget.on_release_focus()')
         self.clock_update_timer.stop()
+        del self.clock_update_timer
         self.clock_update_timer = None
         self.weather_update_timer.stop()
+        del self.weather_update_timer
         self.weather_update_timer = None
 
     def setOfflineMode(self, offlineMode):

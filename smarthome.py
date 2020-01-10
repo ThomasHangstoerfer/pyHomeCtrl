@@ -10,7 +10,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
-from kivy.properties import NumericProperty, ObjectProperty, StringProperty
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty, ListProperty
 from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.network.urlrequest import UrlRequest
@@ -262,6 +262,7 @@ class SmartHomeWohnzimmer(BoxLayout):
     deckenlampe = StringProperty()
     stehlampe = StringProperty()
     rolladen = StringProperty()
+    text_color_WzStehlampe = ListProperty([1,1,1,1])
 
     def on_get_focus(self):
         print('SmartHomeWohnzimmer.on_get_focus()')
@@ -279,6 +280,15 @@ class SmartHomeWohnzimmer(BoxLayout):
     def toggle_WzStehlampe(self):
         print('toggle_WzStehlampe')
         toggle('WzStehlampe')
+
+    def set_status_WzStehlampe(self, status):
+        print('set_status_WzStehlampe(%s)' % status)
+        if status == 'on':
+            # set text color
+            self.text_color_WzStehlampe = [1,1,0,1]
+        if status == 'off':
+            # clear text color
+            self.text_color_WzStehlampe = [1,1,1,1]
 
     def toggle_LEDswitch(self):
         print('toggle_LEDswitch')
@@ -302,7 +312,7 @@ class SmartHomeWohnzimmer(BoxLayout):
         print('redHex ' + redHex)
         print('greenHex ' + greenHex)
         print('blueHex ' + blueHex)
-        FhemConnect().fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
+        #  FhemConnect().fh.send_cmd("set " + 'LED' + " RGB " + redHex + greenHex + blueHex)
 
     def set_red_value(self, value):
         print("set_red_value(%i)" % value)
@@ -341,14 +351,20 @@ class Smarthome:
         Settings().addListener(self.updateSettings)
 
     def init(self):
-        # print('\n\n\n\n SMARTHOME.init() \n\n\n')
+        print('\n\n\n\n SMARTHOME.init() \n\n\n')
         try:
+            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
+            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
+            print('WzStehlampe state %s' % FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
+            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
             self.smarthomewidget.badItem.subwidget.temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
             self.smarthomewidget.badItem.subwidget.desired_temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
             self.smarthomewidget.badItem.subwidget.hum = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
             self.smarthomewidget.badItem.subwidget.window = "zu" if (FhemConnect().fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
             self.smarthomewidget.badItem.subwidget.actuator = FhemConnect().fh.get_dev_reading("BadHeizung", "actuator")+u"%"
             self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( FhemConnect().fh.get_dev_reading("LED", "RGB") )
+            #self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
+            ##print('WzStehlampe %s' % FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
         except Exception as e:
             print('EXCEPTION in Smarthome.init(): %s' % e)
 
@@ -399,6 +415,8 @@ class Smarthome:
             if ev["reading"] == "STATE":
                 print("WzStehlampe: " + ev["value"])
                 #main_screen.stehlampe = ev["value"]
+                self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( ev["value"] )
+                print('WzStehlampe state: %s' % FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
         elif device == "WzDeckenlampe":
             if ev["reading"] == "STATE":
                 print("WzDeckenlampe: " + ev["value"])
