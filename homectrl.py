@@ -368,6 +368,9 @@ class HomeCtrlApp(App):
                 DisplayControl().displayOn()
             else:
                 print('last_mqtt_image_name not changed')
+        if message.topic == 'homectrl/b':
+            print("MQTT: new brightness " + payload)
+            DisplayControl().set_brightness_value(payload)  # e.g. '12 35' brightness 35 at 12 lux
 
     def on_display_switched_on(self):
         print('on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)

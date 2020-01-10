@@ -74,6 +74,15 @@ class DisplayControl(object):
         t = time.localtime()
         return (t.tm_hour == h and t.tm_min < m) or t.tm_hour < h
 
+    # e.g. '12 35' brightness 35 at 12 lux
+    def set_brightness_value(self, value):
+        tokens = value.split(' ')
+        if len(tokens) == 2:
+            lux = tokens[0]
+            b = tokens[1]
+        else:
+            print('DisplayCtrl().set_brightness_value(): invalid param', value)
+
     def update_brightness(self, arg):
         if not Settings().autobrightness:
             return
