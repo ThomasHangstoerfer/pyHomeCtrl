@@ -51,6 +51,27 @@ class PhoneCallPopup(Popup):
         else:
             self.pnumber.text = num
 
+    def handleMQTTMessage(self, topic, payload):
+        print('popup_phonecall.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
+        if topic == "phone/external_name":
+            self.setExternalName(payload)
+        elif topic == "phone/external_number":
+            self.setExternalNumber(payload)
+        elif topic == "phone/event":
+            if payload == "call" or payload == "ring":
+                DisplayControl().displayOn()
+                self.open()
+            elif payload == "disconnect":
+                self.dismiss()
+                self.caller.text = ""
+                self.pnumber.text = ""
+        elif topic == "phone/direction":
+            if payload == "outgoing":
+                self.title = "Ausgehender Anruf"
+            elif payload == "incomming":
+                self.title = "Eingehender Anruf"
+
+
     def handleCallmonitor(self, reading, value):
         # print('reading: ' + reading + ' value: ' + value)
 

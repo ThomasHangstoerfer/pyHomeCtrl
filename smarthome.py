@@ -45,7 +45,8 @@ def toggle(dev):
         FhemConnect().fh.send_cmd("set " + dev + " off")
 
 
-phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.9, 0.9))
+# hier deaktiviert (und weiter unten), weil auf mqtt-gesteuertes popup umgestellt
+#phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.9, 0.9))
 
 
 class SmartHomeBad(BoxLayout):
@@ -423,7 +424,9 @@ class Smarthome:
                 #main_screen.deckenlampe = ev["value"]
 
         elif device == "callmonitor":
-            phonecallpopup.handleCallmonitor(ev["reading"], ev["value"])
+            # hier deaktiviert, weil auf mqtt-gesteuertes popup umgestellt
+            # phonecallpopup.handleCallmonitor(ev["reading"], ev["value"])
+            pass
 
         # {'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 34), 'value': u'low', 'devicetype': u'HMLAN', 'device': u'hmusb', 'reading': u'loadLvl', 'unit': ''}
         # {'timestamp': datetime.datetime(2017, 5, 18, 21, 33, 36), 'value': u'call', 'devicetype': u'FB_CALLMONITOR', 'device': u'callmonitor', 'reading': u'event', 'unit': ''}

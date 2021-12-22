@@ -33,6 +33,7 @@ import image_button
 from popup_settings import SettingsPopup
 from popup_networkinfo import NetworkInfoPopup
 from popup_doorcam import DoorCamPopup
+from popup_phonecall import PhoneCallPopup
 from fhem_connect import FhemConnect
 from wifi_state import WifiState
 from display_ctrl import DisplayControl
@@ -319,6 +320,10 @@ settingspopup = SettingsPopup(auto_dismiss=True, title='Settings', size_hint=(0.
 netinfopopup = NetworkInfoPopup(auto_dismiss=False, title='Network-Info', size_hint=(0.5, 0.5))
 doorcampopup = DoorCamPopup(auto_dismiss=True, title='', separator_height=0, size_hint=(1.0, 1.0))
 
+# TODO es kann nur ein phonecall popup geben, das hier kann nur aktiviert werden,
+# wenn das andere popup in smarthome deaktiviert ist
+phonecallpopup = PhoneCallPopup(auto_dismiss=False, title='Phone', size_hint=(0.9, 0.9))
+
 
 class HomeCtrlApp(App):
     # last_mqtt_image_name = 'dont skip first image'
@@ -340,6 +345,10 @@ class HomeCtrlApp(App):
         # client.subscribe("$SYS/#")
         print("MQTT: Subscribing to topic", "cam/newImage")
         client.subscribe("cam/newImage")
+        print("MQTT: Subscribing to topic", "homectrl/b")
+        client.subscribe("homectrl/b")
+        print("MQTT: Subscribing to topic", "phone/#")
+        client.subscribe("phone/#")
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -371,6 +380,12 @@ class HomeCtrlApp(App):
         if message.topic == 'homectrl/b':
             print("MQTT: new brightness " + payload)
             DisplayControl().set_brightness_value(payload)  # e.g. '12 35' brightness 35 at 12 lux
+        if 'phone/' in  message.topic:
+            print("MQTT: new phone info: " + payload)
+
+            # TODO es kann nur ein phonecall popup geben, das hier kann nur aktiviert werden,
+            # wenn das andere popup in smarthome deaktiviert ist
+            phonecallpopup.handleMQTTMessage(message.topic, payload)
 
     def on_display_switched_on(self):
         print('on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)
@@ -421,7 +436,7 @@ class HomeCtrlApp(App):
         self.mqtt_client.on_connect = self.on_connect
         print("MQTT: connecting to broker")
         try:
-            self.mqtt_client.connect('apollo')
+            self.mqtt_client.connect('apollo.fritz.box')
             self.mqtt_client.loop_start()  # start threaded loop
         except Exception as e:
             print('MQTT: Exception: %s' % e)
