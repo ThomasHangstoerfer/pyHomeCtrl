@@ -42,6 +42,7 @@ class DisplayControl(object):
     display_off_active = True
     display_off_locked = False
     display_is_off = False
+    nighttime_mode = False
 
     callbacks_DisplaySwitchedOn = CallbackList()
 
@@ -189,12 +190,24 @@ class DisplayControl(object):
         print('DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (
             DisplayControl.display_off_locked, Settings().display_off_active))
         # p.export_to_png("/tmp/kivy.png")
-        if Settings().display_off_active and not DisplayControl.display_off_locked:
+
+        t = time.localtime()
+        #nighttime = (t.tm_hour >= 10 and t.tm_hour <= 11 )
+        nighttime = (t.tm_hour >= 1 and t.tm_hour <= 5 )
+        #nighttime = (t.tm_min >= 5 and t.tm_min <= 10 )
+        print('DisplayControl.displayOff(): tm_hour = %i nighttime = %i' % (t.tm_hour, nighttime))
+
+        if (Settings().display_off_active and not DisplayControl.display_off_locked) or nighttime:
             if running_on_pi():
                 setBacklight(True)
             self.popup.open()
             self.display_is_off = True
             print('DisplayControl.display_is_off %i' % self.display_is_off)
+
+        if self.nighttime_mode and not nighttime:
+            print('DisplayControl.displayOff(): nighttime is over -> switch display on')
+            self.displayOn()
+        self.nighttime_mode = nighttime
 
     def displayOn(self):
         print('DisplayControl.displayOn()')
