@@ -43,7 +43,7 @@ from hdc1008 import HDC1008
 from bh1750 import BH1750
 
 from dash_listen import DashListener
-from utils import running_on_pi
+from utils import running_on_pi, get_backlight_brightness
 
 Builder.load_string("""
 
@@ -402,6 +402,7 @@ class HomeCtrlApp(App):
         self.mqtt_client.publish('homectrl/humidity', humid)
         lum = BH1750().readLight()
         self.mqtt_client.publish('homectrl/luminosity', int(lum))
+        self.mqtt_client.publish('homectrl/brightness', get_backlight_brightness())
 
     def switch_to_default_screen(self, arg):
         print('switch_to_default_screen')
