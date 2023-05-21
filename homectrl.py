@@ -43,7 +43,7 @@ from hdc1008 import HDC1008
 from bh1750 import BH1750
 
 from dash_listen import DashListener
-from utils import running_on_pi, get_backlight_brightness
+from utils import running_on_pi
 
 Builder.load_string("""
 
