@@ -85,7 +85,6 @@ def get_network_info(wlan_device):
     except Exception as e:
         return bitrate, quality
     
-    print('found')
     essid = ''
     essid_search = re.search('ESSID.(.*).', output)
     if essid_search:
