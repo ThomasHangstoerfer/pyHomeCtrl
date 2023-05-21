@@ -11,13 +11,13 @@ from display_ctrl import DisplayControl
 # <div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 class PhoneCallPopup(Popup):
-    caller = Label(text='', id='caller', font_size='60sp', size_hint=(1.0, 0.5))
-    pnumber = Label(text='', id='phonenumber', font_size='30sp', size_hint=(1.0, 0.3))
+    caller = Label(text='',  font_size='60sp', size_hint=(1.0, 0.5))
+    pnumber = Label(text='', font_size='30sp', size_hint=(1.0, 0.3))
     old_display_status = False
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(PhoneCallPopup, self).__init__(**kwargs)
-        print('PhoneCallPopup()__init__')
+        #print('PhoneCallPopup()__init__')
         self.content = BoxLayout(orientation="vertical")
         self.content.add_widget(self.caller)
         # self.content.add_widget(Label(text='PhoneCall', id='number'))
@@ -25,15 +25,15 @@ class PhoneCallPopup(Popup):
         self.button = Button(text='Ok', size_hint=(1.0, 0.2))
         self.button.bind(on_press=self.dismiss)
         self.content.add_widget(self.button)
-        print('PhoneCallPopup()__init__ end')
+        #print('PhoneCallPopup()__init__ end')
 
     def on_open(self):
-        print('on_open')
+        #print('on_open')
         DisplayControl().lock()
         pass
 
     def on_dismiss(self):
-        print('on_dismiss')
+        #print('on_dismiss')
         DisplayControl().unlock()
         pass
 
@@ -52,7 +52,7 @@ class PhoneCallPopup(Popup):
             self.pnumber.text = num
 
     def handleMQTTMessage(self, topic, payload):
-        print('popup_phonecall.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
+        #print('popup_phonecall.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
         if topic == "phone/external_name":
             self.setExternalName(payload)
         elif topic == "phone/external_number":
@@ -76,15 +76,15 @@ class PhoneCallPopup(Popup):
         # print('reading: ' + reading + ' value: ' + value)
 
         if reading == "external_name":
-            print("external_name: " + value)
+            #print("external_name: " + value)
             self.setExternalName(value)
 
         elif reading == "external_number":
-            print("external_number: " + value)
+            #print("external_number: " + value)
             self.setExternalNumber(value)
 
         elif reading == "event":
-            print("event: " + value)
+            #print("event: " + value)
             if value == "call" or value == "ring":
                 DisplayControl().displayOn()
                 self.open()
@@ -94,7 +94,7 @@ class PhoneCallPopup(Popup):
                 self.pnumber.text = ""
 
         elif reading == "direction":
-            print("direction: " + value)
+            #print("direction: " + value)
             if value == "outgoing":
                 self.title = "Ausgehender Anruf"
             elif value == "incomming":

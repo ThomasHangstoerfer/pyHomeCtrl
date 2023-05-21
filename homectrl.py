@@ -349,6 +349,12 @@ class HomeCtrlApp(App):
         client.subscribe("homectrl/b")
         print("MQTT: Subscribing to topic", "phone/#")
         client.subscribe("phone/#")
+        print("MQTT: Subscribing to topic", "wz/#")
+        client.subscribe("wz/#")
+        print("MQTT: Subscribing to topic", "stehlampe/#")
+        client.subscribe("stehlampe/#")
+        print("MQTT: Subscribing to topic", "bad/#")
+        client.subscribe("bad/#")
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -378,14 +384,23 @@ class HomeCtrlApp(App):
             else:
                 print('last_mqtt_image_name not changed')
         if message.topic == 'homectrl/b':
-            print("MQTT: new brightness " + payload)
+            #print("MQTT: new brightness " + payload)
             DisplayControl().set_brightness_value(payload)  # e.g. '12 35' brightness 35 at 12 lux
         if 'phone/' in  message.topic:
-            print("MQTT: new phone info: " + payload)
+            #print("MQTT: new phone info: " + payload)
 
             # TODO es kann nur ein phonecall popup geben, das hier kann nur aktiviert werden,
             # wenn das andere popup in smarthome deaktiviert ist
             phonecallpopup.handleMQTTMessage(message.topic, payload)
+        if message.topic == 'wz/stehlampe':
+            #print("MQTT: wz/stehlampe " + payload)
+            sh.handleMQTTMessage(message.topic, payload)
+        if message.topic == 'stehlampe/state':
+            #print("MQTT: stehlampe/state " + payload)
+            sh.handleMQTTMessage(message.topic, payload)
+        if "bad/" in message.topic:
+            #print("MQTT: " + message.topic + ": " + payload)
+            sh.handleMQTTMessage(message.topic, payload)
 
     def on_display_switched_on(self):
         print('on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)
@@ -397,12 +412,13 @@ class HomeCtrlApp(App):
             pass
 
     def update_mqtt(self, *args):
-        temp, humid = HDC1008().read_values()
-        self.mqtt_client.publish('homectrl/temperature', temp)
-        self.mqtt_client.publish('homectrl/humidity', humid)
-        lum = BH1750().readLight()
-        self.mqtt_client.publish('homectrl/luminosity', int(lum))
-        self.mqtt_client.publish('homectrl/brightness', get_backlight_brightness())
+        if running_on_pi():
+            temp, humid = HDC1008().read_values()
+            self.mqtt_client.publish('homectrl/temperature', temp)
+            self.mqtt_client.publish('homectrl/humidity', humid)
+            lum = BH1750().readLight()
+            self.mqtt_client.publish('homectrl/luminosity', int(lum))
+            self.mqtt_client.publish('homectrl/brightness', get_backlight_brightness())
 
     def switch_to_default_screen(self, arg):
         print('switch_to_default_screen')

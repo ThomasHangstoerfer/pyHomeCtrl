@@ -71,7 +71,7 @@ class WeatherWidget(FloatLayout):
                                           on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
 
     def update_clock(self, arg=None):
-        # print('Weather.update_clock()')
+        print('Weather.update_clock()')
         self.clock_time.text = time.strftime("%H:%M:%S", time.localtime())
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
         temp, humid = self.HDC1008.read_values()

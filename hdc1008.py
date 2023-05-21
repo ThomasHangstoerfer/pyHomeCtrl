@@ -86,7 +86,8 @@ class HDC1008(object):
             self.timestamp_last_read = int(time.time())
 
         except:
-            print('HDC1008.read_values(): exception')
+            #print('HDC1008.read_values(): exception')
+            pass
 
         hdc_lock.release()
         return temp, humid

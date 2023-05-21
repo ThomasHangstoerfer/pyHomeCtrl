@@ -28,7 +28,7 @@ class DoorCamPopup(Popup):
         """
 
         self.content = FloatLayout()
-        self.image = Image(id='camimage', size_hint=(1.0, 1.0))
+        self.image = Image( size_hint=(1.0, 1.0))
         self.content.add_widget(self.image)
         self.button = Button(text='X', size_hint=(0.07, 0.1), pos_hint={'x': .9, 'y': .9})
         self.button.bind(on_press=self.dismiss)

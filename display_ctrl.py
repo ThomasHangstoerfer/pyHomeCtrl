@@ -49,7 +49,7 @@ class DisplayControl(object):
     def __init__(self, **kwargs):
         # print( '\n\n\n DisplayControl \n\n\n')
         self.BH1750 = BH1750()
-        print('DisplayControl() Light: %i' % self.BH1750.readLight())
+        #print('DisplayControl() Light: %i' % self.BH1750.readLight())
 
         self.popup = DisplayOffPopup(auto_dismiss=True, title='', size_hint=(1.0, 1.0))
         self.rt = RepeatedTimer(Settings().display_off_timeout, self.displayOff, "DisplayControl.__init__() rt")
@@ -187,6 +187,9 @@ class DisplayControl(object):
         DisplayControl.display_off_locked = False
 
     def displayOff(self, arg):
+        if not running_on_pi():
+            return
+        
         print('DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (
             DisplayControl.display_off_locked, Settings().display_off_active))
         # p.export_to_png("/tmp/kivy.png")

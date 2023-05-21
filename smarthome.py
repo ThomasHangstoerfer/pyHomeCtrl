@@ -283,7 +283,7 @@ class SmartHomeWohnzimmer(BoxLayout):
         toggle('WzStehlampe')
 
     def set_status_WzStehlampe(self, status):
-        print('set_status_WzStehlampe(%s)' % status)
+        #print('set_status_WzStehlampe(%s)' % status)
         if status == 'on':
             # set text color
             self.text_color_WzStehlampe = [1,1,0,1]
@@ -354,18 +354,14 @@ class Smarthome:
     def init(self):
         print('\n\n\n\n SMARTHOME.init() \n\n\n')
         try:
-            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
-            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
-            print('WzStehlampe state %s' % FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
-            self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
-            self.smarthomewidget.badItem.subwidget.temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
-            self.smarthomewidget.badItem.subwidget.desired_temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
-            self.smarthomewidget.badItem.subwidget.hum = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
-            self.smarthomewidget.badItem.subwidget.window = "zu" if (FhemConnect().fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
-            self.smarthomewidget.badItem.subwidget.actuator = FhemConnect().fh.get_dev_reading("BadHeizung", "actuator")+u"%"
-            self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( FhemConnect().fh.get_dev_reading("LED", "RGB") )
             #self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
-            ##print('WzStehlampe %s' % FhemConnect().fh.get_dev_reading("WzStehlampe", "state") )
+            #self.smarthomewidget.badItem.subwidget.temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "measured-temp")+u"°C"
+            #self.smarthomewidget.badItem.subwidget.desired_temp = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "desired-temp")+u"°C"
+            #self.smarthomewidget.badItem.subwidget.hum = FhemConnect().fh.get_dev_reading("BadThermostat_Climate", "humidity")+u"%"
+            #self.smarthomewidget.badItem.subwidget.window = "zu" if (FhemConnect().fh.get_dev_reading("BadFenster", "state")=="closed") else "offen"
+            #self.smarthomewidget.badItem.subwidget.actuator = FhemConnect().fh.get_dev_reading("BadHeizung", "actuator")+u"%"
+            #self.smarthomewidget.wohnzimmerItem.subwidget.setRGB( FhemConnect().fh.get_dev_reading("LED", "RGB") )
+            pass
         except Exception as e:
             print('EXCEPTION in Smarthome.init(): %s' % e)
 
@@ -382,6 +378,23 @@ class Smarthome:
             self.smarthomewidget.badItem.subwidget.actuator = u"100 %"
         else:
             self.init()
+
+    def handleMQTTMessage(self, topic, payload):
+        print('smarthome.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
+        if topic == "stehlampe/state":
+            # hier kommen auch andere payloads als nur on/off
+            if payload == "off" or payload == "on":
+                self.smarthomewidget.wohnzimmerItem.subwidget.set_status_WzStehlampe( payload )
+        if topic == "bad/temp":
+            self.smarthomewidget.badItem.subwidget.temp = payload + u" °C"
+        if topic == "bad/desired-temp":
+            self.smarthomewidget.badItem.subwidget.desired_temp = payload + u" °C"
+        if topic == "bad/window":
+            self.smarthomewidget.badItem.subwidget.window = "zu" if payload == "closed" else "offen"
+        if topic == "bad/humidity":
+            self.smarthomewidget.badItem.subwidget.hum = payload + u"%"
+        if topic == "bad/heizung/actuator":
+            self.smarthomewidget.badItem.subwidget.actuator = payload + u"%"
 
     def update(self, ev):
         # for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():
