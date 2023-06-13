@@ -355,6 +355,8 @@ class HomeCtrlApp(App):
         client.subscribe("stehlampe/#")
         print("MQTT: Subscribing to topic", "bad/#")
         client.subscribe("bad/#")
+        print("MQTT: Subscribing to topic", "energy/#")
+        client.subscribe("energy/#")
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -401,6 +403,10 @@ class HomeCtrlApp(App):
         if "bad/" in message.topic:
             #print("MQTT: " + message.topic + ": " + payload)
             sh.handleMQTTMessage(message.topic, payload)
+        if 'energy/' in message.topic:
+            print("MQTT: new energy message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
 
     def on_display_switched_on(self):
         print('on_display_switched_on hc._screen_manager.current = ' + hc._screen_manager.current)

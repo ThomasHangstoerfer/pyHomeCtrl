@@ -10,18 +10,18 @@
 
 <WeatherWidget>:
     orientation: 'horizontal'
-    ww_city: ww_city
     ww_cur_cond_icon: ww_cur_cond_icon
     ww_temp: ww_temp
-    ww_temp_min_max: ww_temp_min_max
+    #ww_temp_min_max: ww_temp_min_max
     ww_inside_temp: ww_inside_temp
     ww_inside_hum: ww_inside_hum
-    ww_wind_speed: ww_wind_speed
+    #ww_wind_speed: ww_wind_speed
     forecast: forecast
     clock_time: clock_time
     clock_date: clock_date
     dbg_brightness: dbg_brightness
     dbg_lux: dbg_lux
+    dbg_active_power: dbg_active_power
     ImageButton:
         img: 'gfx/reload1.png'
         size_hint: (0.1, 0.1)
@@ -37,66 +37,73 @@
         BoxLayout:
             orientation: 'vertical'
             size_hint: root.size_hint
-            Label:
-                id: ww_city
-                text: ''
             Image:
+                size_hint: (1, 0.25)
                 id: ww_cur_cond_icon
                 size: (50, 50)
             Label:
+                size_hint: (1, 0.25)
                 id: ww_temp
                 text: ''
                 font_size: 40
             BoxLayout:
+                size_hint: (1, 0.50)
                 orientation: 'vertical'
-                Label:
-                    id: ww_temp_min_max
-                    text: ''
-                    font_size: 15
-                Label:
-                    id: ww_wind_speed
-                    text: ''
-                    font_size: 15
-            BoxLayout:
-                orientation: 'horizontal'
                 Label:
                     id: dbg_brightness
                     text: '88'
-                    font_size: 10
+                    font_size:40
                 Label:
                     id: dbg_lux
                     text: '101'
-                    font_size: 10
+                    font_size: 40
+                Label:
+                    id: dbg_active_power
+                    text: '101'
+                    font_size: 40
         BoxLayout:
             orientation: 'vertical'
             size_hint: root.size_hint
-            WeatherForecastWidget:
-                id: forecast
-                size_hint: (0.75, 1)
+            #WeatherForecastWidget:
+            #    id: forecast
+            #    size_hint: (0.75, 0.5)
             BoxLayout:
                 orientation: 'vertical'
                 size_hint: root.size_hint
+                WeatherForecastWidget:
+                    id: forecast
+                    size_hint: (0.75, 0.5)
                 BoxLayout:
                     orientation: 'horizontal'
+                    size_hint: (0.75, 0.25)
                     Label:
                         id: ww_inside_temp
-                        halign: 'center'
+                        size_hint: (0.25, 0.25)
+                        halign: 'left'
                         text: ''
                         font_size: 40
                     Label:
+                        id: clock_date
+                        size_hint: (0.5, 0.50)
+                        text: ''
+                        font_size: 25
+                    Label:
                         id: ww_inside_hum
+                        size_hint: (0.25, 0.25)
+                        halign: 'left'
                         halign: 'center'
                         text: ''
                         font_size: 40
                 Label:
                     id: clock_time
-                    size_hint: (0.75, 1)
+                    size_hint: (1, 0.25)
+                    halign: 'right'
                     text: ''
                     font_size: 85
-                Label:
-                    id: clock_date
-                    text: ''
-                    font_size: 25
+                #Label:
+                #    id: clock_date
+                #    text: ''
+                #    font_size: 25
 
 <WeatherForecastItemWidget>:
     orientation: 'vertical'
