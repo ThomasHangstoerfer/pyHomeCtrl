@@ -43,7 +43,8 @@ from hdc1008 import HDC1008
 from bh1750 import BH1750
 
 from dash_listen import DashListener
-from utils import running_on_pi
+from utils import running_on_pi, get_backlight_brightness
+
 
 Builder.load_string("""
 
@@ -357,6 +358,10 @@ class HomeCtrlApp(App):
         client.subscribe("bad/#")
         print("MQTT: Subscribing to topic", "energy/#")
         client.subscribe("energy/#")
+        print("MQTT: Subscribing to topic", "muell/next_event")
+        client.subscribe("muell/next_event")
+        print("MQTT: Subscribing to topic", "vehicle/#")
+        client.subscribe("vehicle/#")
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -405,6 +410,14 @@ class HomeCtrlApp(App):
             sh.handleMQTTMessage(message.topic, payload)
         if 'energy/' in message.topic:
             print("MQTT: new energy message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'vehicle/' in message.topic:
+            print("MQTT: new vehicle message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'muell/next_event' in message.topic:
+            print("MQTT: new muell message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
 

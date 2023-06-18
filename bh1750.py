@@ -71,12 +71,16 @@ class BH1750:
 
     def readLight(self, addr=DEVICE):
         # Read data from I2C interface
-        bh_lock.acquire()
-        if self.bus:
-            data = self.bus.read_i2c_block_data(addr, BH1750.ONE_TIME_HIGH_RES_MODE_1)
-        else:
-            data = None
-        bh_lock.release()
+        data = 0
+        try:
+            bh_lock.acquire()
+            if self.bus:
+                data = self.bus.read_i2c_block_data(addr, BH1750.ONE_TIME_HIGH_RES_MODE_1)
+            else:
+                data = None
+            bh_lock.release()
+        except Exception as e:
+            print('BH1750: Exception', e)
         return self.convertToNumber(data)
 
 

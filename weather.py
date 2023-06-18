@@ -3,6 +3,8 @@
 import json
 import socket
 import time
+import datetime
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.graphics import Line
@@ -29,6 +31,7 @@ class WeatherWidget(FloatLayout):
     fake_data = 0
 
     #ww_city = ObjectProperty()
+    muell_icon = ObjectProperty()
     ww_cur_cond_icon = ObjectProperty()
     ww_temp = ObjectProperty()
     #ww_temp_min_max = ObjectProperty()
@@ -36,9 +39,12 @@ class WeatherWidget(FloatLayout):
     forecast = ObjectProperty()
     clock_time = ObjectProperty()
     clock_date = ObjectProperty()
-    dbg_brightness = ObjectProperty()
     dbg_lux = ObjectProperty()
     dbg_active_power = ObjectProperty()
+    vehicle_soc = ObjectProperty()
+    vehicle_soc_icon = ObjectProperty()
+    pv_battery_soc = ObjectProperty()
+    pv_battery_soc_icon = ObjectProperty()
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(WeatherWidget, self).__init__(**kwargs)
@@ -71,14 +77,13 @@ class WeatherWidget(FloatLayout):
                                           on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
 
     def update_clock(self, arg=None):
-        print('Weather.update_clock()')
+        #print('Weather.update_clock()')
         self.clock_time.text = time.strftime("%H:%M:%S", time.localtime())
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
         temp, humid = self.HDC1008.read_values()
         self.ww_inside_temp.text = str(int(temp)) + '°C'
         self.ww_inside_hum.text = str(int(humid)) + '%'
 
-        #self.dbg_brightness.text = get_backlight_brightness()
         #self.dbg_lux.text = str(int(DisplayControl().BH1750.readLight()))
         pass
 
@@ -105,13 +110,59 @@ class WeatherWidget(FloatLayout):
 
         print('WeatherWidget.on_mqtt_message()', message.topic)
         if message.topic == 'energy/battery_soc':
-            self.dbg_brightness.text = 'SoC: ' + payload + ' %'
+            self.pv_battery_soc.text = payload + ' %'
+            self.pv_battery_soc_icon.source = self.get_icon_for_soc(int(payload)) #'gfx/SoC/SoC_30.png'
         if message.topic == 'energy/input_power_pv':
             print('energy/input_power_pv: ', payload)
             self.dbg_lux.text = 'PV: ' + str(round( int(payload) / 1000, 2)) + ' kW'
         if message.topic == 'energy/active_power':
             print('energy/active_power: ', payload)
             self.dbg_active_power.text = 'Haus: ' + str(round( int(payload) / 1000, 2) ) + ' kW'
+        if message.topic == 'vehicle/soc':
+            print('vehicle/soc: ', payload)
+            self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+            self.vehicle_soc.text = str(payload) + ' %'
+
+        if message.topic == 'muell/next_event':
+            print('muell/next_event: ', payload)
+            next_event = json.loads(payload)
+            print('datum', next_event["datum"], 'abfallart', next_event["abfallart"])
+
+            now_unix_timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            diff = next_event["datum"] - now_unix_timestamp
+
+            print('now_unix_timestamp: ', now_unix_timestamp)
+            print('diff: ', diff)
+            if diff < (2 * (60*60*24)):
+                print('MUELL ICON')
+                self.muell_icon.source = 'gfx/muell/' + next_event["abfallart"] + '.png'
+            else:
+                print('NO MUELL ICON')
+                self.muell_icon.source = 'gfx/muell/empty.png'
+
+    def get_icon_for_soc(self, soc):
+        if soc < 10:
+            return 'gfx/SoC/SoC_0.png'
+        elif soc < 20:
+            return 'gfx/SoC/SoC_10.png'
+        elif soc < 30:
+            return 'gfx/SoC/SoC_20.png'
+        elif soc < 40:
+            return 'gfx/SoC/SoC_30.png'
+        elif soc < 50:
+            return 'gfx/SoC/SoC_40.png'
+        elif soc < 60:
+            return 'gfx/SoC/SoC_50.png'
+        elif soc < 70:
+            return 'gfx/SoC/SoC_60.png'
+        elif soc < 80:
+            return 'gfx/SoC/SoC_70.png'
+        elif soc < 90:
+            return 'gfx/SoC/SoC_80.png'
+        elif soc < 100:
+            return 'gfx/SoC/SoC_90.png'
+        else:
+            return 'gfx/SoC/SoC_100.png'
 
     def setOfflineMode(self, offlineMode):
         print('WeatherWidget.setOfflineMode(%i)' % offlineMode)
@@ -124,6 +175,7 @@ class WeatherWidget(FloatLayout):
     def clear_widget(self):
         #self.ww_city.text = 'Updating weather...'
         self.ww_cur_cond_icon.source = ''
+        self.muell_icon.source = 'gfx/muell/empty.png'
         self.ww_temp.text = '--°C'
         #self.ww_temp_min_max.text = '--°C / --°C'
         #self.ww_wind_speed.text = 'Wind: --- km/h'
@@ -168,16 +220,16 @@ class WeatherWidget(FloatLayout):
                     self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
                     self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
                                                               flist[index]["weather"][0]["icon"] + '.png'
-                elif count == 2:
-                    self.forecast.forecast_3.wf_day.text = day
-                    self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                                                              flist[index]["weather"][0]["icon"] + '.png'
-                elif count == 3:
-                    self.forecast.forecast_4.wf_day.text = day
-                    self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                                                              flist[index]["weather"][0]["icon"] + '.png'
+                #elif count == 2:
+                #    self.forecast.forecast_3.wf_day.text = day
+                #    self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
+                #    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                #                                              flist[index]["weather"][0]["icon"] + '.png'
+                #elif count == 3:
+                #    self.forecast.forecast_4.wf_day.text = day
+                #    self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
+                #    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
+                #                                              flist[index]["weather"][0]["icon"] + '.png'
                 elif count == 4:
                     print('ende')
                 count += 1
@@ -222,13 +274,13 @@ class WeatherForecastItemWidget(BoxLayout):
 class WeatherForecastWidget(BoxLayout):
     forecast_1 = ObjectProperty()
     forecast_2 = ObjectProperty()
-    forecast_3 = ObjectProperty()
-    forecast_4 = ObjectProperty()
+    #forecast_3 = ObjectProperty()
+    #forecast_4 = ObjectProperty()
 
     def clear_widget(self):
         self.forecast_1.clear_widget()
         self.forecast_2.clear_widget()
-        self.forecast_3.clear_widget()
-        self.forecast_4.clear_widget()
+        #self.forecast_3.clear_widget()
+        #self.forecast_4.clear_widget()
 
     pass

@@ -16,7 +16,7 @@ class Settings(object):
     display_off_timeout = 20.0
     display_brightness = 30
     offlinemode = False
-    autobrightness = True
+    autobrightness = False
 
     def __init__(self, **kwargs):
         # print('\n\n\nSettings:\n  display_off_active  = %s\n  display_off_timeout = %i\n  offlinemode         = %s\n\n\n' % (self.display_off_active, self.display_off_timeout, self.offlinemode))

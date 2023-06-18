@@ -16,7 +16,7 @@ class BrightnessMapping:
                 csvlist = csv.reader(csvfile, delimiter=',')
                 for row in csvlist:  # should be only one row
                     self.brightness_map = [int(i) for i in row]
-                    print('brightness_map: ', self.brightness_map)
+                    #print('brightness_map: ', self.brightness_map)
         except:
             print('BrightnessMapping: exception -> init with default values')
             self.brightness_map = ','.join(str(x) for x in range(0, 255))
@@ -51,3 +51,13 @@ class BrightnessMapping:
         else:
             print('BrightnessMapping.set(): invalid index')
         self.save()
+
+def main():
+    bm = BrightnessMapping()
+    print('load()')
+    bm.load()
+
+
+#if __name__ == "__main__":
+#    main()
+
