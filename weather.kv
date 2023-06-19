@@ -18,6 +18,7 @@
     dbg_lux: dbg_lux
     dbg_active_power: dbg_active_power
     vehicle_soc: vehicle_soc
+    vehicle_charge_power: vehicle_charge_power
     vehicle_soc_icon: vehicle_soc_icon
     pv_battery_soc: pv_battery_soc
     pv_battery_soc_icon: pv_battery_soc_icon
@@ -60,6 +61,11 @@
                         id: vehicle_soc
                         text: ''
                         font_size:40
+                    Label:
+                        size_hint: (1, 0.25)
+                        id: vehicle_charge_power
+                        text: ''
+                        font_size:40
                 BoxLayout: # PV-Battery SoC Icon + Text
                     orientation: 'vertical'
                     Image:
@@ -71,6 +77,9 @@
                         id: pv_battery_soc
                         text: ''
                         font_size:40
+                    Widget: # Empty Space
+                        size_hint: (1, 0.25)
+
             BoxLayout: # PV-Data
                 size_hint: (1, 0.5)
                 orientation: 'vertical'
@@ -148,19 +157,19 @@
                         size_hint: (0.25, 0.25)
                         halign: 'left'
                         text: ''
-                        font_size: 40
+                        font_size: 35
                     Label:
                         id: clock_date
                         size_hint: (0.5, 0.25)
                         text: ''
-                        font_size: 25
+                        font_size: 35
                     Label:
                         id: ww_inside_hum
                         size_hint: (0.25, 0.25)
                         halign: 'left'
                         halign: 'center'
                         text: ''
-                        font_size: 40
+                        font_size: 35
                 Label:
                     id: clock_time
                     size_hint: (1, 0.5)

@@ -42,6 +42,7 @@ class WeatherWidget(FloatLayout):
     dbg_lux = ObjectProperty()
     dbg_active_power = ObjectProperty()
     vehicle_soc = ObjectProperty()
+    vehicle_charge_power = ObjectProperty()
     vehicle_soc_icon = ObjectProperty()
     pv_battery_soc = ObjectProperty()
     pv_battery_soc_icon = ObjectProperty()
@@ -122,6 +123,12 @@ class WeatherWidget(FloatLayout):
             print('vehicle/soc: ', payload)
             self.vehicle_soc_icon.source = 'gfx/evehicle.png'
             self.vehicle_soc.text = str(payload) + ' %'
+        if message.topic == 'vehicle/charge_power':
+            print('vehicle/charge_power: ', payload)
+            if int(payload) == 0:
+                self.vehicle_charge_power.text = ''
+            else:
+                self.vehicle_charge_power.text = str(payload) + ' W'
 
         if message.topic == 'muell/next_event':
             print('muell/next_event: ', payload)
@@ -176,6 +183,7 @@ class WeatherWidget(FloatLayout):
         #self.ww_city.text = 'Updating weather...'
         self.ww_cur_cond_icon.source = ''
         self.muell_icon.source = 'gfx/muell/empty.png'
+        self.vehicle_soc_icon.source = 'gfx/evehicle.png'
         self.ww_temp.text = '--°C'
         #self.ww_temp_min_max.text = '--°C / --°C'
         #self.ww_wind_speed.text = 'Wind: --- km/h'
