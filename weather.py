@@ -39,13 +39,17 @@ class WeatherWidget(FloatLayout):
     forecast = ObjectProperty()
     clock_time = ObjectProperty()
     clock_date = ObjectProperty()
-    dbg_lux = ObjectProperty()
-    dbg_active_power = ObjectProperty()
+    input_power_pv = ObjectProperty()
+    current_power_consumption = ObjectProperty()
     vehicle_soc = ObjectProperty()
-    vehicle_charge_power = ObjectProperty()
     vehicle_soc_icon = ObjectProperty()
+    vehicle_charge_power = ObjectProperty()
+    vehicle_charge_power_direction = ObjectProperty()
     pv_battery_soc = ObjectProperty()
     pv_battery_soc_icon = ObjectProperty()
+    house_to_grid_direction = ObjectProperty()
+    battery_charge_power = ObjectProperty()
+    battery_charge_power_direction = ObjectProperty()
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(WeatherWidget, self).__init__(**kwargs)
@@ -85,7 +89,7 @@ class WeatherWidget(FloatLayout):
         self.ww_inside_temp.text = str(int(temp)) + '°C'
         self.ww_inside_hum.text = str(int(humid)) + '%'
 
-        #self.dbg_lux.text = str(int(DisplayControl().BH1750.readLight()))
+        #self.input_power_pv.text = str(int(DisplayControl().BH1750.readLight()))
         pass
 
     def on_get_focus(self):
@@ -115,20 +119,32 @@ class WeatherWidget(FloatLayout):
             self.pv_battery_soc_icon.source = self.get_icon_for_soc(int(payload)) #'gfx/SoC/SoC_30.png'
         if message.topic == 'energy/input_power_pv':
             print('energy/input_power_pv: ', payload)
-            self.dbg_lux.text = 'PV: ' + str(round( int(payload) / 1000, 2)) + ' kW'
+            self.input_power_pv.text = str(round( int(payload) / 1000, 2)) + ' kW'
+        if message.topic == 'energy/battery_charge_discharge_power':
+            print('energy/battery_charge_discharge_power: ', payload)
+            self.battery_charge_power.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
+            if int(payload) > 0:
+                self.battery_charge_power_direction.text = '<--'
+            else:
+                self.battery_charge_power_direction.text = '-->'
         if message.topic == 'energy/current_power_consumption':
             print('energy/current_power_consumption: ', payload)
-            self.dbg_active_power.text = 'Haus: ' + str(round( int(payload) / 1000, 2) ) + ' kW'
+            self.current_power_consumption.text = str(round( int(payload) / 1000, 2) ) + ' kW'
+        if message.topic == 'energy/active_power_grid':
+            print('energy/active_power_grid: ', payload)
+            self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
+            if int(payload) > 0:
+                self.house_to_grid_direction.text = ' |\nV'
+            else:
+                self.house_to_grid_direction.text = '^\n |'
+
         if message.topic == 'vehicle/soc':
             print('vehicle/soc: ', payload)
             self.vehicle_soc_icon.source = 'gfx/evehicle.png'
             self.vehicle_soc.text = str(payload) + ' %'
         if message.topic == 'vehicle/charge_power':
             print('vehicle/charge_power: ', payload)
-            if int(payload) == 0:
-                self.vehicle_charge_power.text = ''
-            else:
-                self.vehicle_charge_power.text = str(payload) + ' W'
+            self.vehicle_charge_power.text = str(round( int(payload) / 1000, 2) ) + ' kW'
 
         if message.topic == 'muell/next_event':
             print('muell/next_event: ', payload)
@@ -184,7 +200,11 @@ class WeatherWidget(FloatLayout):
         self.ww_cur_cond_icon.source = ''
         self.muell_icon.source = 'gfx/muell/empty.png'
         self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+        self.vehicle_soc.text = ''
+        self.battery_charge_power.text = ''
+        self.current_power_consumption.text = ''
         self.ww_temp.text = '--°C'
+        self.input_power_pv.text = ''
         #self.ww_temp_min_max.text = '--°C / --°C'
         #self.ww_wind_speed.text = 'Wind: --- km/h'
         self.forecast.clear_widget()

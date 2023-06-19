@@ -15,16 +15,21 @@
     forecast: forecast
     clock_time: clock_time
     clock_date: clock_date
-    dbg_lux: dbg_lux
-    dbg_active_power: dbg_active_power
+    input_power_pv: input_power_pv
+    current_power_consumption: current_power_consumption
     vehicle_soc: vehicle_soc
-    vehicle_charge_power: vehicle_charge_power
     vehicle_soc_icon: vehicle_soc_icon
+    vehicle_charge_power: vehicle_charge_power
+    vehicle_charge_power_direction: vehicle_charge_power_direction
     pv_battery_soc: pv_battery_soc
     pv_battery_soc_icon: pv_battery_soc_icon
+    house_to_grid_direction: house_to_grid_direction
+    house_to_grid: house_to_grid
+    battery_charge_power: battery_charge_power
+    battery_charge_power_direction: battery_charge_power_direction
 
     ImageButton:
-        img: 'gfx/reload1.png'
+        source: 'gfx/reload1.png'
         size_hint: (0.1, 0.1)
         right: root.right-self.width
         on_release: root.update("")
@@ -38,61 +43,108 @@
         orientation: 'horizontal'
         size_hint: root.size_hint
 
-        BoxLayout: # Left side of the screen  - PV-Data
+        BoxLayout: # Left side of the screen  - New PV-Data Test
             size_hint: (0.5, 1)
             orientation: 'vertical'
             BoxLayout:
-                orientation: 'horizontal'
-                size_hint: (1, 0.5)
-                #canvas.before:
-                #    Color:
-                #        rgba: 0.4, 0.7, 0.5, 1
-                #    Rectangle:
-                #        pos: self.pos
-                #        size: self.size
-                BoxLayout: # Vehicle SoC Icon + Text
-                    orientation: 'vertical'
-                    Image:
-                        size_hint: (1, 0.75)
-                        id: vehicle_soc_icon
-                        size: (50, 50)
-                    Label:
-                        size_hint: (1, 0.25)
-                        id: vehicle_soc
-                        text: ''
-                        font_size:40
-                    Label:
-                        size_hint: (1, 0.25)
-                        id: vehicle_charge_power
-                        text: ''
-                        font_size:40
-                BoxLayout: # PV-Battery SoC Icon + Text
-                    orientation: 'vertical'
-                    Image:
-                        size_hint: (1, 0.75)
-                        id: pv_battery_soc_icon
-                        size: (50, 50)
-                    Label:
-                        size_hint: (1, 0.25)
-                        id: pv_battery_soc
-                        text: ''
-                        font_size:40
-                    Widget: # Empty Space
-                        size_hint: (1, 0.25)
-
-            BoxLayout: # PV-Data
-                size_hint: (1, 0.5)
                 orientation: 'vertical'
-                Widget: # Empty Space
-                Widget: # Empty Space
-                Label:
-                    id: dbg_lux
-                    text: ''
-                    font_size: 40
-                Label:
-                    id: dbg_active_power
-                    text: ''
-                    font_size: 40
+                halign: 'center'
+                Image: # Sonne
+                    id: pv_battery_soc1
+                    source: 'gfx/weather/w/01d.png'
+                    size: (10, 10)
+                BoxLayout: # von Sonne ins Haus
+                    orientation: 'horizontal'
+                    Widget:
+                        size_hint: (0.45, 1)
+                    Label:
+                        id: input_power_pv_direction
+                        size_hint: (0.1, 1)
+                        text: ' |\nV'
+                        font_size:20
+                    Label:
+                        id: input_power_pv
+                        size_hint: (0.45, 1)
+                        text: ''
+                        text_size: self.size
+                        halign: 'left'
+                        valign: 'middle'
+                        font_size:20
+                BoxLayout:
+                    orientation: 'horizontal'
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Image: # Battery Icon
+                            id: pv_battery_soc_icon
+                            source: 'gfx/SoC/SoC_30.png'
+                            size: (20, 20)
+                        Label: # Battery SoC
+                            id: pv_battery_soc
+                            text: ''
+                            font_size:20
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Label: # von Batterie ins Haus
+                            id: battery_charge_power
+                            text: ''
+                            font_size:20
+                        Label:
+                            id: battery_charge_power_direction
+                            text: '--'
+                            font_size:20
+                        Widget:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Image:
+                            id: house_icon
+                            source: 'gfx/home.png'
+                            size: (20, 20)
+                        Label: # Current Power Consumption
+                            id: current_power_consumption
+                            text: ''
+                            font_size:20
+                    BoxLayout: # vom Haus ins Auto
+                        orientation: 'vertical'
+                        Label:
+                            id: vehicle_charge_power
+                            text: ''
+                            font_size:20
+                        Label:
+                            id: vehicle_charge_power_direction
+                            text: '-->'
+                            font_size:20
+                        Widget:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Image:
+                            id: vehicle_soc_icon
+                            source: 'gfx/evehicle.png'
+                            size: (20, 20)
+                        Label: # Vehicle SoC
+                            id: vehicle_soc
+                            text: ''
+                            font_size:20
+                BoxLayout: # von Haus ins Netz
+                    orientation: 'horizontal'
+                    Widget:
+                        size_hint: (0.45, 1)
+                    Label:
+                        id: house_to_grid_direction
+                        size_hint: (0.1, 1)
+                        text: ' |\nV'
+                    Label:
+                        id: house_to_grid
+                        size_hint: (0.45, 1)
+                        text: ''
+                        font_size:20
+                        text_size: self.size
+                        halign: 'left'
+                        valign: 'middle'
+                Image: # Strommasten
+                    id: pv_battery_soc1
+                    source: 'gfx/power_grid.png'
+                    size_hint_y: None
+                    width: 10
 
         BoxLayout: # Right side of the screen
             orientation: 'vertical'
