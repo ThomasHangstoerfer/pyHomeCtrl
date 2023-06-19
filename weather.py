@@ -116,8 +116,8 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/input_power_pv':
             print('energy/input_power_pv: ', payload)
             self.dbg_lux.text = 'PV: ' + str(round( int(payload) / 1000, 2)) + ' kW'
-        if message.topic == 'energy/active_power':
-            print('energy/active_power: ', payload)
+        if message.topic == 'energy/current_power_consumption':
+            print('energy/current_power_consumption: ', payload)
             self.dbg_active_power.text = 'Haus: ' + str(round( int(payload) / 1000, 2) ) + ' kW'
         if message.topic == 'vehicle/soc':
             print('vehicle/soc: ', payload)
