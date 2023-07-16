@@ -27,6 +27,7 @@
     house_to_grid: house_to_grid
     battery_charge_power: battery_charge_power
     battery_charge_power_direction: battery_charge_power_direction
+    pet_icon: pet_icon
 
     ImageButton:
         source: 'gfx/reload1.png'
@@ -50,10 +51,11 @@
                 orientation: 'vertical'
                 halign: 'center'
                 Image: # Sonne
-                    id: pv_battery_soc1
+                    size_hint: (1, 0.7)
                     source: 'gfx/weather/w/01d.png'
                     size: (10, 10)
                 BoxLayout: # von Sonne ins Haus
+                    size_hint: (1, 1)
                     orientation: 'horizontal'
                     Widget:
                         size_hint: (0.45, 1)
@@ -69,8 +71,9 @@
                         text_size: self.size
                         halign: 'left'
                         valign: 'middle'
-                        font_size:20
+                        font_size:30
                 BoxLayout:
+                    size_hint: (1, 1.1)
                     orientation: 'horizontal'
                     BoxLayout:
                         orientation: 'vertical'
@@ -81,7 +84,7 @@
                         Label: # Battery SoC
                             id: pv_battery_soc
                             text: ''
-                            font_size:20
+                            font_size:30
                     BoxLayout:
                         orientation: 'vertical'
                         Label: # von Batterie ins Haus
@@ -102,7 +105,7 @@
                         Label: # Current Power Consumption
                             id: current_power_consumption
                             text: ''
-                            font_size:20
+                            font_size:30
                     BoxLayout: # vom Haus ins Auto
                         orientation: 'vertical'
                         Label:
@@ -123,27 +126,29 @@
                         Label: # Vehicle SoC
                             id: vehicle_soc
                             text: ''
-                            font_size:20
+                            font_size:30
                 BoxLayout: # von Haus ins Netz
                     orientation: 'horizontal'
+                    size_hint: (1, 1)
                     Widget:
                         size_hint: (0.45, 1)
                     Label:
                         id: house_to_grid_direction
                         size_hint: (0.1, 1)
                         text: ' |\nV'
+                        font_size:20
+                        Widget:
                     Label:
                         id: house_to_grid
                         size_hint: (0.45, 1)
                         text: ''
-                        font_size:20
+                        font_size:30
                         text_size: self.size
                         halign: 'left'
                         valign: 'middle'
                 Image: # Strommasten
-                    id: pv_battery_soc1
                     source: 'gfx/power_grid.png'
-                    size_hint_y: None
+                    size_hint: (1, 0.7)
                     width: 10
 
         BoxLayout: # Right side of the screen
@@ -186,14 +191,19 @@
                         size: (50, 50)
 
             BoxLayout: # Empty space between Weather + Clock
-                size_hint: (1, 0.10)
+                size_hint: (1, 0.1)
                 #canvas.before:
                 #    Color:
                 #        rgba: 0.4, 0.4, 0.5, 1
                 #    Rectangle:
                 #        pos: self.pos
                 #        size: self.size
-                Widget:
+                #Widget:
+                Image:
+                    #size_hint: (1, 0.5)
+                    id: pet_icon
+                    source: 'gfx/pets/doggy.png'
+                    #size: (50, 50)
 
 
 

@@ -4,6 +4,7 @@ import json
 import socket
 import time
 import datetime
+import random
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -29,6 +30,7 @@ weather_theme = "w"
 
 class WeatherWidget(FloatLayout):
     fake_data = 0
+    pet_last_day = time.strftime("%d", time.localtime())
 
     #ww_city = ObjectProperty()
     muell_icon = ObjectProperty()
@@ -50,6 +52,7 @@ class WeatherWidget(FloatLayout):
     house_to_grid_direction = ObjectProperty()
     battery_charge_power = ObjectProperty()
     battery_charge_power_direction = ObjectProperty()
+    pet_icon = ObjectProperty()
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
         super(WeatherWidget, self).__init__(**kwargs)
@@ -62,32 +65,38 @@ class WeatherWidget(FloatLayout):
 
     def update(self, arg):
         print('WeatherWidget.update()')
-        if int(time.time()) - self.timestamp_last_update_weather < 60 * 30 and int(
-                time.time()) - self.timestamp_last_update_forecast < 60 * 30:  # 30 minutes
-            print('WeatherWidget.update() inhibit update')
-            return
 
-        self.clear_widget()
-        if self.fake_data == 1:
-            payload = '{"coord":{"lon":8.57,"lat":48.95},"weather":[{"id":803 removed ......'
-            self.new_weather_data(None, payload)
-            payload = '{"cod":"200","message":0.0045,"cnt":40,"list":[{"dt":1490302800,"main"  removed .......'
-            self.new_forecast_data(None, payload)
+    def get_pet(self):
+        pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png"]
+        pet = random.choice(pets)
+        #print(f'get_pet() = {pet}')
+        return pet
+
+    def update_pet(self, pet):
+        if pet == '':
+            self.pet_icon.source = self.get_pet()
         else:
-            weather_url = 'http://api.openweathermap.org/data/2.5/weather?id=2808802&APPID=83b6d799fe72c462f34c2e772188190d&units=metric'
-            request = UrlRequest(weather_url, on_success=self.new_weather_data, on_failure=self.weather_failure,
-                                 on_redirect=self.weather_redirect)
-            forecast_url = 'http://api.openweathermap.org/data/2.5/forecast?id=2808802&appid=83b6d799fe72c462f34c2e772188190d&units=metric'
-            forecast_request = UrlRequest(forecast_url, on_success=self.new_forecast_data,
-                                          on_failure=self.forecast_failure, on_redirect=self.forecast_redirect)
+            self.pet_icon.source = pet
+        print(f"\n\nupdate_pet() = {self.pet_icon.source}")
+
 
     def update_clock(self, arg=None):
         #print('Weather.update_clock()')
+        #print(f"update_clock() current pet = {self.pet_icon.source}")
         self.clock_time.text = time.strftime("%H:%M:%S", time.localtime())
         self.clock_date.text = time.strftime("%d.%m.%y", time.localtime())
         temp, humid = self.HDC1008.read_values()
         self.ww_inside_temp.text = str(int(temp)) + '°C'
         self.ww_inside_hum.text = str(int(humid)) + '%'
+
+        current_day = time.strftime("%d", time.localtime())
+        #current_day = time.strftime("%M", time.localtime())
+        #print(f'update_clock() self.pet_last_day = {self.pet_last_day} current_day = {current_day}')
+        if current_day != self.pet_last_day:
+            #self.pet_icon.source = self.get_pet()
+            #print(f'new pet: {self.pet_icon.source}')
+            self.update_pet('') # select random pet
+        self.pet_last_day = current_day
 
         #self.input_power_pv.text = str(int(DisplayControl().BH1750.readLight()))
         pass
@@ -163,6 +172,33 @@ class WeatherWidget(FloatLayout):
                 print('NO MUELL ICON')
                 self.muell_icon.source = 'gfx/muell/empty.png'
 
+        if message.topic == 'weather/current/temp':
+            print(message.topic, ': ', payload)
+            self.ww_temp.text = '{}°C'.format(int(float(payload)))
+        if message.topic == 'weather/current/icon':
+            print(message.topic, ': ', payload)
+            self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
+        if message.topic == 'weather/forecast/tomorrow/temp':
+            print(message.topic, ': ', payload)
+            #self.ww_temp.text = '{}°C'.format(int(float(payload)))
+            #self.forecast.forecast_1.wf_day.text = day
+            self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(float(payload)))
+        if message.topic == 'weather/forecast/tomorrow/icon':
+            print(message.topic, ': ', payload)
+            #self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
+            self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
+        if message.topic == 'weather/forecast/d_a_tomorrow/temp':
+            print(message.topic, ': ', payload)
+            #self.ww_temp.text = '{}°C'.format(int(float(payload)))
+            self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(float(payload)))
+        if message.topic == 'weather/forecast/d_a_tomorrow/icon':
+            print(message.topic, ': ', payload)
+            #self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
+            self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
+        if message.topic == 'homectrl/pet':
+            print(message.topic, ': ', payload)
+            self.update_pet(payload)
+
     def get_icon_for_soc(self, soc):
         if soc < 10:
             return 'gfx/SoC/SoC_0.png'
@@ -198,93 +234,16 @@ class WeatherWidget(FloatLayout):
     def clear_widget(self):
         #self.ww_city.text = 'Updating weather...'
         self.ww_cur_cond_icon.source = ''
-        self.muell_icon.source = 'gfx/muell/empty.png'
-        self.vehicle_soc_icon.source = 'gfx/evehicle.png'
-        self.vehicle_soc.text = ''
-        self.battery_charge_power.text = ''
-        self.current_power_consumption.text = ''
+        #self.muell_icon.source = 'gfx/muell/empty.png'
+        #self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+        #self.vehicle_soc.text = ''
+        #self.battery_charge_power.text = ''
+        #self.current_power_consumption.text = ''
         self.ww_temp.text = '--°C'
-        self.input_power_pv.text = ''
+        #self.input_power_pv.text = ''
         #self.ww_temp_min_max.text = '--°C / --°C'
         #self.ww_wind_speed.text = 'Wind: --- km/h'
         self.forecast.clear_widget()
-
-    def weather_failure(self):
-        #self.ww_city.text = 'weather_failure'
-        print('weather_failure')
-
-    def weather_redirect(self):
-        #self.ww_city.text = 'weather_redirect'
-        print('weather_redirect')
-
-    def forecast_failure(self):
-        self.forecast.forecast_1.wf_temp.text = 'forecast_failure'
-        print('forecast_failure')
-
-    def forecast_redirect(self):
-        self.forecast.forecast_1.wf_temp.text = 'forecast_redirect'
-        print('forecast_redirect')
-
-    def new_forecast_data(self, request, payload):
-        # print(payload)
-        self.timestamp_last_update_forecast = int(time.time())
-
-        f = json.loads(payload.decode()) if not isinstance(payload, dict) else payload
-        flist = f["list"]
-        count = 0
-        for index in range(len(flist)):
-            dt_txt = flist[index]["dt_txt"]
-
-            if dt_txt.endswith('12:00:00'):
-                lt = time.localtime(flist[index]["dt"])
-                day = time.strftime("%a", lt)
-                if count == 0:
-                    self.forecast.forecast_1.wf_day.text = day
-                    self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                                                              flist[index]["weather"][0]["icon"] + '.png'
-                elif count == 1:
-                    self.forecast.forecast_2.wf_day.text = day
-                    self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                    self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                                                              flist[index]["weather"][0]["icon"] + '.png'
-                #elif count == 2:
-                #    self.forecast.forecast_3.wf_day.text = day
-                #    self.forecast.forecast_3.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                #    self.forecast.forecast_3.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                #                                              flist[index]["weather"][0]["icon"] + '.png'
-                #elif count == 3:
-                #    self.forecast.forecast_4.wf_day.text = day
-                #    self.forecast.forecast_4.wf_temp.text = '{}°C'.format(int(flist[index]["main"]["temp"]))
-                #    self.forecast.forecast_4.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + \
-                #                                              flist[index]["weather"][0]["icon"] + '.png'
-                elif count == 4:
-                    print('ende')
-                count += 1
-
-        # self.forecast.forecast_1.wf_temp.text = f
-
-    def new_weather_data(self, request, payload):
-        # print(payload)
-        self.timestamp_last_update_weather = int(time.time())
-
-        w = json.loads(payload.decode()) if not isinstance(payload, dict) else payload
-        # w = json.loads(payload)
-        weather = w["weather"]
-        print(weather[0]["main"])
-        #self.ww_city.text = w["name"]
-        self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
-        # if ( self.fake_data == 1 ):
-        #    self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + weather[0]["icon"] + '.png'
-        # else:
-        #    self.ww_cur_cond_icon.source = 'http://openweathermap.org/img/w/' + weather[0]["icon"] + '.png'
-        # print(self.ww_cur_cond_icon.source)
-        self.ww_temp.text = '{}°C'.format(int(w["main"]["temp"]))
-        #self.ww_temp_min_max.text = '{}°C / {}°C'.format(int(w["main"]["temp_min"]), int(w["main"]["temp_max"]))
-        #self.ww_wind_speed.text = 'Wind: {} km/h'.format(int(w["wind"]["speed"]))
-
-    pass
-
 
 class WeatherForecastItemWidget(BoxLayout):
     wf_icon = ObjectProperty()

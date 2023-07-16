@@ -362,6 +362,10 @@ class HomeCtrlApp(App):
         client.subscribe("muell/next_event")
         print("MQTT: Subscribing to topic", "vehicle/#")
         client.subscribe("vehicle/#")
+        print("MQTT: Subscribing to topic", "weather/#")
+        client.subscribe("weather/#")
+        print("MQTT: Subscribing to topic", "weather/#")
+        client.subscribe("homectrl/pet")
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -418,6 +422,14 @@ class HomeCtrlApp(App):
             weather_screen.subwidget.on_mqtt_message(message)
         if 'muell/next_event' in message.topic:
             print("MQTT: new muell message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'weather/' in message.topic:
+            print("MQTT: new weather message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'homectrl/pet' in message.topic:
+            print("MQTT: new pet message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
 
