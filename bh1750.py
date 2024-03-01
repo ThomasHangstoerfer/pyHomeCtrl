@@ -78,9 +78,12 @@ class BH1750:
                 data = self.bus.read_i2c_block_data(addr, BH1750.ONE_TIME_HIGH_RES_MODE_1)
             else:
                 data = None
-            bh_lock.release()
         except Exception as e:
             print('BH1750: Exception', e)
+        try:
+            bh_lock.release()
+        except Exception as e:
+            print('BH1750: Release-Exception', e)
         return self.convertToNumber(data)
 
 
