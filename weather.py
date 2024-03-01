@@ -10,6 +10,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.lang import Builder
+from kivy.clock import Clock, mainthread
 from kivy.network.urlrequest import UrlRequest
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
@@ -80,6 +81,7 @@ class WeatherWidget(FloatLayout):
         print(f"\n\nupdate_pet() = {self.pet_icon.source}")
 
 
+    @mainthread
     def update_clock(self, arg=None):
         #print('Weather.update_clock()')
         #print(f"update_clock() current pet = {self.pet_icon.source}")
@@ -94,7 +96,7 @@ class WeatherWidget(FloatLayout):
         #print(f'update_clock() self.pet_last_day = {self.pet_last_day} current_day = {current_day}')
         if current_day != self.pet_last_day:
             #self.pet_icon.source = self.get_pet()
-            #print(f'new pet: {self.pet_icon.source}')
+            print(f'new pet: {self.pet_icon.source}')
             self.update_pet('') # select random pet
         self.pet_last_day = current_day
 
