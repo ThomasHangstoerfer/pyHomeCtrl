@@ -98,10 +98,11 @@
                         Widget:
                     BoxLayout:
                         orientation: 'vertical'
-                        Image:
+                        ImageButton:
                             id: house_icon
                             source: 'gfx/home.png'
-                            size: (20, 20)
+                            size: (60, 60)
+                            on_release: root.showPVPopup("")
                         Label: # Current Power Consumption
                             id: current_power_consumption
                             text: ''

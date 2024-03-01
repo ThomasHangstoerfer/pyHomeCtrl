@@ -364,13 +364,13 @@ class HomeCtrlApp(App):
         client.subscribe("vehicle/#")
         print("MQTT: Subscribing to topic", "weather/#")
         client.subscribe("weather/#")
-        print("MQTT: Subscribing to topic", "weather/#")
+        print("MQTT: Subscribing to topic", "homectrl/pet")
         client.subscribe("homectrl/pet")
 
     @mainthread
     def on_message(self, client, userdata, message):
         payload = str(message.payload.decode("utf-8"))
-        print('MQTT: on_message() mqtt-message for topic ' + message.topic + ' received ' + payload)
+        #print('MQTT: on_message() mqtt-message for topic ' + message.topic + ' received ' + payload)
         # print("MQTT: message topic=",message.topic)
         # print("MQTT: message qos=",message.qos)
         # print("MQTT: message retain flag=",message.retain)
@@ -413,7 +413,7 @@ class HomeCtrlApp(App):
             #print("MQTT: " + message.topic + ": " + payload)
             sh.handleMQTTMessage(message.topic, payload)
         if 'energy/' in message.topic:
-            print("MQTT: new energy message for weather screen");
+            #print("MQTT: new energy message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'vehicle/' in message.topic:

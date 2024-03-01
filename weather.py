@@ -25,9 +25,11 @@ from display_ctrl import DisplayControl
 from hdc1008 import HDC1008
 from settings import Settings
 from utils import RepeatedTimer, set_backlight_brightness, get_backlight_brightness
+from popup_energydetails import EnergyDetailsPopup
 
 weather_theme = "w"
 
+energydetailspopup = EnergyDetailsPopup(auto_dismiss=False, title='Energy', size_hint=(0.99, 0.99)) 
 
 class WeatherWidget(FloatLayout):
     fake_data = 0
@@ -67,6 +69,9 @@ class WeatherWidget(FloatLayout):
     def update(self, arg):
         print('WeatherWidget.update()')
 
+    def showPVPopup(self, arg):
+        energydetailspopup.open()
+    
     def get_pet(self):
         pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png"]
         pet = random.choice(pets)
@@ -124,7 +129,7 @@ class WeatherWidget(FloatLayout):
     def on_mqtt_message(self, message):
         payload = str(message.payload.decode("utf-8"))
 
-        print('WeatherWidget.on_mqtt_message()', message.topic)
+        #print('WeatherWidget.on_mqtt_message()', message.topic)
         if message.topic == 'energy/battery_soc':
             self.pv_battery_soc.text = payload + ' %'
             self.pv_battery_soc_icon.source = self.get_icon_for_soc(int(payload)) #'gfx/SoC/SoC_30.png'
@@ -141,6 +146,9 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/current_power_consumption':
             print('energy/current_power_consumption: ', payload)
             self.current_power_consumption.text = str(round( int(payload) / 1000, 2) ) + ' kW'
+        if message.topic == 'energy/energy_yield_total':
+            print('energy/energy_yield_total: ', payload)
+            energydetailspopup.handleMQTTMessage(message.topic, payload)
         if message.topic == 'energy/active_power_grid':
             print('energy/active_power_grid: ', payload)
             self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
