@@ -140,9 +140,9 @@ class WeatherWidget(FloatLayout):
             print('energy/battery_charge_discharge_power: ', payload)
             self.battery_charge_power.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
             if int(payload) > 0:
-                self.battery_charge_power_direction.text = '<--'
+                self.battery_charge_power_direction.source = 'gfx/arrow_left.png'
             else:
-                self.battery_charge_power_direction.text = '-->'
+                self.battery_charge_power_direction.source = 'gfx/arrow_right.png'
         if message.topic == 'energy/current_power_consumption':
             print('energy/current_power_consumption: ', payload)
             self.current_power_consumption.text = str(round( int(payload) / 1000, 2) ) + ' kW'
@@ -152,10 +152,14 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/active_power_grid':
             print('energy/active_power_grid: ', payload)
             self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
+            #if int(payload) > 0:
+            #    self.house_to_grid_direction.text = ' |\nV'
+            #else:
+            #    self.house_to_grid_direction.text = '^\n |'
             if int(payload) > 0:
-                self.house_to_grid_direction.text = ' |\nV'
+                self.house_to_grid_direction.source = 'gfx/arrow_down.png'
             else:
-                self.house_to_grid_direction.text = '^\n |'
+                self.house_to_grid_direction.source = 'gfx/arrow_up.png'
 
         if message.topic == 'vehicle/soc':
             print('vehicle/soc: ', payload)

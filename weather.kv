@@ -59,11 +59,11 @@
                     orientation: 'horizontal'
                     Widget:
                         size_hint: (0.45, 1)
-                    Label:
+                    Image: # Arrow PV to House
                         id: input_power_pv_direction
                         size_hint: (0.1, 1)
-                        text: ' |\nV'
-                        font_size:20
+                        source: 'gfx/arrow_down.png'
+                        size: (20, 20)
                     Label:
                         id: input_power_pv
                         size_hint: (0.45, 1)
@@ -91,10 +91,11 @@
                             id: battery_charge_power
                             text: ''
                             font_size:20
-                        Label:
+                        Image: # Arrow Battery Charge Power
                             id: battery_charge_power_direction
-                            text: '--'
-                            font_size:20
+                            #size_hint: (0.1, 1)
+                            source: 'gfx/arrow_right.png'
+                            size: (20, 20)
                         Widget:
                     BoxLayout:
                         orientation: 'vertical'
@@ -113,10 +114,11 @@
                             id: vehicle_charge_power
                             text: ''
                             font_size:20
-                        Label:
+                        Image: # Arrow House to Vehicle
                             id: vehicle_charge_power_direction
-                            text: '-->'
-                            font_size:20
+                            #size_hint: (0.1, 1)
+                            source: 'gfx/arrow_right.png'
+                            size: (20, 20)
                         Widget:
                     BoxLayout:
                         orientation: 'vertical'
@@ -133,12 +135,11 @@
                     size_hint: (1, 1)
                     Widget:
                         size_hint: (0.45, 1)
-                    Label:
+                    Image: # Arrow House to Grid
                         id: house_to_grid_direction
                         size_hint: (0.1, 1)
-                        text: ' |\nV'
-                        font_size:20
-                        Widget:
+                        source: 'gfx/arrow_down.png'
+                        size: (20, 20)
                     Label:
                         id: house_to_grid
                         size_hint: (0.45, 1)
