@@ -79,6 +79,36 @@ class SmartHomeBad(BoxLayout):
             print('\n\nEXCEPTION in SmartHomeBad.tempUp(): %s' % e)
 
 
+class SmartHomePhilipp(BoxLayout):
+    measured_temp_dilli = StringProperty()
+    desired_temp_dilli = StringProperty()
+    hum_dilli = StringProperty()
+    #window = StringProperty()
+    actuator_dilli = StringProperty()
+
+    def on_get_focus(self):
+        print('SmartHomePhilipp.on_get_focus()')
+
+    # set PhilippThermostat_Climate desired-temp 18
+    def tempDown_dilli(self):
+        print('tempDown_dilli()')
+        try:
+            t = float(FhemConnect().fh.get_dev_reading("PhilippThermostat_Climate", "desired-temp"))
+            newt = t - 0.5
+            FhemConnect().fh.send_cmd("set PhilippThermostat_Climate desired-temp " + str(newt))
+        except Exception as e:
+            print('\n\nEXCEPTION in SmartHomePhilipp.tempDown(): %s' % e)
+
+    def tempUp_dilli(self):
+        print('tempUp()')
+        try:
+            t = float(FhemConnect().fh.get_dev_reading("PhilippThermostat_Climate", "desired-temp"))
+            newt = t + 0.5
+            FhemConnect().fh.send_cmd("set PhilippThermostat_Climate desired-temp " + str(newt))
+        except Exception as e:
+            print('\n\nEXCEPTION in SmartHomePhilipp.tempUp(): %s' % e)
+
+
 class SmartHomeHolidayMode(BoxLayout):
     temp = NumericProperty(18)
     
@@ -395,6 +425,17 @@ class Smarthome:
             self.smarthomewidget.badItem.subwidget.hum = payload + u"%"
         if topic == "bad/heizung/actuator":
             self.smarthomewidget.badItem.subwidget.actuator = payload + u"%"
+
+        if topic == "philipp/heizung/measured-temp":
+            self.smarthomewidget.dilliItem.subwidget.temp_dilli = payload + u" °C"
+        if topic == "philipp/heizung/desired-temp":
+            self.smarthomewidget.dilliItem.subwidget.desired_temp_dilli = payload + u" °C"
+        if topic == "philipp/heizung/humidity":
+            self.smarthomewidget.dilliItem.subwidget.hum_dilli = payload + u"%"
+        #if topic == "philipp/heizung/actuator":
+        #    self.smarthomewidget.dilliItem.subwidget.actuator = payload + u"%"
+        if topic == "philipp/heizung/controlMode":
+            self.smarthomewidget.dilliItem.subwidget.actuator_dilli = payload
 
     def update(self, ev):
         # for key, val in homectrlTabbedPanel.smarthomeItem.subwidget.wohnzimmerItem.items():

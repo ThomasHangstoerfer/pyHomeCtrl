@@ -124,6 +124,32 @@
         Label:
             text: root.window
 
+<SmartHomePhilipp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Temperatur'
+        Label:
+            text: root.measured_temp_dilli
+        Button:
+            text: '-'
+            on_release: root.tempDown_dilli()
+        Label:
+            text: root.desired_temp_dilli
+        Button:
+            text: '+'
+            on_release: root.tempUp_dilli()
+    BoxLayout:
+        Label:
+            text: 'Luftfeuchtigkeit'
+        Label:
+            text: root.hum_dilli
+    BoxLayout:
+        Label:
+            text: 'Aktuator'
+        Label:
+            text: root.actuator_dilli
+
 <SmartHomeHolidayMode>:
     orientation: 'horizontal'
     id: first_row
@@ -216,6 +242,7 @@
     tab_pos: 'top_left'
     wohnzimmerItem: wohnzimmerItem
     badItem: badItem
+    dilliItem: dilliItem
 
     ExTabbedPanelItem:
         id: wohnzimmerItem
@@ -247,4 +274,10 @@
         SmartHomeHolidayMode:
             id: smarthomeholidaymode
 
-
+    ExTabbedPanelItem:
+        id: dilliItem
+        #background_normal: 'gfx/home_r.png'
+        text: 'Philipp'
+        subwidget: smarthomephilipp
+        SmartHomePhilipp:
+            id: smarthomephilipp
