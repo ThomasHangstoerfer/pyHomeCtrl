@@ -29,11 +29,11 @@
     battery_charge_power_direction: battery_charge_power_direction
     pet_icon: pet_icon
 
-    ImageButton:
-        source: 'gfx/reload1.png'
-        size_hint: (0.1, 0.1)
-        right: root.right-self.width
-        on_release: root.update("")
+    #ImageButton:
+    #    source: 'gfx/reload1.png'
+    #    size_hint: (0.1, 0.1)
+    #    right: root.right-self.width
+    #    on_release: root.update("")
 
 #    Button:
 #        on_release: root.update()
@@ -122,10 +122,11 @@
                         Widget:
                     BoxLayout:
                         orientation: 'vertical'
-                        Image:
+                        ImageButton:
                             id: vehicle_soc_icon
                             source: 'gfx/evehicle.png'
-                            size: (20, 20)
+                            size: (60, 60)
+                            on_release: root.showVehiclePopup("")
                         Label: # Vehicle SoC
                             id: vehicle_soc
                             text: ''

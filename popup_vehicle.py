@@ -5,6 +5,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Rectangle
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 
 from kivy_garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
 from math import sin
@@ -15,128 +16,178 @@ from display_ctrl import DisplayControl
 import requests
 
 
+
+from kivy.lang import Builder
+
+KV1 = """
+<VehiclePopup>:
+    fuel_bft: fuel_bft
+    Label:
+        id: fuel_bft
+        text: 'BFT'
+"""
+
+KV = """
+<VehiclePopup>:
+    fuel_bft: fuel_bft
+    fuel_jet: fuel_jet
+    fuel_aral: fuel_aral
+    vehicle_soc: vehicle_soc
+    vehicle_charge_power: vehicle_charge_power
+
+    BoxLayout:
+        size_hint: (1.0, 1.0)
+        orientation: 'horizontal'
+        BoxLayout:
+            id: left_layout
+            orientation: 'vertical'
+            size_hint: (0.5, 1.0)
+            Label:
+                id: vehicle_charge_state
+                size_hint: (1.0, 0.2)
+                text: 'Charge state: Charging'
+            Label:
+                id: vehicle_soc
+                size_hint: (1.0, 0.2)
+                text: 'SoC: 89%'
+            Label:
+                id: vehicle_charge_power
+                size_hint: (1.0, 0.2)
+                text: 'Charge Power: 1.6kW'
+            Label:
+                size_hint: (1.0, 0.6)
+            Button:
+                id: back
+                text: 'Back'
+                size_hint: (0.3, 0.2)
+                valign: 'middle'
+                on_press: root.back()
+
+        BoxLayout:
+            id: right_layout
+            orientation: 'vertical'
+            size_hint: (0.5, 1.0)
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.6, 0.4, 0.4, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                id: fuel_layout
+                orientation: 'horizontal'
+                size_hint: (1.0, 0.3)
+
+                Image:
+                    source: 'gfx/power_grid.png'
+                    size_hint: (0.5, 1.0)
+                BoxLayout:
+                    id: fuel_data_layout
+                    orientation: 'vertical'
+                    size_hint: (0.5, 1.0)
+                    Label:
+                        id: fuel_bft
+                        text: 'BFT'
+                    Label:
+                        id: fuel_jet
+                        text: 'Jet'
+                    Label:
+                        id: fuel_aral
+                        text: 'Aral'
+
+            BoxLayout:
+                id: right_mid_layout
+                orientation: 'horizontal'
+                size_hint: (1.0, 0.3)
+
+            BoxLayout:
+                id: right_lower_layout
+                orientation: 'horizontal'
+                size_hint: (1.0, 0.3)
+                Label:
+                    text: 'Charge Mode'
+                    size_hint: (0.2, 1.0)
+
+                Button:
+                    id: btn_charge_mode_slow
+                    text: 'Slow'
+                    size_hint: (0.2, 1.0)
+                    on_press: root.charge_mode('slow')
+
+                Button:
+                    id: btn_charge_mode_medium
+                    text: 'Medium'
+                    size_hint: (0.2, 1.0)
+                    on_press: root.charge_mode('medium')
+
+                Button:
+                    id: btn_charge_mode_fast
+                    text: 'Fast'
+                    size_hint: (0.2, 1.0)
+                    on_press: root.charge_mode('fast')
+
+                Button:
+                    id: btn_charge_mode_pvexcess
+                    text: 'PV-Excess'
+                    size_hint: (0.2, 1.0)
+                    on_press: root.charge_mode('pvexcess')
+
+"""
+
+Builder.load_string(KV)
+
 # <div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-class EnergyDetailsPopup(Popup):
-    caller = Label(text='',  font_size='60sp', size_hint=(1.0, 0.5))
-    pnumber = Label(text='', font_size='30sp', size_hint=(1.0, 0.3))
-    old_display_status = False
+class VehiclePopup(Popup):
 
     graph_container = BoxLayout(orientation="vertical", size_hint=(1.0, 0.9))
 
-    # energy yield today
+    fuel_bft = ObjectProperty()
+    fuel_jet = ObjectProperty()
+    fuel_aral = ObjectProperty()
+    vehicle_soc = ObjectProperty()
+    vehicle_charge_power = ObjectProperty()
+
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
     def __init__(self, **kwargs):  # my_widget is now the object where popup was called from.
-        super(EnergyDetailsPopup, self).__init__(**kwargs)
-        #print('EnergyDetailsPopup()__init__')
-        self.content = BoxLayout(orientation="vertical")
-        #self.content.add_widget(self.caller)
-        # self.content.add_widget(Label(text='Energy', id='number'))
-        self.content.add_widget(self.graph_container)
-
-        #self.graph_container.bind(size=self._update_rect, pos=self._update_rect)
-        #with self.graph_container.canvas.before:
-        #    Color(0, 1, 0, 0.3)  # green; colors range from 0-1 not 0-255
-        #    self.rect = Rectangle(size=self.graph_container.size, pos=self.graph_container.pos)
-
-        self.button_layout = BoxLayout(orientation="horizontal", size_hint=(1.0, 0.1))
-        self.content.add_widget(self.button_layout)
-
-        self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
-
-        self.button_back = Button(text='Back', size_hint=(0.25, 1.0))
-        #self.button_back.bind(on_press=self.dismiss)
-        self.button_back.bind(on_press=self.back)
-        self.button_layout.add_widget(self.button_back)
-
-        self.button_pvpower = Button(text='PV-Power', size_hint=(0.25, 1.0))
-        self.button_pvpower.bind(on_press=self.updatePVPower)
-        self.button_layout.add_widget(self.button_pvpower)
-
-        self.button_yield = Button(text='Energy Yield', size_hint=(0.25, 1.0))
-        self.button_yield.bind(on_press=self.updateYield)
-        self.button_layout.add_widget(self.button_yield)
-
-        self.button_soc = Button(text='Battery SoC', size_hint=(0.25, 1.0))
-        self.button_soc.bind(on_press=self.updateSoC)
-        self.button_layout.add_widget(self.button_soc)
-
-        self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
-
-        self.screen_mode = 'yield'
-        self.yield_mode = 'last_10'
+        super(VehiclePopup, self).__init__(**kwargs)
+        #print('VehiclePopup()__init__')
 
     def on_open(self):
         #print('on_open')
         DisplayControl().lock()
 
-        self.updatePVPower(123)
+        #self.updatePVPower(123)
 
     def on_dismiss(self):
         #print('on_dismiss')
         DisplayControl().unlock()
 
-    def back(self, whatarg):
+    def back(self):
         self.graph_container.clear_widgets()
         self.dismiss()
 
-    def updateYield(self, whatarg):
+    def charge_mode(self, charge_mode):
+        print('popup_vehicle.charge_mode(' + charge_mode + ')')
+        if charge_mode == 'pvexcess':
+            pass
 
-        if self.screen_mode == 'yield':
-            if self.yield_mode == 'last_10':
-                self.yield_mode = 'all'
-            else:
-                self.yield_mode = 'last_10'
-    
-        self.screen_mode = 'yield'
-        self.button_soc.color = (1, 1, 1, 1)
-        self.button_pvpower.color = (1, 1, 1, 1)
-        self.button_yield.color = (0, 1, 0, 1)
-
-        try:
-
-            if self.yield_mode == 'last_10':
-                r = requests.get("http://apollo.fritz.box:1880/energy/daily_energy_yield?count=10")
-            else:
-                r = requests.get("http://apollo.fritz.box:1880/energy/daily_energy_yield")
-            energy_yields = r.json()
-
-            max_value = 0
-            for daydata in energy_yields:
-                #print(daydata["time"][:10], ' - ', daydata["max_value"])
-                if max_value < daydata["max_value"]:
-                    max_value = daydata["max_value"]
-
-            self.graph_container.clear_widgets()
-
-            label = 'Energy Yield per Day'
-            if self.yield_mode == 'last_10':
-                label = label  + ' (last ' + str(len(energy_yields)) + ' days)'
-    
-            graph = Graph(xlabel=label, ylabel='kWh',
-                        x_ticks_minor=0, x_ticks_major=1,
-                        y_ticks_major=5,
-                        y_grid_label=True, x_grid_label=True,
-                        padding=5,
-                        x_grid=True, y_grid=True,
-                        xmin=-len(energy_yields), xmax=0,
-                        ymin=0, ymax=max_value*1.05)
-
-            plot = BarPlot(color=[0, 1, 0, 1], bar_width=-1, bar_spacing=.5)
-            plot.bind_to_graph(graph)
-            for i in range( 0, len(energy_yields)):
-                #print('i:', i, '  (', -i-1, ', ', energy_yields[i]["max_value"], ')')
-                plot.points.append((-len(energy_yields)+i, energy_yields[i]["max_value"]))
-            
-            graph.add_plot(plot)
-            self.graph_container.add_widget(graph)
-
-        except Exception as e:
-            print('popup_energydetails.updateYield: Exception: ', e)
+    def on_mqtt_message(self, topic, payload):
+        print('popup_vehicle.on_mqtt_message()', topic)
+        if topic == 'fuel/BFT':
+            self.fuel_bft.text = 'BFT: ' + payload
+        if topic == 'fuel/Jet':
+            self.fuel_jet.text = 'Jet: ' + payload
+        if topic == 'fuel/Aral':
+            self.fuel_aral.text = 'Aral: ' + payload
+        if topic == 'vehicle/soc':
+            self.vehicle_soc.text = 'SoC: ' + payload + '%'
+        if topic == 'vehicle/charge_power':
+            self.vehicle_charge_power.text = 'Charge Power: ' + payload + 'kW'
 
     def updateSoC(self, whatarg):
 
@@ -168,7 +219,7 @@ class EnergyDetailsPopup(Popup):
             for i in range( 0, len(battery_soc_history)):
                 #print('i:', i, '  (', -i-1, ', ', battery_soc_history[i]["mean_value"], ')')
                 plot.points.append( ( (-len(battery_soc_history)+i)/6, int(battery_soc_history[i]["mean_value"])) )
-            
+
             graph.add_plot(plot)
             self.graph_container.add_widget(graph)
 
@@ -256,20 +307,6 @@ class EnergyDetailsPopup(Popup):
         except Exception as e:
             print('popup_energydetails.updatePVPower: Exception: ', e)
             traceback.print_exc()
-
-    def setExternalName(self, name):
-        if self.caller.text != "" and (name == "unknown" or name == ""):
-            self.pnumber.text = self.caller.text  # transfer number from name-label to number-label
-            self.caller.text = name
-        else:
-            self.caller.text = name
-
-    def setExternalNumber(self, num):
-        if self.caller.text == "unknown" or self.caller.text == "":
-            self.caller.text = num  # caller is unknown, show number in name-label
-            self.pnumber.text = ""
-        else:
-            self.pnumber.text = num
 
     def handleMQTTMessage(self, topic, payload):
         #print('popup_phonecall.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')

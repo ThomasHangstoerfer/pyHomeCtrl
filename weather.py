@@ -26,10 +26,12 @@ from hdc1008 import HDC1008
 from settings import Settings
 from utils import RepeatedTimer, set_backlight_brightness, get_backlight_brightness
 from popup_energydetails import EnergyDetailsPopup
+from popup_vehicle import VehiclePopup
 
 weather_theme = "w"
 
-energydetailspopup = EnergyDetailsPopup(auto_dismiss=False, title='Energy', size_hint=(0.99, 0.99)) 
+energydetailspopup = EnergyDetailsPopup(auto_dismiss=False, title='Energy', size_hint=(0.99, 0.99))
+vehiclepopup = VehiclePopup(auto_dismiss=False, title='Vehicle', size_hint=(0.99, 0.99))
 
 class WeatherWidget(FloatLayout):
     fake_data = 0
@@ -72,6 +74,9 @@ class WeatherWidget(FloatLayout):
     def showPVPopup(self, arg):
         energydetailspopup.open()
     
+    def showVehiclePopup(self, arg):
+        vehiclepopup.open()
+
     def get_pet(self):
         pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png"]
         pet = random.choice(pets)
@@ -84,7 +89,6 @@ class WeatherWidget(FloatLayout):
         else:
             self.pet_icon.source = pet
         print(f"\n\nupdate_pet() = {self.pet_icon.source}")
-
 
     @mainthread
     def update_clock(self, arg=None):
@@ -152,10 +156,6 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/active_power_grid':
             print('energy/active_power_grid: ', payload)
             self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
-            #if int(payload) > 0:
-            #    self.house_to_grid_direction.text = ' |\nV'
-            #else:
-            #    self.house_to_grid_direction.text = '^\n |'
             if int(payload) > 0:
                 self.house_to_grid_direction.source = 'gfx/arrow_down.png'
             else:
@@ -165,6 +165,12 @@ class WeatherWidget(FloatLayout):
             print('vehicle/soc: ', payload)
             self.vehicle_soc_icon.source = 'gfx/evehicle.png'
             self.vehicle_soc.text = str(payload) + ' %'
+        if 'vehicle/' in message.topic :
+            print(message.topic, ': ', payload)
+            vehiclepopup.on_mqtt_message(message.topic, payload)
+        if 'fuel/' in message.topic :
+            print(message.topic, ': ', payload)
+            vehiclepopup.on_mqtt_message(message.topic, payload)
         if message.topic == 'vehicle/charge_power':
             print('vehicle/charge_power: ', payload)
             self.vehicle_charge_power.text = str(round( int(payload) / 1000, 2) ) + ' kW'

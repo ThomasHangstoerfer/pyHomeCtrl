@@ -358,6 +358,8 @@ class HomeCtrlApp(App):
         client.subscribe("bad/#")
         print("MQTT: Subscribing to topic", "energy/#")
         client.subscribe("energy/#")
+        print("MQTT: Subscribing to topic", "fuel/#")
+        client.subscribe("fuel/#")
         print("MQTT: Subscribing to topic", "muell/next_event")
         client.subscribe("muell/next_event")
         print("MQTT: Subscribing to topic", "vehicle/#")
@@ -414,6 +416,10 @@ class HomeCtrlApp(App):
             sh.handleMQTTMessage(message.topic, payload)
         if 'energy/' in message.topic:
             #print("MQTT: new energy message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'fuel/' in message.topic:
+            print("MQTT: new fuel message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'vehicle/' in message.topic:
