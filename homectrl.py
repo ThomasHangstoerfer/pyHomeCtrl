@@ -379,7 +379,7 @@ class HomeCtrlApp(App):
         if message.topic == 'cam/newImage':
             if payload != self.last_mqtt_image_name:
                 filename = "/qnap/Download/today/" + payload
-                print("MQTT: new image -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
+                print("MQTT: DoorCam: new image " + payload + " -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
                 try:
                     hc._screen_manager.screen_doorcam.set_filename(payload, filename)
                     if self.last_mqtt_image_name != '':  # skip the first image (dont show popup)
@@ -387,15 +387,15 @@ class HomeCtrlApp(App):
                         doorcampopup.set_image_filename(filename)
                         doorcampopup.open()
                     else:
-                        print('MQTT: ignore first image')
+                        print('MQTT: DoorCam: ignore first image')
 
                     self.last_mqtt_image_name = payload
                 except Exception as e:
-                    print('MQTT: Exception: %s' % e)
+                    print('MQTT: DoorCam: Exception: %s' % e)
                     pass
                 DisplayControl().displayOn()
             else:
-                print('last_mqtt_image_name not changed')
+                print('MQTT: DoorCam: last_mqtt_image_name not changed')
         if message.topic == 'homectrl/b':
             #print("MQTT: new brightness " + payload)
             DisplayControl().set_brightness_value(payload)  # e.g. '12 35' brightness 35 at 12 lux
