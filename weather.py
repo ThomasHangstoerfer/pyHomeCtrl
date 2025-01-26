@@ -78,7 +78,7 @@ class WeatherWidget(FloatLayout):
         vehiclepopup.open()
 
     def get_pet(self):
-        pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png"]
+        pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png", "gfx/pets/empty.png", "gfx/pets/empty.png"]
         pet = random.choice(pets)
         #print(f'get_pet() = {pet}')
         return pet

@@ -56,13 +56,14 @@ class DoorCamPopup(Popup):
         pass
 
     def set_image_filename(self, filename):
-        print('DoorCamPopup.set_image_filename(%s)', filename)
+        print('DoorCamPopup.set_image_filename(): ', filename)
         if self.dismiss_timer is not None:
             self.dismiss_timer.finish()
             del self.dismiss_timer
             #self.dismiss_timer.restart()
         self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.set_image_filename")
         self.image.source = filename
+        #self.image.reload()
 
     def dismiss_popup(self, arg):
         print('DoorCamPopup.dismiss_popup()')
