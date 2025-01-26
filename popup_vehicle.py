@@ -7,7 +7,8 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color, Rectangle
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 
-from kivy_garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
+#from kivy_garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
+from kivy.garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
 from math import sin
 
 import traceback

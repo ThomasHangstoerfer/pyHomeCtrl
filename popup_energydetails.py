@@ -6,7 +6,8 @@ from kivy.uix.popup import Popup
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Rectangle
 
-from kivy_garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
+#from kivy_garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
+from kivy.garden.graph import Graph, BarPlot, LinePlot, SmoothLinePlot
 from math import sin
 
 import traceback
@@ -46,7 +47,10 @@ class EnergyDetailsPopup(Popup):
         self.button_layout = BoxLayout(orientation="horizontal", size_hint=(1.0, 0.1))
         self.content.add_widget(self.button_layout)
 
-        self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
+        #self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
+        #lab = Label(text='LABEL')
+        #self.button_layout.add_widget(lab)
+        self.button_layout.add_widget(Label(text=''))
 
         self.button_back = Button(text='Back', size_hint=(0.25, 1.0))
         #self.button_back.bind(on_press=self.dismiss)
@@ -65,7 +69,8 @@ class EnergyDetailsPopup(Popup):
         self.button_soc.bind(on_press=self.updateSoC)
         self.button_layout.add_widget(self.button_soc)
 
-        self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
+        #self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
+        self.button_layout.add_widget(Label(text=''))
 
         self.screen_mode = 'yield'
         self.yield_mode = 'last_10'
