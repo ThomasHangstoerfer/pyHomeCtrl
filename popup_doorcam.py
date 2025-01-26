@@ -21,6 +21,13 @@ class KivyCamera(Image):
 
     def __init__(self, capture, fps, **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
+
+        self.cam_user = 'admin'
+        self.cam_password = 'GEHEIM'
+        self.cam_host = '192.168.1.177'
+        self.cam_stream = 'Preview_01_sub'
+        #self.cam_stream = 'Preview_01_main'
+
         self.capture = capture
         self.cam_update_locked = False
 
@@ -31,10 +38,16 @@ class KivyCamera(Image):
         self.capture = capture
 
     def activate(self):
-        pass
+        print('KivyCamera: activate() creating VideoCapture')
+        self.capture = cv2.VideoCapture('rtsp://'+self.cam_user+':'+self.cam_password+'@'+self.cam_host+'/'+self.cam_stream)
+        print('KivyCamera: activate() VideoCapture created')
+        print('KivyCamera: activate() VideoCapture frame size = ', self.capture.get(cv2.CAP_PROP_FRAME_WIDTH), "x", self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def deactivate(self):
-        pass
+        print('KivyCamera: deactivate() releasing VideoCapture')
+        if self.capture is not None:
+            self.capture.release()
+            self.capture = None
 
     def update(self, dt):
         if self.capture is None:
@@ -82,8 +95,6 @@ class DoorCamPopup(Popup):
         #self.image = Image( size_hint=(1.0, 1.0))
         #self.content.add_widget(self.image)
 
-        #self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=1.0)
-        #self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=500.0)
         self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=5.0)
         self.content.add_widget(self.camera)
 
@@ -104,21 +115,7 @@ class DoorCamPopup(Popup):
             self.dismiss_timer = None
         self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.on_open")
 
-
         self.camera.activate()
-
-        print('DooCamPopup: on_open() creating VideoCapture')
-        self.cam_user = 'admin'
-        self.cam_password = 'GEHEIM'
-        self.cam_host = '192.168.1.177'
-        self.cam_stream = 'Preview_01_sub'
-        #self.cam_stream = 'Preview_01_main'
-        self.capture = cv2.VideoCapture('rtsp://'+self.cam_user+':'+self.cam_password+'@'+self.cam_host+'/'+self.cam_stream)
-        print('DooCamPopup: on_open() VideoCapture created')
-        print('DooCamPopup: on_open() VideoCapture frame size = ', self.capture.get(cv2.CAP_PROP_FRAME_WIDTH), "x", self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-        self.camera.set_capture(self.capture)
-        #self.my_camera = KivyCamera(capture=self.capture, fps=500.0)
 
 
     def on_dismiss(self):
@@ -130,10 +127,6 @@ class DoorCamPopup(Popup):
         DisplayControl().unlock()
 
         self.camera.deactivate()
-
-        if self.capture is not None:
-            self.capture.release()
-            self.capture = None
 
     def set_image_filename(self, filename):
         print('DoorCamPopup.set_image_filename(): ', filename)
