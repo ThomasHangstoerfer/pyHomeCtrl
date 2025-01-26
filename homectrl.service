@@ -3,7 +3,8 @@ Description=pyHomeCtrl
 After=network.target
 
 [Service]
-Type=forking
+#Type=forking # this is discouraged
+Type=exec
 ExecStart=/usr/bin/python3 /home/pi/pyHomeCtrl_systemd/homectrl.py
 #ExecStop=/usr/local/bin/nzbget -Q
 #Restart=on-failure
