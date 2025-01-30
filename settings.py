@@ -14,7 +14,7 @@ class Settings(object):
     # display_off_active = True
     display_off_active = False
     display_off_timeout = 20.0
-    display_brightness = 30
+    display_brightness = 70
     offlinemode = False
     autobrightness = False
 
