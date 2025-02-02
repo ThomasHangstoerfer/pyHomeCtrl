@@ -132,6 +132,12 @@ class RepeatedTimer(object):
         # print 'self.to_be_stopped = %s' % self.to_be_stopped
         if (self.to_be_stopped == False):
             self.start()
+        # print 'self.to_be_stopped = %s' % self.to_be_stopped
+        if (self.to_be_stopped == False):
+            self.start()
+        # print 'self.to_be_stopped = %s' % self.to_be_stopped
+        if (self.to_be_stopped == False):
+            self.start()
         # print('RepeatedTimer._run() ignore_next = ', self.ignore_next)
         if (self.ignore_next):
             # print('ignore first display_off')
@@ -149,16 +155,16 @@ class RepeatedTimer(object):
             self.is_running = True
 
     def stop(self):
-        # print 'RepeatedTimer.stop()'
+        # print('RepeatedTimer.stop()')
         self._timer.cancel()
         self.is_running = False
 
     def restart(self):
-        # print 'RepeatedTimer.restart()'
+        # print('RepeatedTimer.restart()')
         self.stop()
         self.start()
 
     def finish(self):
-        # print 'RepeatedTimer.finish()'
+        print('RepeatedTimer.finish()' , self.args)
         self.to_be_stopped = True
         self.stop()

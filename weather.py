@@ -123,10 +123,10 @@ class WeatherWidget(FloatLayout):
 
     def on_release_focus(self):
         print('WeatherWidget.on_release_focus()')
-        self.clock_update_timer.stop()
+        self.clock_update_timer.finish()
         del self.clock_update_timer
         self.clock_update_timer = None
-        self.weather_update_timer.stop()
+        self.weather_update_timer.finish()
         del self.weather_update_timer
         self.weather_update_timer = None
 

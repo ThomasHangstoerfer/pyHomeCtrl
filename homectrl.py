@@ -503,6 +503,7 @@ class HomeCtrlApp(App):
         dl.running = False
         dl.stop()
         DisplayControl().stop()
+        settingspopup.finish()
         cur_screen = hc._screen_manager.get_screen(hc._screen_manager.current)
         cur_screen.subwidget.on_release_focus()
 

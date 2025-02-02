@@ -172,7 +172,7 @@ class DisplayControl(object):
         # return ret
 
     def stop(self):
-        # print( 'DisplayControl.stop()')
+        print( 'DisplayControl.stop()')
         self.displayOn()
         self.rt.finish()
         self.brightness_update_timer.finish()

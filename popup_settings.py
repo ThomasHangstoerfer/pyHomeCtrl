@@ -66,6 +66,9 @@ class SettingsPopup(Popup):
         self.bind(on_dismiss=self.dismiss_popup)
         Settings().addListener(self.update)
 
+    def finish(self):
+        self.brightness_update_timer.finish()
+
     def on_checkbox_active(self, a, checked):
         print('on_checkbox_active(', checked)
         Settings().setDisplayOffActive(checked)
