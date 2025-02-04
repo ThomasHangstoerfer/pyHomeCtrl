@@ -28,6 +28,8 @@ class KivyCamera(Image):
         self.cam_stream = 'Preview_01_sub'
         #self.cam_stream = 'Preview_01_main'
 
+        self.allow_stretch = True
+
         self.capture = capture
         self.cam_update_locked = False
 
@@ -51,7 +53,7 @@ class KivyCamera(Image):
 
     def update(self, dt):
         if self.capture is None:
-            print("KivyCamera.update() capture is None")
+            #print("KivyCamera.update() capture is None")
             return
         print("KivyCamera.update() capture.isOpened()=", self.capture.isOpened(), "cam_update_locked =", self.cam_update_locked)
         if self.cam_update_locked:
@@ -91,6 +93,12 @@ class DoorCamPopup(Popup):
         """
 
         self.content = FloatLayout()
+
+        #self.canvas.before.clear()
+        #with self.canvas.before:
+        #    Color(0, 1, 0, 0.25)
+        #    Rectangle(pos=self.pos, size=self.size)
+
 
         #self.image = Image( size_hint=(1.0, 1.0))
         #self.content.add_widget(self.image)
