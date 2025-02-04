@@ -8,7 +8,9 @@ import sys
 import subprocess
 import re
 
-bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
+#bl_power_file = "/sys/class/backlight/rpi_backlight/bl_power"
+bl_power_file = "/sys/class/backlight/10-0045/bl_power"
+brightness_file = "/sys/class/backlight/10-0045/brightness"
 
 
 def singleton(cls):
@@ -44,7 +46,7 @@ def set_backlight_brightness(b):
     if last_brightness == b:
         return
     try:
-        cmd = 'echo ' + str(b) + ' > /sys/class/backlight/rpi_backlight/brightness'
+        cmd = 'echo ' + str(b) + ' > ' + brightness_file
         # print('utils.set_backlight_brightness(%i): %s' % (b, cmd))
         os.system(cmd)
         last_brightness = b
@@ -58,7 +60,7 @@ def get_backlight_brightness():
     if not running_on_pi():
         return data
     try:
-        with open('/sys/class/backlight/rpi_backlight/brightness', 'r') as file:
+        with open(brightness_file, 'r') as file:
             data = file.read().replace('\n', '')
     except Exception:
         print('utils.get_backlight_brightness() failed)')
@@ -68,9 +70,12 @@ def get_backlight_brightness():
 
 
 def get_ip_address():
-    s = socket(AF_INET, SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    return s.getsockname()[0]
+    try:
+        s = socket(AF_INET, SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except:
+        return ""
 
 
 def get_network_info(wlan_device):
