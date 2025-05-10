@@ -368,6 +368,8 @@ class HomeCtrlApp(App):
         client.subscribe("weather/#")
         print("MQTT: Subscribing to topic", "homectrl/pet")
         client.subscribe("homectrl/pet")
+        print("MQTT: Subscribing to topic", "garage/#")
+        client.subscribe("garage/#")
 
     @mainthread
     def on_message(self, client, userdata, message):

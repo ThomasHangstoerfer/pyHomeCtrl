@@ -36,6 +36,7 @@ vehiclepopup = VehiclePopup(auto_dismiss=False, title='Vehicle', size_hint=(0.99
 class WeatherWidget(FloatLayout):
     fake_data = 0
     pet_last_day = time.strftime("%d", time.localtime())
+    garage_door_status = ''
 
     #ww_city = ObjectProperty()
     muell_icon = ObjectProperty()
@@ -113,6 +114,15 @@ class WeatherWidget(FloatLayout):
         self.pet_last_day = current_day
 
         #self.input_power_pv.text = str(int(DisplayControl().BH1750.readLight()))
+        if self.garage_door_status == 'closed':
+            self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+        else:
+            if (time.localtime().tm_sec%2) == 1:
+                self.vehicle_soc_icon.source = 'gfx/evehicle_red.png'
+            else:
+                self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+
+
         pass
 
     def on_get_focus(self):
@@ -166,7 +176,7 @@ class WeatherWidget(FloatLayout):
 
         if message.topic == 'vehicle/soc':
             #print('vehicle/soc: ', payload)
-            self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+            #self.vehicle_soc_icon.source = 'gfx/evehicle_red.png'
             self.vehicle_soc.text = str(payload) + ' %'
         if 'vehicle/' in message.topic :
             #print(message.topic, ': ', payload)
@@ -221,6 +231,9 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'homectrl/pet':
             #print(message.topic, ': ', payload)
             self.update_pet(payload)
+        if message.topic == 'garage/door_status':
+            #print(message.topic, ': ', payload)
+            self.garage_door_status = payload
 
     def get_icon_for_soc(self, soc):
         if soc < 10:
