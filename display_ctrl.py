@@ -195,7 +195,7 @@ class DisplayControl(object):
         # p.export_to_png("/tmp/kivy.png")
 
         t = time.localtime()
-        #nighttime = (t.tm_hour >= 10 and t.tm_hour <= 11 )
+        #nighttime = (t.tm_hour >= 10 and t.tm_hour <= 12 )
         nighttime = (t.tm_hour >= 1 and t.tm_hour <= 5 )
         #nighttime = (t.tm_min >= 5 and t.tm_min <= 10 )
         print('DisplayControl.displayOff(): tm_hour = %i nighttime = %i' % (t.tm_hour, nighttime))

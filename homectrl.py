@@ -290,7 +290,7 @@ class ExTabbedPanelItem(TabbedPanelItem):
 class SimpleClock(Label):
 
     def update(self, *args):
-        self.text = time.strftime("%d %b %y\n %H:%M:%S", time.localtime())
+        self.text = time.strftime("%d %b %y\n %H:%M", time.localtime())
 
     def on_touch_down(self, touch):
         # print('touch.pos[0] = %s touch.pos[1] = %s self.size[0] = %s self.size[1] = %s' % (touch.pos[0], touch.pos[1], self.size[0], self.size[1]))
@@ -419,23 +419,23 @@ class HomeCtrlApp(App):
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'fuel/' in message.topic:
-            print("MQTT: new fuel message for weather screen");
+            #print("MQTT: new fuel message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'vehicle/' in message.topic:
-            print("MQTT: new vehicle message for weather screen");
+            #print("MQTT: new vehicle message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'muell/next_event' in message.topic:
-            print("MQTT: new muell message for weather screen");
+            #print("MQTT: new muell message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'weather/' in message.topic:
-            print("MQTT: new weather message for weather screen");
+            #print("MQTT: new weather message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if 'homectrl/pet' in message.topic:
-            print("MQTT: new pet message for weather screen");
+            #print("MQTT: new pet message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
 
@@ -477,7 +477,7 @@ class HomeCtrlApp(App):
         global sh
         sh = smarthome.Smarthome(fc, hc._screen_manager.screen_smarthome.smarthome_tabbed_panel)
 
-        Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 1)
+        Clock.schedule_interval(hc.boxlayout_mainbuttons.simpleclock.update, 30)
         Clock.schedule_interval(self.update_mqtt, 10)
         Clock.schedule_once(self.switch_to_default_screen, 5)
 

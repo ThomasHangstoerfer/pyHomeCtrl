@@ -410,7 +410,7 @@ class Smarthome:
             self.init()
 
     def handleMQTTMessage(self, topic, payload):
-        print('smarthome.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
+        #print('smarthome.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
         if topic == "stehlampe/state":
             # hier kommen auch andere payloads als nur on/off
             if payload == "off" or payload == "on":

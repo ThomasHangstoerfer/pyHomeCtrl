@@ -219,7 +219,7 @@ class VerboseClock(ColoredGridLayout):
                 layout.add_widget(buchstabe)
 
         if ( self.has_focus is True ):
-            self.update_event = Clock.schedule_once(self.update, 2)
+            self.update_event = Clock.schedule_once(self.update, 60)
         #Clock.schedule_interval(self.update, 1)
 
         self.bind(size=self._update_rect, pos=self._update_rect, active_theme=self._update_rect)

@@ -41,13 +41,14 @@ last_brightness = 0
 
 def set_backlight_brightness(b):
     if not running_on_pi():
+        print('utils.set_backlight_brightness(): not running on pi!')
         return
     global last_brightness
     if last_brightness == b:
         return
     try:
         cmd = 'echo ' + str(b) + ' > ' + brightness_file
-        # print('utils.set_backlight_brightness(%i): %s' % (b, cmd))
+        print('utils.set_backlight_brightness(%i): %s' % (b, cmd))
         os.system(cmd)
         last_brightness = b
     except Exception:

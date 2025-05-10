@@ -81,9 +81,12 @@ class WeatherWidget(FloatLayout):
         pets = ["gfx/pets/h_bear.png", "gfx/pets/h_cow3.png", "gfx/pets/h_elephant.png", "gfx/pets/h_kangaroo.png", "gfx/pets/doggy.png", "gfx/pets/doggy.png", "gfx/pets/empty.png", "gfx/pets/empty.png"]
         pet = random.choice(pets)
         #print(f'get_pet() = {pet}')
+        pet = "gfx/pets/empty.png" # never show pet
         return pet
 
     def update_pet(self, pet):
+        self.pet_icon.source = ''
+        pass
         if pet == '':
             self.pet_icon.source = self.get_pet()
         else:
@@ -116,7 +119,7 @@ class WeatherWidget(FloatLayout):
         print('WeatherWidget.on_get_focus()')
         self.update("")
         self.update_clock()
-        self.clock_update_timer = RepeatedTimer(1, self.update_clock,
+        self.clock_update_timer = RepeatedTimer(0.5, self.update_clock,
                                                 "WeatherWidget.on_get_focus() clock_update_timer")  # it auto-starts, no need of clock_update_timer.start()
         self.weather_update_timer = RepeatedTimer(60 * 60, self.update,
                                                   "WeatherWidget.on_get_focus() weather_update_timer")  # it auto-starts, no need of clock_update_timer.start()
@@ -138,23 +141,23 @@ class WeatherWidget(FloatLayout):
             self.pv_battery_soc.text = payload + ' %'
             self.pv_battery_soc_icon.source = self.get_icon_for_soc(int(payload)) #'gfx/SoC/SoC_30.png'
         if message.topic == 'energy/input_power_pv':
-            print('energy/input_power_pv: ', payload)
+            #print('energy/input_power_pv: ', payload)
             self.input_power_pv.text = str(round( int(payload) / 1000, 2)) + ' kW'
         if message.topic == 'energy/battery_charge_discharge_power':
-            print('energy/battery_charge_discharge_power: ', payload)
+            #print('energy/battery_charge_discharge_power: ', payload)
             self.battery_charge_power.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
             if int(payload) > 0:
                 self.battery_charge_power_direction.source = 'gfx/arrow_left.png'
             else:
                 self.battery_charge_power_direction.source = 'gfx/arrow_right.png'
         if message.topic == 'energy/current_power_consumption':
-            print('energy/current_power_consumption: ', payload)
+            #print('energy/current_power_consumption: ', payload)
             self.current_power_consumption.text = str(round( int(payload) / 1000, 2) ) + ' kW'
         if message.topic == 'energy/energy_yield_total':
-            print('energy/energy_yield_total: ', payload)
+            #print('energy/energy_yield_total: ', payload)
             energydetailspopup.handleMQTTMessage(message.topic, payload)
         if message.topic == 'energy/active_power_grid':
-            print('energy/active_power_grid: ', payload)
+            #print('energy/active_power_grid: ', payload)
             self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
             if int(payload) > 0:
                 self.house_to_grid_direction.source = 'gfx/arrow_down.png'
@@ -162,17 +165,17 @@ class WeatherWidget(FloatLayout):
                 self.house_to_grid_direction.source = 'gfx/arrow_up.png'
 
         if message.topic == 'vehicle/soc':
-            print('vehicle/soc: ', payload)
+            #print('vehicle/soc: ', payload)
             self.vehicle_soc_icon.source = 'gfx/evehicle.png'
             self.vehicle_soc.text = str(payload) + ' %'
         if 'vehicle/' in message.topic :
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             vehiclepopup.on_mqtt_message(message.topic, payload)
         if 'fuel/' in message.topic :
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             vehiclepopup.on_mqtt_message(message.topic, payload)
         if message.topic == 'vehicle/charge_power':
-            print('vehicle/charge_power: ', payload)
+            #print('vehicle/charge_power: ', payload)
             self.vehicle_charge_power.text = str(round( int(payload) / 1000, 2) ) + ' kW'
 
         if message.topic == 'muell/next_event':
@@ -193,30 +196,30 @@ class WeatherWidget(FloatLayout):
                 self.muell_icon.source = 'gfx/muell/empty.png'
 
         if message.topic == 'weather/current/temp':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             self.ww_temp.text = '{}°C'.format(int(float(payload)))
         if message.topic == 'weather/current/icon':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
         if message.topic == 'weather/forecast/tomorrow/temp':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             #self.ww_temp.text = '{}°C'.format(int(float(payload)))
             #self.forecast.forecast_1.wf_day.text = day
             self.forecast.forecast_1.wf_temp.text = '{}°C'.format(int(float(payload)))
         if message.topic == 'weather/forecast/tomorrow/icon':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             #self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
             self.forecast.forecast_1.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
         if message.topic == 'weather/forecast/d_a_tomorrow/temp':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             #self.ww_temp.text = '{}°C'.format(int(float(payload)))
             self.forecast.forecast_2.wf_temp.text = '{}°C'.format(int(float(payload)))
         if message.topic == 'weather/forecast/d_a_tomorrow/icon':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             #self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
             self.forecast.forecast_2.wf_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
         if message.topic == 'homectrl/pet':
-            print(message.topic, ': ', payload)
+            #print(message.topic, ': ', payload)
             self.update_pet(payload)
 
     def get_icon_for_soc(self, soc):
