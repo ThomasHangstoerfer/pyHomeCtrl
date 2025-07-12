@@ -186,7 +186,7 @@ class WeatherWidget(FloatLayout):
             vehiclepopup.on_mqtt_message(message.topic, payload)
         if message.topic == 'vehicle/charge_power':
             #print('vehicle/charge_power: ', payload)
-            self.vehicle_charge_power.text = str(round( int(payload) / 1000, 2) ) + ' kW'
+            self.vehicle_charge_power.text = str(round( float(payload) / 1000, 2) ) + ' kW'
 
         if message.topic == 'muell/next_event':
             print('muell/next_event: ', payload)
@@ -232,7 +232,7 @@ class WeatherWidget(FloatLayout):
             #print(message.topic, ': ', payload)
             self.update_pet(payload)
         if message.topic == 'garage/door_status':
-            #print(message.topic, ': ', payload)
+            print(message.topic, ': ', payload)
             self.garage_door_status = payload
 
     def get_icon_for_soc(self, soc):

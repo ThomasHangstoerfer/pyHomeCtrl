@@ -19,8 +19,6 @@ import requests
 # <div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 class EnergyDetailsPopup(Popup):
-    caller = Label(text='',  font_size='60sp', size_hint=(1.0, 0.5))
-    pnumber = Label(text='', font_size='30sp', size_hint=(1.0, 0.3))
     old_display_status = False
 
     graph_container = BoxLayout(orientation="vertical", size_hint=(1.0, 0.9))
@@ -35,8 +33,6 @@ class EnergyDetailsPopup(Popup):
         super(EnergyDetailsPopup, self).__init__(**kwargs)
         #print('EnergyDetailsPopup()__init__')
         self.content = BoxLayout(orientation="vertical")
-        #self.content.add_widget(self.caller)
-        # self.content.add_widget(Label(text='Energy', id='number'))
         self.content.add_widget(self.graph_container)
 
         #self.graph_container.bind(size=self._update_rect, pos=self._update_rect)
@@ -47,13 +43,9 @@ class EnergyDetailsPopup(Popup):
         self.button_layout = BoxLayout(orientation="horizontal", size_hint=(1.0, 0.1))
         self.content.add_widget(self.button_layout)
 
-        #self.button_layout.add_widget(Label(text='', id='number', size_hint=(0.1, 1.0)))
-        #lab = Label(text='LABEL')
-        #self.button_layout.add_widget(lab)
         self.button_layout.add_widget(Label(text=''))
 
         self.button_back = Button(text='Back', size_hint=(0.25, 1.0))
-        #self.button_back.bind(on_press=self.dismiss)
         self.button_back.bind(on_press=self.back)
         self.button_layout.add_widget(self.button_back)
 
@@ -263,25 +255,14 @@ class EnergyDetailsPopup(Popup):
             traceback.print_exc()
 
     def setExternalName(self, name):
-        if self.caller.text != "" and (name == "unknown" or name == ""):
-            self.pnumber.text = self.caller.text  # transfer number from name-label to number-label
-            self.caller.text = name
-        else:
-            self.caller.text = name
+        pass
 
     def setExternalNumber(self, num):
-        if self.caller.text == "unknown" or self.caller.text == "":
-            self.caller.text = num  # caller is unknown, show number in name-label
-            self.pnumber.text = ""
-        else:
-            self.pnumber.text = num
+        pass
 
     def handleMQTTMessage(self, topic, payload):
-        #print('popup_phonecall.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
+        #print('popup_energydetails.handleMQTTMessage(topic=' + topic + ', payload=' + payload + ')')
         if topic == "energy/energy_yield_total":
             #self.energy_yield_total.text = str(round( int(payload) / 1000, 2) ) + ' kW'
             self.title = 'Energy - Total: ' + str(int(float(payload)) ) + ' kW'
-
-        #elif topic == "phone/external_number":
-        #    self.setExternalNumber(payload)
 

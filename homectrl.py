@@ -378,6 +378,8 @@ class HomeCtrlApp(App):
         client.subscribe("homectrl/pet")
         print("MQTT: Subscribing to topic", "garage/#")
         client.subscribe("garage/#")
+        print("MQTT: Subscribing to topic", "go-e/...")
+        client.subscribe("go-e/tpa") # there is a lot of traffic, only subscribe what we need
 
     @mainthread
     def on_message(self, client, userdata, message):
@@ -446,6 +448,14 @@ class HomeCtrlApp(App):
             weather_screen.subwidget.on_mqtt_message(message)
         if 'homectrl/pet' in message.topic:
             #print("MQTT: new pet message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'garage/' in message.topic:
+            #print("MQTT: new garage message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'go-e/' in message.topic:
+            #print("MQTT: new go-e message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
 
