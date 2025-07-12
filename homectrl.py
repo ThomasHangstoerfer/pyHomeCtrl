@@ -339,6 +339,14 @@ class HomeCtrlApp(App):
         DisplayControl().displayOn()
 
     @mainthread
+    def on_mqtt_connect_fail(self):
+        print("MQTT: Connect failed")
+
+    @mainthread
+    def on_mqtt_disconnect(self, client, userdata, rc):
+        print("MQTT: Disconnect with result code " + str(rc))
+
+    @mainthread
     def on_connect(self, client, userdata, flags, rc):
         print("MQTT: Connected with result code " + str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
@@ -490,6 +498,8 @@ class HomeCtrlApp(App):
 
         self.mqtt_client.on_message = self.on_message
         self.mqtt_client.on_connect = self.on_connect
+        self.mqtt_client.on_connect_fail = self.on_mqtt_connect_fail
+        self.mqtt_client.on_disconnect = self.on_mqtt_disconnect
         print("MQTT: connecting to broker")
         try:
             self.mqtt_client.connect('apollo.fritz.box')
