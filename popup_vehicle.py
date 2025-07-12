@@ -35,6 +35,9 @@ KV = """
     fuel_aral: fuel_aral
     vehicle_soc: vehicle_soc
     vehicle_charge_power: vehicle_charge_power
+    vehicle_fuel_level: vehicle_fuel_level
+    vehicle_erange: vehicle_erange
+    vehicle_fuelrange: vehicle_fuelrange
 
     BoxLayout:
         size_hint: (1.0, 1.0)
@@ -55,6 +58,18 @@ KV = """
                 id: vehicle_charge_power
                 size_hint: (1.0, 0.2)
                 text: 'Charge Power: 1.6kW'
+            Label:
+                id: vehicle_fuel_level
+                size_hint: (1.0, 0.2)
+                text: 'Fuel: --%'
+            Label:
+                id: vehicle_erange
+                size_hint: (1.0, 0.2)
+                text: 'E-Range: --km'
+            Label:
+                id: vehicle_fuelrange
+                size_hint: (1.0, 0.2)
+                text: 'Range: --km'
             Label:
                 size_hint: (1.0, 0.6)
             Button:
@@ -148,6 +163,9 @@ class VehiclePopup(Popup):
     fuel_aral = ObjectProperty()
     vehicle_soc = ObjectProperty()
     vehicle_charge_power = ObjectProperty()
+    vehicle_fuel_level = ObjectProperty()
+    vehicle_erange = ObjectProperty()
+    vehicle_range = ObjectProperty()
 
 
     def _update_rect(self, instance, value):
@@ -189,6 +207,12 @@ class VehiclePopup(Popup):
             self.vehicle_soc.text = 'SoC: ' + payload + '%'
         if topic == 'vehicle/charge_power':
             self.vehicle_charge_power.text = 'Charge Power: ' + payload + 'kW'
+        if topic == 'vehicle/fuel_level':
+            self.vehicle_fuel_level.text = 'Fuel: ' + payload + '%'
+        if topic == 'vehicle/erange':
+            self.vehicle_erange.text = 'E-Range: ' + payload + 'km'
+        if topic == 'vehicle/fuelrange':
+            self.vehicle_fuelrange.text = 'Range: ' + payload + 'km'
 
     def updateSoC(self, whatarg):
 
