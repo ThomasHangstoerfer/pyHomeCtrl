@@ -48,6 +48,8 @@ class WeatherWidget(FloatLayout):
     clock_time = ObjectProperty()
     clock_date = ObjectProperty()
     input_power_pv = ObjectProperty()
+    input_power_pv_total = ObjectProperty()
+    input_power_pvbalkon = ObjectProperty()
     current_power_consumption = ObjectProperty()
     vehicle_soc = ObjectProperty()
     vehicle_soc_icon = ObjectProperty()
@@ -150,9 +152,24 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/battery_soc':
             self.pv_battery_soc.text = payload + ' %'
             self.pv_battery_soc_icon.source = self.get_icon_for_soc(int(payload)) #'gfx/SoC/SoC_30.png'
+
         if message.topic == 'energy/input_power_pv':
             #print('energy/input_power_pv: ', payload)
             self.input_power_pv.text = str(round( int(payload) / 1000, 2)) + ' kW'
+        if message.topic == 'energy/input_power_pvbalkon':
+            #print('energy/input_power_pvbalkon: ', payload)
+            #self.input_power_pv.text = str(round( int(payload) / 1000, 2)) + ' kW'
+            self.input_power_pvbalkon.text = payload + ' W'
+            pass
+        if message.topic == 'energy/input_power_pvbalkon_total':
+            #print('energy/input_power_pvbalkon_total: ', payload)
+            #self.input_power_pvbalkon_total.text = str(round( int(payload) / 1000, 2)) + ' kW'
+            pass
+        if message.topic == 'energy/input_power_pv_total':
+            #print('energy/input_power_pv_total: ', payload)
+            self.input_power_pv_total.text = str(round( int(payload) / 1000, 2)) + ' kW'
+            pass
+
         if message.topic == 'energy/battery_charge_discharge_power':
             #print('energy/battery_charge_discharge_power: ', payload)
             self.battery_charge_power.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
@@ -198,7 +215,7 @@ class WeatherWidget(FloatLayout):
 
             print('now_unix_timestamp: ', now_unix_timestamp)
             print('diff: ', diff)
-            if diff < (2 * (60*60*24)):
+            if diff < (60*60*24):
                 print('MUELL ICON')
                 self.muell_icon.source = 'gfx/muell/' + next_event["abfallart"] + '.png'
             else:

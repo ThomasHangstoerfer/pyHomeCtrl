@@ -16,6 +16,8 @@
     clock_time: clock_time
     clock_date: clock_date
     input_power_pv: input_power_pv
+    input_power_pv_total: input_power_pv_total
+    input_power_pvbalkon: input_power_pvbalkon
     current_power_consumption: current_power_consumption
     vehicle_soc: vehicle_soc
     vehicle_soc_icon: vehicle_soc_icon
@@ -57,15 +59,32 @@
                 BoxLayout: # von Sonne ins Haus
                     size_hint: (1, 1)
                     orientation: 'horizontal'
-                    Widget:
+                    BoxLayout: # PV-Ertrag Details (Dach+Balkon)
                         size_hint: (0.45, 1)
+                        orientation: 'vertical'
+                        Label:
+                            id: input_power_pv
+                            size_hint: (1, 0.5)
+                            text: ''
+                            text_size: self.size
+                            halign: 'right'
+                            valign: 'bottom'
+                            font_size:20
+                        Label:
+                            id: input_power_pvbalkon
+                            size_hint: (1, 0.5)
+                            text: ''
+                            text_size: self.size
+                            halign: 'right'
+                            valign: 'top'
+                            font_size:20
                     Image: # Arrow PV to House
                         id: input_power_pv_direction
                         size_hint: (0.1, 1)
                         source: 'gfx/arrow_down.png'
                         size: (20, 20)
                     Label:
-                        id: input_power_pv
+                        id: input_power_pv_total
                         size_hint: (0.45, 1)
                         text: ''
                         text_size: self.size
