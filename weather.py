@@ -183,13 +183,14 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'energy/energy_yield_total':
             #print('energy/energy_yield_total: ', payload)
             energydetailspopup.handleMQTTMessage(message.topic, payload)
-        if message.topic == 'energy/active_power_grid':
-            #print('energy/active_power_grid: ', payload)
+        #if message.topic == 'energy/active_power_grid':
+        if message.topic == 'energy/From_To_Grid':
+            #print('energy/From_To_Grid: ', payload)
             self.house_to_grid.text = str(round( abs(int(payload)) / 1000, 2) ) + ' kW'
             if int(payload) > 0:
-                self.house_to_grid_direction.source = 'gfx/arrow_down.png'
-            else:
                 self.house_to_grid_direction.source = 'gfx/arrow_up.png'
+            else:
+                self.house_to_grid_direction.source = 'gfx/arrow_down.png'
 
         if message.topic == 'vehicle/soc':
             #print('vehicle/soc: ', payload)

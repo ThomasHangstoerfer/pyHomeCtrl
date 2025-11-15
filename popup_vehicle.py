@@ -196,7 +196,7 @@ class VehiclePopup(Popup):
             pass
 
     def on_mqtt_message(self, topic, payload):
-        print('popup_vehicle.on_mqtt_message()', topic)
+        #print('popup_vehicle.on_mqtt_message()', topic)
         if topic == 'fuel/BFT':
             self.fuel_bft.text = 'BFT: ' + payload
         if topic == 'fuel/Jet':

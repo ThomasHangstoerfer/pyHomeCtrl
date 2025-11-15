@@ -339,7 +339,7 @@ class HomeCtrlApp(App):
         DisplayControl().displayOn()
 
     @mainthread
-    def on_mqtt_connect_fail(self):
+    def on_mqtt_connect_fail(self, a, b):
         print("MQTT: Connect failed")
 
     @mainthread
@@ -354,6 +354,8 @@ class HomeCtrlApp(App):
         # client.subscribe("$SYS/#")
         print("MQTT: Subscribing to topic", "cam/newImage")
         client.subscribe("cam/newImage")
+        print("MQTT: Subscribing to topic", "cam/resetstream")
+        client.subscribe("cam/resetstream")
         print("MQTT: Subscribing to topic", "homectrl/b")
         client.subscribe("homectrl/b")
         print("MQTT: Subscribing to topic", "phone/#")
@@ -388,6 +390,11 @@ class HomeCtrlApp(App):
         # print("MQTT: message topic=",message.topic)
         # print("MQTT: message qos=",message.qos)
         # print("MQTT: message retain flag=",message.retain)
+        if message.topic == 'cam/resetstream':
+            print('MQTT: DoorCam: reset stream')
+            doorcampopup.reset_stream()
+            pass
+
         if message.topic == 'cam/newImage':
             if payload != self.last_mqtt_image_name:
                 filename = "/qnap/Download/today/" + payload

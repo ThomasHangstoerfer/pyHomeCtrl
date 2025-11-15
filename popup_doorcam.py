@@ -23,43 +23,78 @@ class KivyCamera(Image):
         super(KivyCamera, self).__init__(**kwargs)
 
         self.cam_user = 'admin'
-        self.cam_password = 'GEHEIM'
+        self.cam_password = 'Wurstbaby'
         self.cam_host = '192.168.1.177'
         self.cam_stream = 'Preview_01_sub'
         #self.cam_stream = 'Preview_01_main'
 
+        self.fps = fps
         self.allow_stretch = True
 
         self.capture = capture
         self.cam_update_locked = False
+        self.is_active = False
 
         print("fps: ", (1 / fps))
-        Clock.schedule_interval(self.update, 1 / fps)
+        #Clock.schedule_interval(self.update, 1 / fps)
+        Clock.schedule_once(self.update, 1 / fps * 10)
+
+        self.activate_internal()
 
     def set_capture(self, capture):
         self.capture = capture
 
     def activate(self):
-        print('KivyCamera: activate() creating VideoCapture')
+        print('KivyCamera: activate()')
+        #self.activate_internal()
+        self.is_active = True
+        pass
+
+    def activate_internal(self):
+        print('KivyCamera: activate_internal() creating VideoCapture')
         self.capture = cv2.VideoCapture('rtsp://'+self.cam_user+':'+self.cam_password+'@'+self.cam_host+'/'+self.cam_stream)
-        print('KivyCamera: activate() VideoCapture created')
-        print('KivyCamera: activate() VideoCapture frame size = ', self.capture.get(cv2.CAP_PROP_FRAME_WIDTH), "x", self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        print('KivyCamera: activate_internal() VideoCapture created')
+        print('KivyCamera: activate_internal() VideoCapture frame size = ', self.capture.get(cv2.CAP_PROP_FRAME_WIDTH), "x", self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def deactivate(self):
-        print('KivyCamera: deactivate() releasing VideoCapture')
+        print('KivyCamera: deactivate()')
+        #self.deactivate_internal()
+        self.is_active = False
+        pass
+
+    def deactivate_internal(self):
+        print('KivyCamera: deactivate_internal() releasing VideoCapture')
         if self.capture is not None:
             self.capture.release()
             self.capture = None
+
+    def reset_stream(self):
+        self.deactivate_internal()
+        self.activate_internal()
 
     def update(self, dt):
         if self.capture is None:
             #print("KivyCamera.update() capture is None")
             return
-        print("KivyCamera.update() capture.isOpened()=", self.capture.isOpened(), "cam_update_locked =", self.cam_update_locked)
+        #print("KivyCamera.update() capture.isOpened()=", self.capture.isOpened(), "cam_update_locked =", self.cam_update_locked)
+
+
+        if self.is_active:
+            Clock.schedule_once(self.update, 1 / self.fps)
+        else:
+            Clock.schedule_once(self.update, 1 / self.fps)
+
         if self.cam_update_locked:
             return
         self.cam_update_locked = True
         ret, frame = self.capture.read()
+
+        #drop all available frames, but the last one
+        #while ret:
+        #    print('skip frame')
+        #    frame = next_frame
+        #    ret, next_frame = self.capture.read()
+
         if ret:
             # convert it to texture
             buf1 = cv2.flip(frame, 0)
@@ -103,7 +138,8 @@ class DoorCamPopup(Popup):
         #self.image = Image( size_hint=(1.0, 1.0))
         #self.content.add_widget(self.image)
 
-        self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=5.0)
+        #self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=5.0)
+        self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=7.0)
         self.content.add_widget(self.camera)
 
         self.button = Button(text='X', size_hint=(0.07, 0.1), pos_hint={'x': .9, 'y': .9})
@@ -121,7 +157,7 @@ class DoorCamPopup(Popup):
             self.dismiss_timer.finish()
             del self.dismiss_timer
             self.dismiss_timer = None
-        self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.on_open")
+        self.dismiss_timer = RepeatedTimer(20, self.dismiss_popup, "DoorCamPopup.on_open")
 
         self.camera.activate()
 
@@ -142,10 +178,15 @@ class DoorCamPopup(Popup):
             self.dismiss_timer.finish()
             del self.dismiss_timer
             #self.dismiss_timer.restart()
-        self.dismiss_timer = RepeatedTimer(10, self.dismiss_popup, "DoorCamPopup.set_image_filename")
+        self.dismiss_timer = RepeatedTimer(20, self.dismiss_popup, "DoorCamPopup.set_image_filename")
         #self.image.source = filename
         #self.image.reload()
 
     def dismiss_popup(self, arg):
         print('DoorCamPopup.dismiss_popup()')
         self.dismiss()
+
+    def reset_stream(self):
+        print('DoorCamPopup.reset_stream()')
+        self.camera.reset_stream()
+

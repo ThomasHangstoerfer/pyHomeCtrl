@@ -190,30 +190,30 @@ class DisplayControl(object):
         if not running_on_pi():
             return
         
-        print('DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (
-            DisplayControl.display_off_locked, Settings().display_off_active))
+        #print('DisplayControl.displayOff() display_off_locked = %s display_off_active = %s' % (
+        #    DisplayControl.display_off_locked, Settings().display_off_active))
         # p.export_to_png("/tmp/kivy.png")
 
         t = time.localtime()
         #nighttime = (t.tm_hour >= 10 and t.tm_hour <= 12 )
         nighttime = (t.tm_hour >= 1 and t.tm_hour <= 5 )
         #nighttime = (t.tm_min >= 5 and t.tm_min <= 10 )
-        print('DisplayControl.displayOff(): tm_hour = %i nighttime = %i' % (t.tm_hour, nighttime))
+        #print('DisplayControl.displayOff(): tm_hour = %i nighttime = %i' % (t.tm_hour, nighttime))
 
         if (Settings().display_off_active and not DisplayControl.display_off_locked) or nighttime:
             if running_on_pi():
                 setBacklight(True)
-            self.popup.open()
+            #self.popup.open()
             self.display_is_off = True
-            print('DisplayControl.display_is_off %i' % self.display_is_off)
+            #print('DisplayControl.display_is_off %i' % self.display_is_off)
 
         if self.nighttime_mode and not nighttime:
-            print('DisplayControl.displayOff(): nighttime is over -> switch display on')
+            #print('DisplayControl.displayOff(): nighttime is over -> switch display on')
             self.displayOn()
         self.nighttime_mode = nighttime
 
     def displayOn(self):
-        print('DisplayControl.displayOn()')
+        #print('DisplayControl.displayOn()')
         self.rt.restart()
         self.popup.content.trigger_action()
         if (running_on_pi()):
@@ -223,4 +223,4 @@ class DisplayControl(object):
             return
         self.display_is_off = False
         self.callbacks_DisplaySwitchedOn.fire()
-        print('DisplayControl.display_is_off %s' % self.display_is_off)
+        #print('DisplayControl.display_is_off %s' % self.display_is_off)

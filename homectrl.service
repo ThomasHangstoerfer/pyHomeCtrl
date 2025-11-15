@@ -7,7 +7,8 @@ After=network.target
 Type=exec
 ExecStart=/usr/bin/python3 /home/pi/pyHomeCtrl_systemd/homectrl.py
 #ExecStop=/usr/local/bin/nzbget -Q
-#Restart=on-failure
+Restart=on-failure
+ExecStopPost=killall -9 python3
 
 [Install]
 WantedBy=multi-user.target
