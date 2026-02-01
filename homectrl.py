@@ -380,6 +380,8 @@ class HomeCtrlApp(App):
         client.subscribe("homectrl/pet")
         print("MQTT: Subscribing to topic", "garage/#")
         client.subscribe("garage/#")
+        print("MQTT: Subscribing to topic", "garagelinks/#")
+        client.subscribe("garagelinks/#")
         print("MQTT: Subscribing to topic", "go-e/...")
         client.subscribe("go-e/tpa") # there is a lot of traffic, only subscribe what we need
 
