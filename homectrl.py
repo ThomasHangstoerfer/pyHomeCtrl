@@ -461,6 +461,10 @@ class HomeCtrlApp(App):
             #print("MQTT: new garage message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
+        if 'garagelinks/' in message.topic:
+            #print("MQTT: new garagelinks message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
         if 'go-e/' in message.topic:
             #print("MQTT: new go-e message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')

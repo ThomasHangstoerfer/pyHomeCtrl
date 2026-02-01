@@ -37,6 +37,7 @@ class WeatherWidget(FloatLayout):
     fake_data = 0
     pet_last_day = time.strftime("%d", time.localtime())
     garage_door_status = ''
+    garage_door_links_status = ''
 
     #ww_city = ObjectProperty()
     muell_icon = ObjectProperty()
@@ -116,14 +117,18 @@ class WeatherWidget(FloatLayout):
         self.pet_last_day = current_day
 
         #self.input_power_pv.text = str(int(DisplayControl().BH1750.readLight()))
-        if self.garage_door_status == 'closed':
-            self.vehicle_soc_icon.source = 'gfx/evehicle.png'
-        else:
-            if (time.localtime().tm_sec%2) == 1:
-                self.vehicle_soc_icon.source = 'gfx/evehicle_red.png'
-            else:
-                self.vehicle_soc_icon.source = 'gfx/evehicle.png'
+        icon_garage_right = 'gfx/evehicle.png'
+        icon_garage_left = 'gfx/evehicle.png'
 
+        if self.garage_door_status != 'closed':
+            icon_garage_right = 'gfx/evehicle_red.png'
+        if self.garage_door_links_status != 'closed':
+            icon_garage_left = 'gfx/evehicle_yellow.png'
+
+        if (time.localtime().tm_sec%2) == 1:
+            self.vehicle_soc_icon.source = icon_garage_right
+        else:
+            self.vehicle_soc_icon.source = icon_garage_left
 
         pass
 
@@ -252,6 +257,9 @@ class WeatherWidget(FloatLayout):
         if message.topic == 'garage/door_status':
             print(message.topic, ': ', payload)
             self.garage_door_status = payload
+        if message.topic == 'garagelinks/door_status':
+            print(message.topic, ': ', payload)
+            self.garage_door_links_status = payload
 
     def get_icon_for_soc(self, soc):
         if soc < 10:
