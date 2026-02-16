@@ -123,7 +123,7 @@ class WeatherWidget(FloatLayout):
         if self.garage_door_status != 'closed':
             icon_garage_right = 'gfx/evehicle_red.png'
         if self.garage_door_links_status != 'closed':
-            icon_garage_left = 'gfx/evehicle_yellow.png'
+            icon_garage_left = 'gfx/evehicle_blue.png'
 
         if (time.localtime().tm_sec%2) == 1:
             self.vehicle_soc_icon.source = icon_garage_right
