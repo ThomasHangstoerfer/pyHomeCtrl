@@ -97,9 +97,9 @@ class EnergyDetailsPopup(Popup):
         try:
 
             if self.yield_mode == 'last_10':
-                r = requests.get("http://apollo.fritz.box:1880/energy/daily_energy_yield?count=10")
+                r = requests.get("http://192.168.1.2:1880/energy/daily_energy_yield?count=10")
             else:
-                r = requests.get("http://apollo.fritz.box:1880/energy/daily_energy_yield")
+                r = requests.get("http://192.168.1.2:1880/energy/daily_energy_yield")
             energy_yields = r.json()
 
             max_value = 0
@@ -144,7 +144,7 @@ class EnergyDetailsPopup(Popup):
 
         try:
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/battery_soc_history")
+            r = requests.get("http://192.168.1.2:1880/energy/battery_soc_history")
             battery_soc_history = r.json()
 
             self.graph_container.clear_widgets()
@@ -180,10 +180,10 @@ class EnergyDetailsPopup(Popup):
         self.button_pvpower.color = (0, 1, 0, 1)
         try:
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/pv_power")
+            r = requests.get("http://192.168.1.2:1880/energy/pv_power")
             pv_power = r.json()
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/power_to_grid")
+            r = requests.get("http://192.168.1.2:1880/energy/power_to_grid")
             power_to_grid = r.json()
 
             self.graph_container.clear_widgets()

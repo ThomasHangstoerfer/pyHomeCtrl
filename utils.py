@@ -28,7 +28,7 @@ def singleton(cls):
 
 
 def setBacklight(on):
-    print("setBacklight")
+    #print("setBacklight")
     if running_on_pi():
         if on:
             os.system('echo 1 > ' + bl_power_file)

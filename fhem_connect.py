@@ -28,7 +28,7 @@ class FhemConnect(object):
 
         self.callbacks_update = CallbackList()
         #server = 'pi'
-        server = 'apollo'
+        server = '192.168.1.2'
         self.fhem_server = server
         self.fh = fhem.Fhem(self.fhem_server, loglevel=0)
         global fh

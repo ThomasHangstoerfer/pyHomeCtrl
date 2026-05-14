@@ -73,7 +73,8 @@ class WeatherWidget(FloatLayout):
         self.timestamp_last_update_forecast = 0
 
     def update(self, arg):
-        print('WeatherWidget.update()')
+        #print('WeatherWidget.update()')
+        pass
 
     def showPVPopup(self, arg):
         energydetailspopup.open()

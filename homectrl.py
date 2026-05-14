@@ -309,7 +309,8 @@ class HomeCtrl(FloatLayout):
     pass
 
 
-fhem_server = "apollo"
+#fhem_server = "apollo"
+fhem_server = "192.168.1.2"
 # fc = fhem_connect.FhemConnect(fhem_server);
 fc = fhem_connect.FhemConnect()
 
@@ -525,7 +526,7 @@ class HomeCtrlApp(App):
         self.mqtt_client.on_disconnect = self.on_mqtt_disconnect
         print("MQTT: connecting to broker")
         try:
-            self.mqtt_client.connect('apollo.fritz.box')
+            self.mqtt_client.connect('192.168.1.2')
             self.mqtt_client.loop_start()  # start threaded loop
         except Exception as e:
             print('MQTT: Exception: %s' % e)

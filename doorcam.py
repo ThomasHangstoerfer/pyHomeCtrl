@@ -43,7 +43,7 @@ Builder.load_string("""
 #        #size: root.size
 #        background_normal: ''
 #        nocache: True
-#        #source: '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+#        #source: '/share/BTSync/pyHomeCtrl/cam/cam-02.jpg'
     Image:
         id: camimage
         source: ''
@@ -84,7 +84,7 @@ class DoorCam(BoxLayout):
     def update(self, e):
         print('DoorCam.update() index %i file_name %s' % (self.index, self.file_name))
         self.image_timestamp.text = self.image_name
-        # self.camimage.source = '/qnap/BTSync/pyHomeCtrl/cam/cam-02.jpg'
+        # self.camimage.source = '/share/BTSync/pyHomeCtrl/cam/cam-02.jpg'
         # filepath = getLatestFile(cam_path)
         # self.camimage.source = filepath
         # if ( displayCtrl.display_is_off == True ):
@@ -110,7 +110,7 @@ class DoorCam(BoxLayout):
                     #    self.camimage.source = 'http://apollo:9615/latest-%i.jpg' % self.index
                     # else:
                     #    self.camimage.source = 'http://apollo:9615/latest.jpg'
-                    # self.camimage.source = "/qnap/Download/today/" + self.file_name
+                    # self.camimage.source = "/share/Download/today/" + self.file_name
                     self.camimage.source = self.file_name
 
                     print('self.camimage.source = %s' % self.camimage.source)

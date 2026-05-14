@@ -223,7 +223,7 @@ class VehiclePopup(Popup):
 
         try:
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/battery_soc_history")
+            r = requests.get("http://192.168.1.2:1880/energy/battery_soc_history")
             battery_soc_history = r.json()
 
             self.graph_container.clear_widgets()
@@ -259,10 +259,10 @@ class VehiclePopup(Popup):
         self.button_pvpower.color = (0, 1, 0, 1)
         try:
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/pv_power")
+            r = requests.get("http://192.168.1.2:1880/energy/pv_power")
             pv_power = r.json()
 
-            r = requests.get("http://apollo.fritz.box:1880/energy/power_to_grid")
+            r = requests.get("http://192.168.1.2:1880/energy/power_to_grid")
             power_to_grid = r.json()
 
             self.graph_container.clear_widgets()

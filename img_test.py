@@ -62,21 +62,21 @@ class RootWidget(TabbedPanel):
     def __init__(self, **kwargs):
         super(RootWidget, self).__init__(**kwargs)
         #global image_name
-        #iw = Image.open("/qnap/Download/today/cam-20191124-025440.jpg")   # Use PIL.Image
+        #iw = Image.open("/share/Download/today/cam-20191124-025440.jpg")   # Use PIL.Image
         self.new_image()
 
     def new_image(self, image_name=''):
         #global image_name
-        #iw = Image.open("/qnap/Download/today/cam-20191124-025440.jpg")   # Use PIL.Image
+        #iw = Image.open("/share/Download/today/cam-20191124-025440.jpg")   # Use PIL.Image
         if len(image_name) == 0:
             return
         print('new_image(): ' + image_name)
-        iw = Image.open("/qnap/Download/today/" + image_name)   # Use PIL.Image
+        iw = Image.open("/share/Download/today/" + image_name)   # Use PIL.Image
         iw.save('./phase.jpg')
         #gray = iw.convert('1')
         #gray.save('./gray_im.jpg')
         #self.img.source = './phase.jpg'
-        self.img.source = "/qnap/Download/today/" + image_name
+        self.img.source = "/share/Download/today/" + image_name
         #self.img3.texture = CoreImage('./gray_im.jpg').texture
         #self.img4.source = './gray_im.jpg'
 

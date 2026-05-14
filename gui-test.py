@@ -15,7 +15,7 @@ import collections
 import os, sys
 from stat import *
 
-cam_path = '/qnap/Download/'
+cam_path = '/share/Download/'
 
 def getLatestFile(folder):
     #print('getLatestFile(%s)' % folder)
