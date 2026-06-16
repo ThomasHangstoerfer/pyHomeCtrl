@@ -400,7 +400,7 @@ class HomeCtrlApp(App):
 
         if message.topic == 'cam/newImage':
             if payload != self.last_mqtt_image_name:
-                filename = "/qnap/Download/today/" + payload
+                filename = "/share/Download/today/" + payload
                 print("MQTT: DoorCam: new image " + payload + " -> switch to DoorCam hc._screen_manager.current: " + hc._screen_manager.current)
                 try:
                     hc._screen_manager.screen_doorcam.set_filename(payload, filename)
