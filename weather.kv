@@ -12,7 +12,7 @@
     ww_inside_temp: ww_inside_temp
     ww_inside_hum: ww_inside_hum
     #ww_wind_speed: ww_wind_speed
-    forecast: forecast
+    #forecast: forecast
     clock_time: clock_time
     clock_date: clock_date
     input_power_pv: input_power_pv
@@ -30,6 +30,8 @@
     battery_charge_power: battery_charge_power
     battery_charge_power_direction: battery_charge_power_direction
     pet_icon: pet_icon
+    current_station: current_station
+    current_title : current_title
 
     #ImageButton:
     #    source: 'gfx/reload1.png'
@@ -201,14 +203,54 @@
                         text: ''
                         font_size: 40
 
-                BoxLayout: # Forecast + Muell-Icon
+                BoxLayout: # Forecast/WebRadio + Muell-Icon
                     size_hint: (0.75, 1)
                     orientation: 'vertical'
-                    WeatherForecastWidget:
-                        size_hint: (1, 0.5)
-                        id: forecast
+                    BoxLayout: # WebRadio Controls
+                        #canvas.before:
+                        #    Color:
+                        #        rgba: 0.4, 0.4, 0.5, 1
+                        #    Rectangle:
+                        #        pos: self.pos
+                        #        size: self.size
+                        orientation: 'horizontal'
+                        halign: 'center'
+                        size_hint: (1, 0.4)
+                        id: webradio
+                        ImageButton:
+                            id: prev_icon
+                            source: 'gfx/media/media_prev.png'
+                            size: (30, 30)
+                            size_hint: (0.3, 1)
+                            on_release: root.radioPlayPrev()
+                        ImageButton:
+                            id: play_icon
+                            source: 'gfx/media/media_play.png'
+                            size: (30, 30)
+                            size_hint: (0.3, 1)
+                            on_release: root.radioPlayPause()
+                        ImageButton:
+                            id: next_icon
+                            source: 'gfx/media/media_next.png'
+                            size: (30, 30)
+                            size_hint: (0.3, 1)
+                            on_release: root.radioPlayNext()
+                    Label:
+                        size_hint: (1, 0.2)
+                        id: current_station
+                        text: ''
+                        font_size: 20
+                    Label:
+                        size_hint: (1, 0.2)
+                        id: current_title
+                        text: ''
+                        font_size: 20
+
+                    #WeatherForecastWidget:
+                    #    size_hint: (1, 0.5)
+                    #    id: forecast
                     Image:
-                        size_hint: (1, 0.5)
+                        size_hint: (1, 0.4)
                         id: muell_icon
                         size: (50, 50)
 
