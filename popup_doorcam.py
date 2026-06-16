@@ -12,7 +12,7 @@ from utils import RepeatedTimer
 
 from kivy.app import App
 from kivy.uix.image import Image
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.graphics.texture import Texture
 import cv2
 
@@ -169,8 +169,9 @@ class DoorCamPopup(Popup):
             del self.dismiss_timer
         self.dismiss_timer = None
         DisplayControl().unlock()
-
-        self.camera.deactivate()
+        if self.camera is not None:
+            self.camera.deactivate()
+        self.reset_stream()
 
     def set_image_filename(self, filename):
         print('DoorCamPopup.set_image_filename(): ', filename)
@@ -183,10 +184,20 @@ class DoorCamPopup(Popup):
         #self.image.reload()
 
     def dismiss_popup(self, arg):
-        print('DoorCamPopup.dismiss_popup()')
+        #print('DoorCamPopup.dismiss_popup()')
         self.dismiss()
 
+    @mainthread
     def reset_stream(self):
         print('DoorCamPopup.reset_stream()')
-        self.camera.reset_stream()
 
+        # entweder den Stream in der Camera resetten...
+        #self.camera.reset_stream()
+
+        # ...oder die Camera neu instantiieren
+        self.camera.deactivate_internal()
+        self.content.remove_widget(self.camera)
+        self.camera = None
+        self.camera = KivyCamera(capture=None, size_hint=(1.0, 1.0), fps=7.0)
+
+        self.content.add_widget(self.camera)
