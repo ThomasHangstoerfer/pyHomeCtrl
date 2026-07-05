@@ -387,6 +387,8 @@ class HomeCtrlApp(App):
         client.subscribe("go-e/tpa") # there is a lot of traffic, only subscribe what we need
         print("MQTT: Subscribing to topic", "webradio/#")
         client.subscribe("webradio/#")
+        print("MQTT: Subscribing to topic", "heizung/boiler_data")
+        client.subscribe("heizung/boiler_data")
         print("MQTT: Subscribing to topic", "homectrl/screenshot")
         client.subscribe("homectrl/screenshot")
 
@@ -478,6 +480,10 @@ class HomeCtrlApp(App):
             weather_screen.subwidget.on_mqtt_message(message)
         if 'webradio/' in message.topic:
             #print("MQTT: new webradio message for weather screen");
+            weather_screen = hc._screen_manager.get_screen('weather')
+            weather_screen.subwidget.on_mqtt_message(message)
+        if 'heizung/' in message.topic:
+            #print("MQTT: new heizung message for weather screen");
             weather_screen = hc._screen_manager.get_screen('weather')
             weather_screen.subwidget.on_mqtt_message(message)
         if message.topic == 'homectrl/screenshot':
