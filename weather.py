@@ -339,9 +339,9 @@ class WeatherWidget(FloatLayout):
                     print('NO MUELL ICON')
                     self.muell_icon.source = 'gfx/muell/empty.png'
 
-            if message.topic == 'weather/current/temp':
+            #if message.topic == 'weather/current/temp':
                 #print(message.topic, ': ', payload)
-                self.ww_temp.text = '{}°C'.format(int(float(payload)))
+                #self.ww_temp.text = '{}°C'.format(int(float(payload)))
             if message.topic == 'weather/current/icon':
                 #print(message.topic, ': ', payload)
                 self.ww_cur_cond_icon.source = 'gfx/weather/' + weather_theme + '/' + payload + '.png'
@@ -423,9 +423,15 @@ class WeatherWidget(FloatLayout):
                     output = subprocess.run(['/usr/bin/mpc', 'load', payload], stdout=subprocess.PIPE).stdout.decode('utf-8')
                 except Exception as err:
                     print(f'Exception: {err=}')
+            if message.topic == 'heizung/boiler_data':
+                #print(message.topic, ': ', payload)
+                boiler_data = json.loads(payload)
+                outdoortemp = boiler_data["outdoortemp"]
+                print('outdoortemp', outdoortemp)
+                self.ww_temp.text = '{}°C'.format(int(float(outdoortemp)))
 
         except Exception as err:
-            print(f"Exception in weather.on_mqtt_message({message.topic}) {err=}, {type(err)=}")
+            print(f"\n\nException in weather.on_mqtt_message({message.topic}) {err=}, {type(err)=}\n\n")
 
     def get_icon_for_soc(self, soc):
         if soc < 10:
