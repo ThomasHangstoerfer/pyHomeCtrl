@@ -304,7 +304,7 @@ class SmartHomeWohnzimmer(BoxLayout):
         # global phonecallpopup
         # phonecallpopup.handleCallmonitor("external_name", "Thomas")
         # phonecallpopup.handleCallmonitor("external_number", "0173-1234567")
-        # phonecallpopup.handleCallmonitor("direction", "incomming")
+        # phonecallpopup.handleCallmonitor("direction", "incoming")
         # phonecallpopup.handleCallmonitor("event", "call")
         # phonecallpopup.open()
 

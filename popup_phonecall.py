@@ -68,7 +68,7 @@ class PhoneCallPopup(Popup):
         elif topic == "phone/direction":
             if payload == "outgoing":
                 self.title = "Ausgehender Anruf"
-            elif payload == "incomming":
+            elif payload == "incoming":
                 self.title = "Eingehender Anruf"
 
 
@@ -97,5 +97,5 @@ class PhoneCallPopup(Popup):
             #print("direction: " + value)
             if value == "outgoing":
                 self.title = "Ausgehender Anruf"
-            elif value == "incomming":
+            elif value == "incoming":
                 self.title = "Eingehender Anruf"
